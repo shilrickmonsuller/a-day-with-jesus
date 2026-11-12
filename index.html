@@ -406,6 +406,51 @@ input, select, textarea { font-size: 16px; }
 .soap textarea { min-height: 96px; width: 100%; box-sizing: border-box; }
 .tag-lib { font-size: 11.5px; padding: 2px 8px; }
 
+/* ---- v9: justified reading text ---- */
+.devo-body p, .verses p { text-align: justify; -webkit-hyphens: auto; hyphens: auto; text-wrap: pretty; }
+.verses { max-width: 70ch; }
+@media (max-width: 380px) { .devo-body p, .verses p { text-align: left; } }
+
+/* ---- v9: highlighter ---- */
+:root { --hl-yellow: #fde68a; --hl-green: #bbf7d0; --hl-blue: #bfdbfe; --hl-pink: #fbcfe8; --hl-orange: #fed7aa; --hl-purple: #ddd6fe; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --hl-yellow: #5e4c10; --hl-green: #1d4a31; --hl-blue: #1c3a63; --hl-pink: #5a2348; --hl-orange: #613a14; --hl-purple: #3d3168; } }
+:root[data-theme="dark"] { --hl-yellow: #5e4c10; --hl-green: #1d4a31; --hl-blue: #1c3a63; --hl-pink: #5a2348; --hl-orange: #613a14; --hl-purple: #3d3168; }
+.c-yellow { --hlc: var(--hl-yellow); } .c-green { --hlc: var(--hl-green); } .c-blue { --hlc: var(--hl-blue); }
+.c-pink { --hlc: var(--hl-pink); } .c-orange { --hlc: var(--hl-orange); } .c-purple { --hlc: var(--hl-purple); }
+.verses p[class*="c-"] { background: var(--hlc); }
+.verses p.sel { box-shadow: inset 0 0 0 2px var(--indigo); }
+.selbar { flex-direction: column; align-items: stretch; }
+.selbar > .row-acts { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+.hl-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center; padding-bottom: 6px; border-bottom: 1px solid rgba(255,255,255,.15); }
+.hl-swatches { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.swatch { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--paper); background: var(--hlc); cursor: pointer; padding: 0; }
+.selbar .hl-clear { border: 1px solid rgba(255,255,255,.4); border-radius: 99px; }
+.dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--hlc); margin-right: 6px; vertical-align: middle; border: 1px solid var(--line); }
+.hl-card { border-left: 6px solid var(--hlc); }
+
+/* ---- v9: read by book ---- */
+.progress.thin { height: 5px; margin-top: 4px; display: block; }
+.book-name { font-family: var(--read); font-size: 16.5px; }
+
+/* ---- v9: share the app + invites ---- */
+@media (max-width: 699px) { .wide-only { display: none !important; } }
+.share-app { background: var(--paper); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: grid; gap: 10px; }
+.sheet .share-app { background: var(--bg); }
+.share-app-head { display: flex; gap: 12px; align-items: center; }
+.share-app-head b { font-family: var(--read); font-size: 18px; }
+.share-app-mark { width: 44px; height: 44px; border-radius: 12px; background: var(--paper); border: 1px solid var(--line); display: grid; place-items: center; flex: none; }
+.share-app-mark svg { width: 30px; height: 30px; }
+.link-box { background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; font: 13px ui-monospace, Menlo, Consolas, monospace; overflow-wrap: anywhere; user-select: all; -webkit-user-select: all; }
+.sheet .link-box { background: var(--paper); }
+.qr-box { display: grid; justify-items: center; gap: 6px; padding: 6px; }
+.qr-svg { width: 180px; max-width: 100%; background: #fff; border-radius: 10px; padding: 6px; border: 1px solid var(--line); }
+.qr-svg svg { display: block; width: 100%; height: auto; }
+.inst { border: 1px solid var(--line); border-radius: 10px; background: var(--paper); }
+.inst summary { cursor: pointer; padding: 10px 12px; font-weight: 700; font-size: 13.5px; }
+.inst ol { margin: 0; padding: 0 14px 12px 32px; display: grid; gap: 4px; font-size: 14px; }
+.join-card { background: var(--paper); border: 1px solid var(--line); border-radius: 16px; padding: 24px 18px; display: grid; gap: 12px; justify-items: center; text-align: center; }
+.avatar { flex: none; width: 34px; height: 34px; border-radius: 50%; background: var(--indigo-soft); color: var(--indigo); display: grid; place-items: center; font-weight: 800; }
+
 </style>
 <header class="topbar gutter">
   <div class="shell">
@@ -420,6 +465,9 @@ input, select, textarea { font-size: 16px; }
       <h1>A Day With Jesus</h1>
     </div>
     <div class="row" style="gap:8px;flex-wrap:nowrap">
+    <button class="icon-btn wide-only" id="share-app" type="button" aria-label="Share the app" title="Share the app">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v13"/></svg>
+    </button>
     <button class="icon-btn sync-btn" id="sync-btn" type="button" aria-label="Account and sync" hidden>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18a4.5 4.5 0 0 1-.6-8.96A6 6 0 0 1 18 8.5a4 4 0 0 1-.5 9.5z"/></svg>
       <i class="sync-dot"></i>
@@ -580,7 +628,7 @@ const S = {
   devo: { date: null, ed: null }, memColl: "lamp2",
   studies: [], studyQ: "", activeStudy: null, studyEditing: false,
   prayers: [], prayerMode: "meetings", prayerFilter: "praying", prayerPerson: "", prayerForm: null, answering: null,
-  collapse: {}, library: [], libTab: "mine", libQ: "", libFilter: "all", libShareOpen: null, libMode: "file", libUploading: "", libGroup: "",
+  hlt: {}, hlFilter: "", journalCh: 0, collapse: {}, library: [], libTab: "mine", libQ: "", libFilter: "all", libShareOpen: null, libMode: "file", libUploading: "", libGroup: "",
   activeMeeting: null, meetingPerson: "", spaceForm: null, editingItem: null, studyMode: "one", activeStudyId: null, studyLocal: false, uploading: {},
 };
 let BIBLE = null, MEMORY = null, PLAN = null;
@@ -588,7 +636,7 @@ const VERSIONS = { KJV: { file: "kjv.json", name: "King James Version" }, BSB: {
 const BIBLE_CACHE = {}, bibleLoads = {};
 const curVer = () => (VERSIONS[S.settings.bibleVersion] ? S.settings.bibleVersion : "KJV");
 const KV_KEYS = { progress: "progress3y" };
-const saveKV = (k) => { if (k === "progress") stampProgress(); else if (k === "settings" || k === "mem") stampKV(k); const p = DB.put("kv", S[k], KV_KEYS[k] || k).catch(() => {}); if (k === "progress" || k === "settings" || k === "mem") localChanged(); return p; };
+const saveKV = (k) => { if (k === "progress") stampProgress(); else if (k === "settings" || k === "mem") stampKV(k); const p = DB.put("kv", S[k], KV_KEYS[k] || k).catch(() => {}); if (k === "progress" || k === "settings" || k === "mem" || k === "hlt") localChanged(); return p; };
 
 /* ---------- plan ---------- */
 function buildPlan() {
@@ -616,6 +664,9 @@ function buildPlan() {
   return days;
 }
 const chapKey = (r) => r.b + "." + r.c;
+const CHAP_DAY = {};   // "b.c" -> plan day
+function chapRead(b, c) { const k = b + "." + c, d = CHAP_DAY[k]; return !!d && (S.progress[d] || []).includes(k); }
+function setChapRead(b, c, on) { const k = b + "." + c, d = CHAP_DAY[k]; if (!d) return; const st = new Set(S.progress[d] || []); on ? st.add(k) : st.delete(k); S.progress[d] = [...st]; saveKV("progress"); }
 const chapName = (r) => BOOKS[r.b] + " " + r.c;
 function summarize(list) {
   const out = []; let i = 0;
@@ -690,7 +741,7 @@ function openChapter(b, c, opts = {}) {
 const TABS = [["today", "Today"], ["plan", "Plan"], ["bible", "Bible"], ["memory", "Memory"], ["prayer", "Prayer"], ["study", "Bible Study"], ["notes", "Notes"], ["sermons", "Sermons"], ["library", "Library"], ["saved", "Saved"]];
 const PRIMARY = ["today", "plan", "bible", "memory"];
 function go(tab) { if (location.hash !== "#" + tab) location.hash = "#" + tab; else render(); }
-function readHash() { let t = location.hash.slice(1); if (t === "lamp") t = "memory"; S.tab = TABS.some(x => x[0] === t) ? t : "today"; }
+function readHash() { let t = location.hash.slice(1); if (/^join-[A-Za-z0-9]{6,20}$/.test(t)) { S.joinCode = t.slice(5).toUpperCase(); S.tab = "join"; return; } if (t === "lamp") t = "memory"; S.tab = TABS.some(x => x[0] === t) ? t : "today"; }
 function renderTabs() {
   const nav = $("#tabbar"); nav.textContent = "";
   TABS.forEach(([id, label]) => nav.append(h("button", { type: "button", class: PRIMARY.includes(id) ? "primary-tab" : "secondary-tab", "aria-current": S.tab === id ? "page" : null, onclick: () => go(id) }, icon(id), h("span", null, label))));
@@ -701,6 +752,7 @@ function openMore() {
   const close = () => { layer.textContent = ""; };
   const sheet = h("div", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": "More sections" },
     h("div", { class: "spread" }, h("h2", { class: "title", style: "font-size:22px;margin:0" }, "More"), h("button", { class: "icon-btn", type: "button", "aria-label": "Close", onclick: close }, icon("x"))),
+    shareAppCard(),
     h("div", { class: "more-grid" },
       ...TABS.filter(t => !PRIMARY.includes(t[0])).map(([id, label]) => h("button", { type: "button", class: "more-item" + (S.tab === id ? " cur" : ""), onclick: () => { close(); go(id); } }, icon(id), h("span", null, label))),
       h("button", { type: "button", class: "more-item", onclick: () => { close(); openSettings(); } }, h("span", { "aria-hidden": "true", style: "display:inline-grid", html: $("#open-settings svg").outerHTML }), h("span", null, "Settings"))));
@@ -713,7 +765,7 @@ function render() {
   renderTabs();
   const v = $("#view"); v.textContent = "";
   const wrap = h("section", { class: "view stack" });
-  ({ today: viewToday, plan: viewPlan, bible: viewBible, memory: viewMemory, saved: viewSaved, notes: viewNotes, sermons: viewSermons, study: viewStudy, prayer: viewPrayer, library: viewLibrary })[S.tab](wrap);
+  ({ today: viewToday, plan: viewPlan, bible: viewBible, memory: viewMemory, saved: viewSaved, notes: viewNotes, sermons: viewSermons, study: viewStudy, prayer: viewPrayer, library: viewLibrary, join: viewJoin })[S.tab](wrap);
   v.append(wrap);
   renderSelbar();
 }
@@ -790,16 +842,12 @@ function viewToday(root) {
     ...[["m", "Morning"], ["e", "Evening"]].map(([k, l]) => h("button", { type: "button", "aria-pressed": ed === k ? "true" : "false", onclick: () => setEd(k) }, l)));
 
   const paras = text.split(/\n+/).map(s => s.trim()).filter(Boolean);
-  const planDay = currentDay();
   const body = h("div", { class: "devo-main" },
     h("p", { class: "devo-key" }, h("span", null, verse.replace(/[.,;:]?$/, "") + " "), "— ",
       p ? h("button", { class: "devo-ref", type: "button", onclick: () => openChapter(p.b, p.c, { hl: p.verses }) }, ref) : h("span", { class: "devo-ref" }, ref)),
     h("div", { class: "devo-body" }, paras.map(t => h("p", null, t))),
     h("hr", { class: "devo-rule" }),
     h("div", { class: "devo-foot" },
-      h("button", { class: "devo-plan", type: "button", onclick: () => { S.viewDay = null; go("plan"); } },
-        h("span", { class: "devo-aside-label" }, "Bible reading plan"),
-        h("span", null, `Year ${Math.ceil(planDay / 365)} · Day ${planDay}: `, h("b", null, summarize(PLAN[planDay - 1]))), icon("right")),
       h("div", { class: "row" },
         h("button", { class: "btn sm soft", type: "button", onclick: () => { newNote({ title: `Reflection · ${fmtDate(date, { month: "short", day: "numeric" })}`, ref, body: `“${verse}” — ${ref}\n\n` }); go("notes"); } }, icon("notes"), "Write a reflection"),
         h("button", { class: "btn sm", type: "button", disabled: S.saved.some(s => s.ref === ref) ? true : null, onclick: async () => { await addSaved({ ref, text: verse, translation: "KJV", note: "From the daily devotional" }); toast("Verse saved"); rerenderKeepScroll(); } }, icon("saved"), S.saved.some(s => s.ref === ref) ? "Saved" : "Save verse"),
@@ -871,6 +919,7 @@ function viewPlan(root) {
     return box;
   }));
   root.append(journalPanel(day, date, list));
+  readByBook(root, list);
 }
 function viewPlanList(root, cur) {
   root.append(h("p", { class: "muted small", style: "margin:0" }, `About one chapter a day through the whole Bible, moving between Old Testament books, New Testament books, and Psalms and Proverbs. Started ${fmtDate(S.settings.start, { month: "long", day: "numeric", year: "numeric" })}. Change the start date in Settings.`));
@@ -905,37 +954,89 @@ function readChapterBtn(ref, backDay) {
   return p ? h("button", { class: "btn sm soft", type: "button", onclick: () => openChapter(p.b, p.c, { hl: p.verses, back: backDay || null }) }, "Read whole chapter") : null;
 }
 function journalId(date) { return "journal-" + date; }
+function chapJournalId(b, c) { return `jch-${b}-${c}`; }
 const SOAP_PARTS = [
   ["s", "Scripture", "a verse that stood out", "Copy a verse here, or select verses in the Bible tab and tap Journal"],
   ["o", "Observation", "what does it say?", "What do you notice about God, people, or the situation?"],
   ["a", "Application", "what will I do?", "One way to live this out today"],
   ["p", "Prayer", "talk to Jesus", "Talk to Jesus about what you read"],
 ];
-function journalPanel(day, date, list) {
-  const id = journalId(date);
+function soapWritten(b, c) { const n = S.notes.find(x => x.id === chapJournalId(b, c)); return n ? SOAP_PARTS.filter(([k]) => ((n.soap || {})[k] || "").trim()).length : 0; }
+/* One S.O.A.P. journal per chapter, shared by Today's reading, Read by book, and the Bible tab's Journal button */
+function soapEditor(b, c, pfx = "soap") {
+  const id = chapJournalId(b, c), name = `${BOOKS[b]} ${c}`;
   const existing = S.notes.find(n => n.id === id);
-  const soap = existing ? { ...existing.soap } : { s: "", o: "", a: "", p: "" };
+  const soap = existing ? { s: "", o: "", a: "", p: "", ...existing.soap } : { s: "", o: "", a: "", p: "" };
   const status = h("div", { class: "saved-note", "aria-live": "polite" }, existing ? "Saved " + fmtTs(existing.updated) : "");
   let timer;
-  const build = () => { const prev = S.notes.find(n => n.id === id); return { ...(prev || { id, kind: "journal", created: Date.now(), attachments: [], body: "" }), title: `Plan Day ${day} · ${fmtDate(date, { month: "short", day: "numeric" })}`, ref: summarize(list), date, day, soap: { ...soap }, updated: Date.now() }; };
-  // keep the in-memory note current on every keystroke, so opening/closing a part never loses typing
+  const build = () => { const prev = S.notes.find(n => n.id === id); return { ...(prev || { id, kind: "journal", created: Date.now(), attachments: [], body: "" }), title: `${name} · S.O.A.P.`, ref: name, b, c, soap: { ...soap }, updated: Date.now() }; };
   const remember = (note) => { const i = S.notes.findIndex(n => n.id === id); i >= 0 ? S.notes[i] = note : S.notes.push(note); return note; };
-  const store = async (note) => { remember(note); await DB.put("notes", note); };
   const save = () => { const note = remember(build()); clearTimeout(timer); timer = setTimeout(async () => { try { await DB.put("notes", note); status.textContent = "Saved"; } catch { status.textContent = "Couldn’t save. Your device storage may be full."; } }, 600); };
-  const written = SOAP_PARTS.filter(([k]) => (soap[k] || "").trim()).length;
-  return collapseSec(`plan-journal`, false, "Reading journal", `S.O.A.P. · ${written} of 4 written`, null, () => h("div", { class: "stack soap", style: "gap:8px" },
-    h("p", { class: "muted small", style: "margin:0" }, "Write through today’s chapter with S.O.A.P."),
-    ...SOAP_PARTS.map(([k, name, hint, ph]) => {
+  return h("div", { class: "stack soap", style: "gap:8px" },
+    ...SOAP_PARTS.map(([k, label, hint, ph]) => {
       const txt = (soap[k] || "").trim();
-      const preview = txt ? txt.split("\n")[0] : "Not written yet";
-      return collapseRow(`soap:${k}`, false,
+      return collapseRow(`soap:${b}.${c}:${k}`, false,
         h("span", { class: "crow-file" }, h("span", { class: "soap-letter" }, k.toUpperCase()),
-          h("span", { class: "crow-text" }, h("b", null, name, h("span", { class: "muted", style: "font-weight:400" }, " — " + hint)), h("span", { class: "muted small soap-prev" }, preview))),
-        () => h("textarea", { class: "field", id: `soap-${k}`, "aria-label": name, placeholder: ph, oninput: (e) => { soap[k] = e.target.value; status.textContent = "Saving…"; save(); } }, soap[k] || ""));
+          h("span", { class: "crow-text" }, h("b", null, label, h("span", { class: "muted", style: "font-weight:400" }, " — " + hint)), h("span", { class: "muted small soap-prev" }, txt ? txt.split("\n")[0] : "Not written yet"))),
+        () => h("textarea", { class: "field", id: `${pfx}-${b}-${c}-${k}`, "aria-label": `${label}, ${name}`, placeholder: ph, oninput: (e) => { const cur = (S.notes.find(n => n.id === id) || {}).soap || {}; Object.assign(soap, cur, { [k]: e.target.value }); status.textContent = "Saving…"; save(); } }, soap[k] || ""));
     }),
     h("div", { class: "spread" },
-      h("button", { class: "btn sm ghost", type: "button", onclick: async () => { clearTimeout(timer); await store(build()).catch(() => {}); S.activeNote = id; S.editing = true; go("notes"); } }, icon("plus"), "Attach files"),
-      status)));
+      h("button", { class: "btn sm ghost", type: "button", onclick: async () => { clearTimeout(timer); const note = remember(build()); await DB.put("notes", note).catch(() => {}); S.activeNote = id; S.editing = true; go("notes"); } }, icon("plus"), "Attach files"),
+      status));
+}
+function journalPanel(day, date, list) {
+  const i = Math.min(S.journalCh || 0, list.length - 1), r = list[i];
+  const written = soapWritten(r.b, r.c);
+  return collapseSec("plan-journal", false, "Reading journal", `${chapName(r)} · S.O.A.P. · ${written} of 4 written`, null, () => h("div", { class: "stack", style: "gap:8px" },
+    list.length > 1 ? h("div", { class: "seg seg-wide", role: "group", "aria-label": "Journal for chapter" }, ...list.map((x, j) => h("button", { type: "button", "aria-pressed": j === i ? "true" : "false", onclick: () => { S.journalCh = j; rerenderKeepScroll(); } }, chapName(x)))) : null,
+    h("p", { class: "muted small", style: "margin:0" }, `Write through ${chapName(r)} with S.O.A.P. It’s the same journal you’ll find under Read by book.`),
+    soapEditor(r.b, r.c, "rj")));
+}
+/* Read by book: every book → chapters → read tick, links and S.O.A.P. */
+function chapterRow(b, c, opts = {}) {
+  const on = chapRead(b, c), ck = `pbc:${b}.${c}`, open = isOpenKey(ck, false), name = `${BOOKS[b]} ${c}`;
+  const nW = soapWritten(b, c);
+  return h("div", { class: "crow chaprow" + (on ? " read" : "") },
+    h("div", { class: "chaprow-head" },
+      h("button", { class: "check", type: "button", role: "checkbox", "aria-checked": on ? "true" : "false", "aria-label": `Mark ${name} as read`, disabled: CHAP_DAY[b + "." + c] ? null : true, html: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">${ICONS.check}</svg>`,
+        onclick: () => { setChapRead(b, c, !on); rerenderKeepScroll(); } }),
+      h("button", { type: "button", class: "crow-head", "aria-expanded": open ? "true" : "false", onclick: () => { setOpenKey(ck, !open); rerenderKeepScroll(); } },
+        h("span", { class: "crow-text", style: "flex-direction:row;align-items:center;gap:8px;flex-wrap:wrap" }, h("b", { class: "name" }, opts.label || "Chapter " + c),
+          opts.today ? h("span", { class: "chip gold" }, "Today") : null, nW ? h("span", { class: "chip", style: "background:var(--indigo-soft);color:var(--indigo)" }, "S.O.A.P.") : null),
+        chevronSvg(open))),
+    open ? h("div", { class: "crow-body stack", style: "gap:8px" },
+      h("div", { class: "row", style: "gap:6px" }, h("button", { class: "btn sm soft", type: "button", onclick: () => openChapter(b, c, { back: CHAP_DAY[b + "." + c] || null }) }, "Read chapter"), nivLink(name, "NIV")),
+      h("div", { class: "muted small", style: "font-weight:700;letter-spacing:.06em;text-transform:uppercase" }, "S.O.A.P. journal · " + name),
+      soapEditor(b, c)) : null);
+}
+function readByBook(root, todayList) {
+  const todayKeys = new Set(todayList.map(chapKey));
+  const todayBook = todayList[0] ? todayList[0].b : 0;
+  root.append(h("div", { class: "stack", style: "gap:2px;margin-top:6px" }, h("h3", { class: "sub" }, "Read by book"), h("span", { class: "muted small" }, "All 66 books. Open a book for its chapters, then a chapter for its S.O.A.P. journal.")));
+  [["ot", "Old Testament", 0, 39], ["nt", "New Testament", 39, 66]].forEach(([id, label, from, to]) => {
+    let total = 0, done = 0;
+    for (let b = from; b < to; b++) for (let c = 1; c <= CHAPTERS[b]; c++) { total++; if (chapRead(b, c)) done++; }
+    root.append(collapseSec(`pbg:${id}`, todayBook >= from && todayBook < to, label, `${to - from} books · ${done} of ${total} chapters read`, null, () => h("div", { class: "stack", style: "gap:6px" },
+      ...Array.from({ length: to - from }, (_, i) => {
+        const b = from + i; let d = 0; for (let c = 1; c <= CHAPTERS[b]; c++) if (chapRead(b, c)) d++;
+        return collapseRow(`pbb:${b}`, false,
+          h("span", { class: "crow-text" },
+            h("span", { class: "spread", style: "gap:8px" }, h("b", { class: "book-name" }, BOOKS[b]), h("span", { class: "muted small" }, `${d} of ${CHAPTERS[b]} read`)),
+            h("span", { class: "progress thin" }, h("i", { style: `width:${(d / CHAPTERS[b] * 100).toFixed(1)}%` }))),
+          () => h("div", { class: "stack", style: "gap:6px" }, ...Array.from({ length: CHAPTERS[b] }, (_, j) => chapterRow(b, j + 1, { today: todayKeys.has(b + "." + (j + 1)) }))));
+      }))));
+  });
+}
+async function migrateDayJournals() {
+  // v9: journals moved from one-per-day to one-per-chapter
+  for (const n of [...S.notes]) {
+    if (n.kind !== "journal" || !/^journal-\d{4}-\d{2}-\d{2}$/.test(n.id) || !n.day || !PLAN[n.day - 1]) continue;
+    const r = PLAN[n.day - 1][0], id = chapJournalId(r.b, r.c);
+    if (S.notes.some(x => x.id === id)) continue;
+    const note = { ...n, id, b: r.b, c: r.c, title: `${chapName(r)} · S.O.A.P.`, ref: chapName(r) };
+    delete note.date; delete note.day; delete note._t;
+    try { await DB.put("notes", note); await DB.del("notes", n.id); S.notes = S.notes.filter(x => x.id !== n.id); S.notes.push(note); } catch {}
+  }
 }
 
 /* ================= BIBLE ================= */
@@ -969,7 +1070,8 @@ function viewBible(root) {
   const vEl = h("div", { class: "verses" });
   verses.forEach((t, i) => {
     const n = i + 1;
-    const cls = [B.sel.has(n) ? "sel" : "", savedSet.has(n) ? "saved" : "", B.hl && B.hl.has(n) ? "hl" : ""].join(" ").trim();
+    const hc = hlColor(B.b, B.c, n);
+    const cls = [B.sel.has(n) ? "sel" : "", savedSet.has(n) ? "saved" : "", B.hl && B.hl.has(n) ? "hl" : "", hc ? "c-" + hc : ""].join(" ").trim();
     vEl.append(h("p", { class: cls || null, id: "v" + n, role: "button", tabindex: "0", "aria-pressed": B.sel.has(n) ? "true" : "false",
       onclick: () => toggleVerse(n), onkeydown: (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleVerse(n); } },
       html: t ? `<sup>${n}</sup>${lordify(t)}` : `<sup>${n}</sup><span class="muted small">This verse is not in the earliest manuscripts, so ${curVer()} leaves it out. Switch to KJV to read it.</span>` }));
@@ -1036,28 +1138,39 @@ function selectionText() {
   const B = S.bible; const nums = [...B.sel].sort((a, b) => a - b);
   return { ref: refFor(B.b, B.c, nums), text: nums.map(n => BIBLE.text[B.b][B.c - 1][n - 1]).join(" ") };
 }
+const HL_COLORS = [["yellow", "Yellow"], ["green", "Green"], ["blue", "Blue"], ["pink", "Pink"], ["orange", "Orange"], ["purple", "Purple"]];
+function hlColor(b, c, v) { const x = S.hlt[`${b}.${c}.${v}`]; return x && x.c ? x.c : ""; }
+function setHighlight(color) {
+  const B = S.bible, t = Date.now();
+  [...B.sel].forEach(v => { S.hlt[`${B.b}.${B.c}.${v}`] = { c: color, t }; });
+  saveKV("hlt"); B.sel.clear(); render();
+  toast(color ? "Highlighted" : "Highlight removed");
+}
 function renderSelbar() {
   document.querySelectorAll(".selbar").forEach(e => e.remove());
   if (S.tab !== "bible" || !S.bible.sel.size || S.bible.mode !== "read") return;
   const bar = h("div", { class: "selbar", role: "toolbar", "aria-label": "Selected verses" },
-    h("span", { class: "count" }, `${S.bible.sel.size} selected`),
+    h("div", { class: "hl-row" },
+      h("span", { class: "count" }, `${S.bible.sel.size} selected`),
+      h("span", { class: "hl-swatches", role: "group", "aria-label": "Highlight color" }, ...HL_COLORS.map(([k, l]) => h("button", { type: "button", class: "swatch c-" + k, "aria-label": "Highlight " + l, title: l, onclick: () => setHighlight(k) })),
+        [...S.bible.sel].some(v => hlColor(S.bible.b, S.bible.c, v)) ? h("button", { type: "button", class: "btn sm hl-clear", onclick: () => setHighlight("") }, "Remove") : null)),
+    h("div", { class: "row-acts" },
     h("button", { class: "btn sm", type: "button", onclick: async () => { const s = selectionText(); await addSaved({ ref: s.ref, text: s.text, translation: curVer() }); S.bible.sel.clear(); render(); toast("Saved " + s.ref); } }, icon("saved"), "Save"),
     h("button", { class: "btn sm", type: "button", onclick: () => { const s = selectionText(); copyText(`${s.text}\n— ${s.ref} (${curVer()})`); } }, icon("copy"), "Copy"),
     h("button", { class: "btn sm", type: "button", onclick: () => addToJournal() }, "Journal"),
     h("button", { class: "btn sm", type: "button", onclick: () => { const s = selectionText(); newNote({ title: s.ref, ref: s.ref, body: `“${s.text}” — ${s.ref} (${curVer()})\n\n` }); S.bible.sel.clear(); go("notes"); } }, icon("notes"), "Note"),
     h("button", { class: "btn sm", type: "button", onclick: () => { const s = selectionText(); newSermon({ scripture: s.ref, content: `“${s.text}” — ${s.ref} (${curVer()})\n\n` }); S.bible.sel.clear(); go("sermons"); } }, icon("sermons"), "Sermon"),
-    h("button", { class: "btn sm", type: "button", "aria-label": "Clear selection", onclick: () => { S.bible.sel.clear(); render(); } }, icon("x")));
+    h("button", { class: "btn sm", type: "button", "aria-label": "Clear selection", onclick: () => { S.bible.sel.clear(); render(); } }, icon("x"))));
   document.body.append(bar);
 }
 async function addToJournal() {
-  const s = selectionText();
-  const day = S.bible.back || currentDay(); const date = dateForDay(day); const id = journalId(date);
+  const sel = selectionText(), B = S.bible, id = chapJournalId(B.b, B.c), name = `${BOOKS[B.b]} ${B.c}`;
   const prev = S.notes.find(n => n.id === id);
-  const note = { ...(prev || { id, kind: "journal", created: Date.now(), attachments: [], body: "", soap: { s: "", o: "", a: "", p: "" } }),
-    title: `Day ${day} · ${fmtDate(date, { month: "short", day: "numeric" })}`, ref: summarize(PLAN[day - 1]), date, day, updated: Date.now() };
-  note.soap = { ...note.soap, s: (note.soap.s ? note.soap.s + "\n" : "") + `${s.text} (${s.ref} ${curVer()})` };
+  const note = { ...(prev || { id, kind: "journal", created: Date.now(), attachments: [], body: "", soap: { s: "", o: "", a: "", p: "" } }), title: `${name} · S.O.A.P.`, ref: name, b: B.b, c: B.c, updated: Date.now() };
+  note.soap = { s: "", o: "", a: "", p: "", ...note.soap };
+  note.soap.s = (note.soap.s ? note.soap.s + "\n" : "") + `${sel.text} (${sel.ref} ${curVer()})`;
   await DB.put("notes", note); const i = S.notes.findIndex(n => n.id === id); i >= 0 ? S.notes[i] = note : S.notes.push(note);
-  S.bible.sel.clear(); render(); toast(`Added to Day ${day} journal`);
+  S.bible.sel.clear(); render(); toast(`Added to the ${name} journal`);
 }
 
 /* ================= MY MEMORY VERSES ================= */
@@ -1144,9 +1257,7 @@ function viewMemory(root) {
       h("button", { class: "btn sm primary", type: "button", onclick: () => { const set = memFiltered(c); if (!set.length) return toast("No verses match these filters"); openPractice(set.map(memCard), c.id === "tms" ? "TMS practice" : c.name + " practice"); } }, icon("play"), "Practice these")),
     h("div", { class: "progress" }, h("i", { style: `width:${(mc / flat.length * 100).toFixed(1)}%` }))));
   if (c.id === "witness") root.append(bridgeIllustration());
-  if (c.sections.length > 1) root.append(h("div", { class: "seg", role: "group", "aria-label": "Section" },
-    h("button", { type: "button", "aria-pressed": S.lampSec === "all" ? "true" : "false", onclick: () => { S.lampSec = "all"; render(); } }, "All"),
-    ...c.sections.map(s => h("button", { type: "button", title: s.name, "aria-pressed": S.lampSec === s.id ? "true" : "false", onclick: () => { S.lampSec = s.id; render(); } }, s.id))));
+  S.lampSec = "all";
   const statuses = [["all", "All"], ...(c.id === "lamp2" ? [["week", "This week"]] : []), ["learning", "Learning"], ["memorized", "Memorized"]];
   root.append(h("div", { class: "seg", role: "group", "aria-label": "Status" },
     ...statuses.map(([k, l]) => h("button", { type: "button", "aria-pressed": S.lampStatus === k ? "true" : "false", onclick: () => { S.lampStatus = k; render(); } }, l))));
@@ -1246,7 +1357,8 @@ function viewSaved(root) {
       h("button", { class: "btn primary", type: "button", onclick: () => { S.savedForm = { ref: "", text: "", translation: "NIV", note: "" }; render(); } }, icon("plus"), "Add a verse"))));
   if (S.savedForm) root.append(savedForm());
   root.append(h("div", { class: "seg", role: "group", "aria-label": "Filter" },
-    ...[["all", `All (${all.length})`], ["todo", "To memorize"], ["done", "Memorized"]].map(([k, l]) => h("button", { type: "button", "aria-pressed": S.savedFilter === k ? "true" : "false", onclick: () => { S.savedFilter = k; render(); } }, l))));
+    ...[["all", `All (${all.length})`], ["todo", "To memorize"], ["done", "Memorized"], ["hl", `Highlights (${Object.values(S.hlt).filter(x => x.c).length})`]].map(([k, l]) => h("button", { type: "button", "aria-pressed": S.savedFilter === k ? "true" : "false", onclick: () => { S.savedFilter = k; render(); } }, l))));
+  if (S.savedFilter === "hl") return viewHighlights(root);
   if (!list.length) {
     root.append(h("div", { class: "empty" }, h("b", null, all.length ? "Nothing in this list" : "Save verses you want to review"),
       h("span", null, "In the Bible tab, tap a verse and choose Save. In Lamp 2, tap Save on any card. Or add one yourself, such as an NIV verse from church."),
@@ -1273,6 +1385,26 @@ function viewSaved(root) {
       delSlot.textContent = ""; delSlot.append(h("span", { class: "confirm" }, "Remove?", h("button", { class: "btn sm danger", type: "button", onclick: async () => { await DB.del("saved", s.id); S.saved = S.saved.filter(x => x.id !== s.id); rerenderKeepScroll(); } }, "Remove"), h("button", { class: "btn sm ghost", type: "button", onclick: showDel }, "Keep")));
     } }, "Remove")); };
     showDel();
+  });
+  root.append(listEl);
+}
+function viewHighlights(root) {
+  const keys = Object.entries(S.hlt).filter(([, x]) => x.c).map(([k, x]) => { const [b, c, v] = k.split(".").map(Number); return { b, c, v, color: x.c }; })
+    .sort((a, b) => a.b - b.b || a.c - b.c || a.v - b.v);
+  if (!keys.length) { root.append(h("div", { class: "empty" }, h("b", null, "No highlights yet"), h("span", null, "In the Bible tab, tap verses and choose a color."), h("button", { class: "btn soft", type: "button", onclick: () => go("bible") }, "Open the Bible"))); return; }
+  if (!BIBLE) { root.append(h("div", { class: "loading" }, "Loading…")); loadBible().then(() => { if (S.tab === "saved") render(); }).catch(() => {}); return; }
+  const colors = [...new Set(keys.map(k => k.color))];
+  if (colors.length > 1) root.append(h("div", { class: "row people-chips" }, h("button", { type: "button", class: "chip" + (S.hlFilter ? "" : " sel"), onclick: () => { S.hlFilter = ""; render(); } }, "All colors"),
+    ...HL_COLORS.filter(([k]) => colors.includes(k)).map(([k, l]) => h("button", { type: "button", class: "chip" + (S.hlFilter === k ? " sel" : ""), onclick: () => { S.hlFilter = S.hlFilter === k ? "" : k; render(); } }, h("span", { class: "dot c-" + k }), l))));
+  const listEl = h("div", { class: "mem-list" });
+  keys.filter(k => !S.hlFilter || k.color === S.hlFilter).forEach(k => {
+    const ref = `${BOOKS[k.b]} ${k.c}:${k.v}`, text = (BIBLE.text[k.b][k.c - 1] || [])[k.v - 1] || "";
+    listEl.append(h("article", { class: "mem hl-card c-" + k.color },
+      h("div", { class: "top" }, h("div", { class: "ref" }, ref), h("span", { class: "chip" }, curVer())),
+      h("p", { class: "txt", html: lordify(text) }),
+      h("div", { class: "acts" },
+        h("button", { class: "btn sm soft", type: "button", onclick: () => openChapter(k.b, k.c, { hl: new Set([k.v]) }) }, "Read chapter"), nivLink(ref),
+        h("button", { class: "btn sm ghost", type: "button", onclick: () => { S.hlt[`${k.b}.${k.c}.${k.v}`] = { c: "", t: Date.now() }; saveKV("hlt"); rerenderKeepScroll(); } }, "Remove highlight"))));
   });
   root.append(listEl);
 }
@@ -1826,7 +1958,7 @@ const redirectUri = () => location.origin + location.pathname.replace(/index\.ht
 function signIn(prompt) {
   if (!SYNC_ON) return;
   const state = uid("st");
-  localStorage_set("authState", state + "|" + S.tab);
+  localStorage_set("authState", state + "|" + (S.tab === "join" && S.joinCode ? "join-" + S.joinCode : S.tab));
   const p = new URLSearchParams({ client_id: CFG.googleClientId, redirect_uri: redirectUri(), response_type: "token", scope: SCOPES, include_granted_scopes: "true", state });
   // "none" = silent refresh; "switch" = pick another account; default = reuse the signed-in account when known
   if (prompt === "none") { p.set("prompt", "none"); if (Sync.email) p.set("login_hint", Sync.email); }
@@ -1866,8 +1998,8 @@ async function acceptAccount() {
 async function hasLocalData() { for (const s of SYNC_STORES) if ((await DB.all(s)).length) return true; return false; }
 async function clearDevice() {
   for (const s of [...SYNC_STORES, "files"]) await DB.clear(s);
-  for (const k of ["progress3y", "mem", "tombs", "progressT", "kvT"]) await DB.del("kv", k).catch(() => {});
-  S.notes = []; S.saved = []; S.sermons = []; S.studies = []; S.prayers = []; S.library = []; S.progress = {}; S.mem = {};
+  for (const k of ["progress3y", "mem", "hlt", "tombs", "progressT", "kvT"]) await DB.del("kv", k).catch(() => {});
+  S.notes = []; S.saved = []; S.sermons = []; S.studies = []; S.prayers = []; S.library = []; S.progress = {}; S.mem = {}; S.hlt = {};
   TOMBS = {}; KVT = {}; PROGT = {}; lastProgress = {};
   S.activeNote = S.activeSermon = S.activeStudy = null;
 }
@@ -1918,7 +2050,7 @@ async function buildLocalDoc() {
   for (const s of SYNC_STORES) { stores[s] = {}; (await DB.all(s)).forEach(r => { stores[s][r.id] = r; }); }
   const progress = {};
   Object.keys(S.progress).forEach(d => { progress[d] = { k: S.progress[d], t: PROGT[d] || 0 }; });
-  return { v: 1, kv: { settings: { val: S.settings, t: KVT.settings || 0 }, mem: S.mem, progress }, stores, tombs: { ...TOMBS } };
+  return { v: 1, kv: { settings: { val: S.settings, t: KVT.settings || 0 }, mem: S.mem, hlt: S.hlt, progress }, stores, tombs: { ...TOMBS } };
 }
 function mergeDocs(local, remote) {
   remote = remote || {}; const rkv = remote.kv || {};
@@ -1938,6 +2070,8 @@ function mergeDocs(local, remote) {
   out.kv.settings = !sb ? sa : !sa ? sb : ((sb.t || 0) > (sa.t || 0) ? sb : sa);
   out.kv.mem = { ...(rkv.mem || {}) };
   for (const [k, v] of Object.entries(local.kv.mem || {})) if (!out.kv.mem[k] || (v.t || 0) > (out.kv.mem[k].t || 0)) out.kv.mem[k] = v;
+  out.kv.hlt = { ...(rkv.hlt || {}) };
+  for (const [k, v] of Object.entries(local.kv.hlt || {})) if (!out.kv.hlt[k] || (v.t || 0) > (out.kv.hlt[k].t || 0)) out.kv.hlt[k] = v;
   out.kv.progress = { ...(rkv.progress || {}) };
   for (const [d, v] of Object.entries(local.kv.progress || {})) if (!out.kv.progress[d] || (v.t || 0) > (out.kv.progress[d].t || 0)) out.kv.progress[d] = v;
   return out;
@@ -1953,6 +2087,7 @@ async function applyMerged(doc) {
   for (const k of Object.keys(TOMBS)) if (k.startsWith("files:")) await DB.rawDel("files", k.slice(6)).catch(() => {});
   const st = doc.kv.settings;
   if (st && (st.t || 0) > (KVT.settings || 0)) { S.settings = { ...S.settings, ...st.val }; KVT.settings = st.t; await DB.put("kv", S.settings, "settings"); await DB.put("kv", KVT, "kvT"); applyTheme(); changed = true; }
+  if (doc.kv.hlt && JSON.stringify(doc.kv.hlt) !== JSON.stringify(S.hlt)) { S.hlt = doc.kv.hlt; await DB.put("kv", S.hlt, "hlt"); changed = true; }
   if (JSON.stringify(doc.kv.mem) !== JSON.stringify(S.mem)) { S.mem = doc.kv.mem; await DB.put("kv", S.mem, "mem"); changed = true; }
   const prog = {}; const pt = {};
   Object.entries(doc.kv.progress).forEach(([d, v]) => { prog[d] = v.k; pt[d] = v.t; });
@@ -2092,7 +2227,7 @@ let fbAuth = null, fdb = null, fbLoading = null;
 const SH = { user: null, spaces: null, unsubSpaces: null, sub: {}, data: {}, error: "", folder: null };
 const meEmail = () => ((SH.user && SH.user.email) || "").toLowerCase();
 const meName = () => Sync.name || (SH.user && SH.user.displayName) || meEmail();
-const shRefresh = () => { if (S.tab === "prayer" || S.tab === "study" || S.tab === "library") safeRerender(); };
+const shRefresh = () => { if (S.tab === "prayer" || S.tab === "study" || S.tab === "library" || S.tab === "join") safeRerender(); };
 function loadScriptOnce(src) {
   if (document.querySelector(`script[data-src="${src}"]`)) return Promise.resolve();
   return new Promise((res, rej) => { const el = document.createElement("script"); el.src = src; el.dataset.src = src; el.onload = res; el.onerror = () => rej(new Error("load " + src)); document.head.append(el); });
@@ -2229,7 +2364,7 @@ function viewPrayer(root) {
   else root.append(h("div", { class: "mem-list" }, meetings.map(m => h("button", { type: "button", class: "mem space-card", onclick: () => { S.activeMeeting = m.id; render(); window.scrollTo(0, 0); } },
     h("div", { class: "top" }, h("div", { class: "ref" }, m.name), h("span", { class: "chip" }, `${m.memberEmails.length} member${m.memberEmails.length > 1 ? "s" : ""}`)),
     m.desc ? h("div", { class: "topic" }, m.desc) : null,
-    h("div", { class: "muted small" }, isOwnerOf(m) ? "You lead this meeting" : "Led by " + (m.ownerName || m.ownerEmail))))));
+    h("div", { class: "muted small" }, isOwnerOf(m) ? "You lead this meeting" : "Led by " + (m.ownerName || m.ownerEmail)), pendingChip(m)))));
   legacyRequests(root);
 }
 function spaceForm(type) {
@@ -2292,7 +2427,7 @@ function viewStudy(root) {
   else root.append(h("div", { class: "mem-list" }, list.map(s => h("button", { type: "button", class: "mem space-card", onclick: () => { S.activeStudyId = s.id; render(); window.scrollTo(0, 0); } },
     h("div", { class: "top" }, h("div", { class: "ref" }, s.name), h("span", { class: "chip" }, `${s.memberEmails.length} member${s.memberEmails.length > 1 ? "s" : ""}`)),
     s.material ? h("div", { class: "topic" }, s.material) : null,
-    h("div", { class: "muted small" }, (isOwnerOf(s) ? "You lead this study" : "Led by " + (s.ownerName || s.ownerEmail)) + (s.started ? " · started " + fmtDate(s.started, { month: "short", day: "numeric", year: "numeric" }) : ""))))));
+    h("div", { class: "muted small" }, (isOwnerOf(s) ? "You lead this study" : "Led by " + (s.ownerName || s.ownerEmail)) + (s.started ? " · started " + fmtDate(s.started, { month: "short", day: "numeric", year: "numeric" }) : "")), pendingChip(s)))));
   localStudiesLink(root);
 }
 function localStudiesLink(root) {
@@ -2482,6 +2617,7 @@ function meetingView(root, m) {
       h("label", { class: "lbl" }, "Prayer items", fText),
       h("div", null, h("button", { class: "btn primary", type: "submit" }, icon("plus"), "Add")));
   }));
+  inviteBars(root, m);
   root.append(collapseBar(`pm-mem:${m.id}`, "Members", String(m.memberEmails.length), false, () => membersPanel(m, 0, true)));
   if (isOwnerOf(m)) root.append(h("div", { class: "row", style: "justify-content:flex-end" }, deleteRow("Delete meeting", "Delete this meeting for everyone?", () => { spaceRef(m.id).delete().catch(fbErr); S.activeMeeting = null; render(); })));
 }
@@ -2561,6 +2697,7 @@ function studySpaceView(root, sp) {
         sTopic.value = ""; sNotes.value = ""; toast("Session added");
       } }, icon("plus"), "Add session")));
   }));
+  inviteBars(root, sp);
   root.append(collapseBar(`ss-mem:${sp.id}`, owner ? "Members & study details" : "Members", String(sp.memberEmails.length), false, () => {
     const box = h("div", { class: "stack", style: "gap:12px" });
     if (owner) {
@@ -2760,11 +2897,171 @@ function viewLibraryShared(root, items) {
   });
 }
 
+
+/* ================= SHARE THE APP + GROUP INVITE LINKS ================= */
+const APP_URL = () => location.origin + location.pathname.replace(/index\.html$/, "");
+const inviteUrl = (code) => APP_URL() + "#join-" + code;
+function qrBox(text) {
+  const box = h("div", { class: "qr-box" }, h("span", { class: "muted small" }, "Making QR code…"));
+  loadScriptOnce("vendor/qrcode.js").then(() => {
+    const q = qrcode(0, "M"); q.addData(text); q.make();
+    box.textContent = "";
+    box.append(h("div", { class: "qr-svg", html: q.createSvgTag({ cellSize: 4, margin: 2, scalable: true }) }), h("span", { class: "muted small" }, "Scan with a phone camera to open the link."));
+  }).catch(() => { box.textContent = "Couldn’t make the QR code. Check your connection once, then try again."; });
+  return box;
+}
+async function shareLink(url, title, text) {
+  if (navigator.share) { try { await navigator.share({ title, text, url }); return; } catch (e) { if (e && e.name === "AbortError") return; } }
+  copyText(url);
+}
+/* link + Copy / Share… / QR code, without re-rendering the page */
+function linkTools(url, title, text) {
+  const qrSlot = h("div");
+  const qrBtn = h("button", { class: "btn sm", type: "button", onclick: () => { if (qrSlot.firstChild) { qrSlot.textContent = ""; qrBtn.textContent = "QR code"; } else { qrSlot.append(qrBox(url)); qrBtn.textContent = "Hide QR code"; } } }, "QR code");
+  return h("div", { class: "stack", style: "gap:8px" },
+    h("div", { class: "link-box" }, url),
+    h("div", { class: "row", style: "gap:6px" },
+      h("button", { class: "btn sm primary", type: "button", onclick: () => copyText(url) }, icon("copy"), "Copy link"),
+      h("button", { class: "btn sm soft", type: "button", onclick: () => shareLink(url, title, text) }, "Share…"), qrBtn),
+    qrSlot);
+}
+function installSteps() {
+  return h("div", { class: "stack", style: "gap:6px" },
+    h("details", { class: "inst" }, h("summary", null, "Install on iPhone / iPad"), h("ol", null, h("li", null, "Open the link in ", h("b", null, "Safari"), "."), h("li", null, "Tap the ", h("b", null, "Share"), " button."), h("li", null, "Tap ", h("b", null, "Add to Home Screen"), ", then ", h("b", null, "Add"), "."))),
+    h("details", { class: "inst" }, h("summary", null, "Install on Android"), h("ol", null, h("li", null, "Open the link in ", h("b", null, "Chrome"), "."), h("li", null, "Tap ", h("b", null, "Install app"), " (or the ⋮ menu → ", h("b", null, "Add to Home screen"), ")."))));
+}
+function shareAppCard() {
+  return h("section", { class: "share-app" },
+    h("div", { class: "share-app-head" }, h("span", { class: "share-app-mark", "aria-hidden": "true", html: $(".brand svg") ? $(".brand svg").outerHTML : "" }),
+      h("div", null, h("b", null, "Share A Day With Jesus"), h("div", { class: "muted small" }, "Invite anyone to install the app"))),
+    linkTools(APP_URL(), "A Day With Jesus", "A daily devotional, Bible reading plan, memory verses and prayer app."),
+    installSteps());
+}
+function openShareApp() {
+  const layer = $("#layer"); const close = () => { layer.textContent = ""; };
+  layer.textContent = "";
+  layer.append(h("div", { class: "overlay", onclick: (e) => { if (e.target === e.currentTarget) close(); } },
+    h("div", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": "Share the app" },
+      h("div", { class: "spread" }, h("h2", { class: "title", style: "font-size:22px;margin:0" }, "Share the app"), h("button", { class: "icon-btn", type: "button", "aria-label": "Close", onclick: close }, icon("x"))),
+      shareAppCard())));
+}
+
+/* --- invites: leader side --- */
+const inviteRef = (code) => fdb.collection("invites").doc(code);
+function newInviteCode() { const a = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; return [...crypto.getRandomValues(new Uint8Array(10))].map(x => a[x % a.length]).join(""); }
+async function makeInvite(sp) {
+  const code = newInviteCode(), old = sp.inviteCode;
+  try {
+    await inviteRef(code).set({ spaceId: sp.id, name: sp.name, type: sp.type, ownerName: sp.ownerName || meName(), ownerUid: SH.user.uid, created: Date.now() });
+    await spaceRef(sp.id).update({ inviteCode: code, updated: Date.now() });
+    if (old) inviteRef(old).delete().catch(() => {});
+    toast(old ? "New link made. The old one no longer works." : "Invite link ready");
+  } catch (e) { fbErr(e); }
+}
+function pendingChip(sp) {
+  if (!isOwnerOf(sp)) return null;
+  const r = subData(sp.id, "requests");
+  return r && r.length ? h("span", { class: "chip gold", style: "justify-self:start" }, `${r.length} waiting to join`) : null;
+}
+function inviteBars(root, sp) {
+  if (!isOwnerOf(sp)) return;
+  root.append(collapseBar(`inv:${sp.id}`, "Invite people", "↗", true, () => {
+    const box = h("div", { class: "stack", style: "gap:10px" },
+      h("p", { class: "muted small", style: "margin:0" }, "Send this link to church members by Messenger, Viber or SMS. They tap it, sign in with Google and ask to join. You approve each person."));
+    if (!sp.inviteCode) { box.append(h("div", null, h("button", { class: "btn primary", type: "button", onclick: () => makeInvite(sp) }, "Create invite link"))); return box; }
+    box.append(linkTools(inviteUrl(sp.inviteCode), sp.name, `You’re invited to join “${sp.name}” in A Day With Jesus.`));
+    const slot = h("div");
+    const ask = () => { slot.textContent = ""; slot.append(h("button", { class: "btn sm ghost", type: "button", onclick: () => {
+      slot.textContent = ""; slot.append(h("span", { class: "confirm" }, "The old link will stop working.", h("button", { class: "btn sm primary", type: "button", onclick: () => makeInvite(sp) }, "Make new link"), h("button", { class: "btn sm ghost", type: "button", onclick: ask }, "Cancel")));
+    } }, "Make a new link")); };
+    ask(); box.append(slot);
+    return box;
+  }));
+  const reqs = subData(sp.id, "requests") || [];
+  const rk = `req:${sp.id}`;
+  if (reqs.length && !(rk in S.collapse)) setOpenKey(rk, true);
+  root.append(collapseBar(rk, "Join requests", String(reqs.length), false, () => {
+    if (!reqs.length) return h("div", { class: "muted small" }, "No requests waiting. People who use your invite link appear here.");
+    return h("div", { class: "stack", style: "gap:8px" }, [...reqs].sort((a, b) => a.created - b.created).map(r => h("div", { class: "crow", style: "padding:10px 12px;display:grid;gap:8px" },
+      h("div", { class: "row", style: "gap:10px;flex-wrap:nowrap" }, h("span", { class: "avatar" }, (r.name || r.email || "?")[0].toUpperCase()),
+        h("span", { class: "crow-text" }, h("b", null, r.name || r.email), h("span", { class: "muted small", style: "overflow-wrap:anywhere" }, `${r.email} · ${fmtTs(r.created)}`))),
+      h("div", { class: "row", style: "gap:6px" },
+        h("button", { class: "btn sm primary", type: "button", onclick: async () => {
+          const emails = [...new Set([...sp.memberEmails, (r.email || "").toLowerCase()])];
+          if (emails.length > 300) return toast("This group is full (300 members)");
+          try { await spaceRef(sp.id).update({ memberEmails: emails, updated: Date.now() }); await spaceRef(sp.id).collection("requests").doc(r.id).delete(); toast(`${r.name || r.email} joined`); } catch (e) { fbErr(e); }
+        } }, icon("check"), "Approve"),
+        h("button", { class: "btn sm", type: "button", onclick: () => spaceRef(sp.id).collection("requests").doc(r.id).delete().catch(fbErr) }, "Decline")))));
+  }));
+}
+
+/* --- invites: person who opened the link --- */
+function joinWatch(spaceId) {
+  if (S.joinWatch === spaceId) return;
+  if (S.joinUnsub) S.joinUnsub();
+  S.joinWatch = spaceId; S.joinReq = undefined;
+  S.joinUnsub = spaceRef(spaceId).collection("requests").doc(SH.user.uid).onSnapshot(
+    d => { S.joinReq = d.exists ? d.data() : null; shRefresh(); }, () => { S.joinReq = null; shRefresh(); });
+}
+function openJoined(info) {
+  if (S.joinUnsub) S.joinUnsub(); S.joinUnsub = null; S.joinWatch = null; S.joinCode = null; S.joinInfo = null; S.joinSent = false;
+  if (info.type === "prayer") { S.prayerMode = "meetings"; S.activeMeeting = info.spaceId; go("prayer"); }
+  else { S.studyMode = info.type === "group" ? "group" : "one"; S.activeStudyId = info.spaceId; go("study"); }
+}
+function viewJoin(root) {
+  const code = S.joinCode;
+  const kinds = { prayer: "Prayer meeting", one: "One-on-one Bible study", group: "Group Bible study" };
+  const card = h("section", { class: "join-card" });
+  root.append(card);
+  const installCard = h("section", { class: "panel stack", style: "gap:8px" }, h("b", null, "Install A Day With Jesus"), h("span", { class: "muted small" }, "Add it to your Home Screen to use it like an app, even offline."), installSteps());
+  const head = (eyebrow, title, sub) => card.append(h("div", { class: "eyebrow" }, eyebrow), h("h2", { class: "title", style: "font-size:clamp(24px,5vw,30px)" }, title), sub ? h("p", { class: "muted small", style: "margin:0" }, sub) : null);
+  if (!FB_ON || !SYNC_ON) { head("Invitation", "Groups aren’t set up yet", "This copy of the app can’t open group invitations."); return; }
+  if (!Sync.email) {
+    head("You’re invited", "Join a group in A Day With Jesus", "Sign in with your Google account to see the invitation and ask to join.");
+    card.append(h("button", { class: "btn primary gbtn", type: "button", onclick: () => signIn() }, googleG(), "Sign in with Google"));
+    root.append(installCard); return;
+  }
+  if (!SH.user || !fdb) { head("You’re invited", SH.error ? "Not connected" : "Connecting…", SH.error || "Opening your invitation."); if (Sync.token) fbSignIn(Sync.token); else if (!fbLoading) fbInit().catch(() => {}); return; }
+  if (!S.joinInfo || S.joinInfo.code !== code) {
+    S.joinInfo = { code, loading: true };
+    inviteRef(code).get().then(d => { S.joinInfo = d.exists ? { code, ...d.data() } : { code, missing: true }; shRefresh(); }).catch(() => { S.joinInfo = { code, missing: true }; shRefresh(); });
+  }
+  const info = S.joinInfo;
+  if (info.loading) { head("You’re invited", "Opening invitation…"); return; }
+  if (info.missing) {
+    head("Invitation", "This link doesn’t work anymore", "The leader may have made a new link. Ask them to send it again.");
+    card.append(h("button", { class: "btn", type: "button", onclick: () => go("today") }, "Go to Today")); return;
+  }
+  head("You’re invited", info.name, `${kinds[info.type] || "Group"} · led by ${info.ownerName || "the leader"}`);
+  const member = (SH.spaces || []).some(x => x.id === info.spaceId);
+  if (member) {
+    card.append(h("span", { class: "chip ok" }, "You’re in!"), h("p", { style: "margin:0" }, info.type === "prayer" ? "You can now add prayer items and see everyone’s." : "You can now see sessions, shared files and notes."),
+      h("button", { class: "btn primary", type: "button", onclick: () => openJoined(info) }, info.type === "prayer" ? "Open the prayer meeting" : "Open the Bible study"));
+    return;
+  }
+  joinWatch(info.spaceId);
+  if (S.joinReq === undefined) { card.append(h("div", { class: "muted small" }, "Checking…")); return; }
+  if (S.joinReq) {
+    card.append(h("span", { class: "chip gold" }, "Waiting for approval"), h("p", { style: "margin:0" }, "Request sent. The group opens here as soon as the leader approves you."),
+      h("div", null, h("button", { class: "btn", type: "button", onclick: () => { spaceRef(info.spaceId).collection("requests").doc(SH.user.uid).delete().catch(fbErr); S.joinSent = false; } }, "Cancel request")));
+  } else {
+    if (S.joinSent) card.append(h("p", { class: "muted small", style: "margin:0" }, "Your request was declined or cancelled. You can ask again."));
+    card.append(h("p", { style: "margin:0" }, info.type === "prayer" ? "You’ve been invited to pray together with this group." : "You’ve been invited to study the Bible with this group."),
+      h("div", null, h("button", { class: "btn primary", type: "button", onclick: () => {
+        S.joinSent = true;
+        spaceRef(info.spaceId).collection("requests").doc(SH.user.uid).set({ uid: SH.user.uid, email: meEmail(), name: meName(), code, created: Date.now() }).catch(fbErr);
+      } }, "Ask to join")));
+  }
+  if (!isStandalone()) root.append(installCard);
+}
+
 /* ================= START ================= */
 async function start() {
   PLAN = buildPlan();
+  PLAN.forEach((l, i) => l.forEach(r => { CHAP_DAY[chapKey(r)] = i + 1; }));
   try {
-    const [settings, progress, mem, pos] = await Promise.all(["settings", "progress3y", "mem", "biblePos"].map(k => DB.get("kv", k).catch(() => null)));
+    const [settings, progress, mem, pos, hlt] = await Promise.all(["settings", "progress3y", "mem", "biblePos", "hlt"].map(k => DB.get("kv", k).catch(() => null)));
+    if (hlt) S.hlt = hlt;
     if (settings) S.settings = { ...S.settings, ...settings }; else saveKV("settings");
     if (progress) S.progress = progress;
     if (mem) S.mem = mem;
@@ -2775,6 +3072,7 @@ async function start() {
     S.studies = await DB.all("studies").catch(() => []);
     S.prayers = await DB.all("prayers").catch(() => []);
     S.library = await DB.all("library").catch(() => []);
+    await migrateDayJournals();
   } catch {}
   applyTheme();
   await initSync().catch(() => {});
@@ -2788,6 +3086,7 @@ async function start() {
 window.addEventListener("hashchange", () => { readHash(); if (S.tab !== "bible") S.bible.sel.clear(); render(); window.scrollTo(0, 0); });
 window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); installEvt = e; if (S.tab === "today") rerenderKeepScroll(); });
 $("#open-settings").addEventListener("click", openSettings);
+$("#share-app").addEventListener("click", openShareApp);
 $("#sync-btn").addEventListener("click", openSettings);
 // Re-check the day when the app comes back to the foreground (e.g. the next morning)
 let lastDay = ymd(new Date());
