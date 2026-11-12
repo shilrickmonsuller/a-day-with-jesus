@@ -492,6 +492,13 @@ input, select, textarea { font-size: 16px; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .perm-mark.no { background: #4a2420; color: #ef8077; } }
 :root[data-theme="dark"] .perm-mark.no { background: #4a2420; color: #ef8077; }
 .perm-icon { flex: none; width: 40px; height: 40px; border-radius: 12px; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; font-weight: 900; font-size: 20px; }
+.share-opt { display: flex; gap: 8px; align-items: flex-start; font-size: 14px; background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; text-align: left; }
+.share-opt input { margin-top: 3px; }
+.share-opt b { display: block; }
+.rate-btn { flex: 1; }
+
+/* ---- writing boxes grow with their text ---- */
+textarea.field { resize: none; overflow-y: hidden; min-height: calc(3 * 1.65em + 22px); box-sizing: border-box; }
 
 </style>
 <header class="topbar gutter">
@@ -785,7 +792,7 @@ function openChapter(b, c, opts = {}) {
 const TABS = [["today", "Today"], ["plan", "Plan"], ["bible", "Bible"], ["memory", "Memory"], ["prayer", "Prayer"], ["study", "Bible Study"], ["notes", "Notes"], ["sermons", "Sermons"], ["library", "Library"], ["saved", "Saved"], ["review", "Review"]];
 const PRIMARY = ["today", "plan", "bible", "memory"];
 function go(tab) { if (location.hash !== "#" + tab) location.hash = "#" + tab; else render(); }
-function readHash() { let t = location.hash.slice(1); if (t === "reviews") { S.tab = "reviews"; return; } if (/^join-[A-Za-z0-9]{6,20}$/.test(t)) { S.joinCode = t.slice(5).toUpperCase(); S.tab = "join"; return; } if (t === "lamp") t = "memory"; S.tab = TABS.some(x => x[0] === t) ? t : "today"; }
+function readHash() { let t = location.hash.slice(1); if (t === "reviews") { S.tab = "reviews"; return; } if (t === "member-reviews") { S.tab = "memberReviews"; return; } if (/^join-[A-Za-z0-9]{6,20}$/.test(t)) { S.joinCode = t.slice(5).toUpperCase(); S.tab = "join"; return; } if (t === "lamp") t = "memory"; S.tab = TABS.some(x => x[0] === t) ? t : "today"; }
 function renderTabs() {
   const nav = $("#tabbar"); nav.textContent = "";
   TABS.forEach(([id, label]) => nav.append(h("button", { type: "button", class: PRIMARY.includes(id) ? "primary-tab" : "secondary-tab", "aria-current": S.tab === id ? "page" : null, onclick: () => go(id) }, icon(id), h("span", null, label))));
@@ -797,7 +804,9 @@ function openMore() {
   const sheet = h("div", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": "More sections" },
     h("div", { class: "spread" }, h("h2", { class: "title", style: "font-size:22px;margin:0" }, "More"), h("button", { class: "icon-btn", type: "button", "aria-label": "Close", onclick: close }, icon("x"))),
     shareAppCard(),
-    h("button", { type: "button", class: "btn rate-btn", onclick: () => { close(); openRateApp(); } }, icon("star"), "Rate & review the app"),
+    h("div", { class: "row", style: "gap:8px;flex-wrap:nowrap" },
+      h("button", { type: "button", class: "btn rate-btn", onclick: () => { close(); openRateApp(); } }, icon("star"), "Rate & review"),
+      h("button", { type: "button", class: "btn rate-btn", onclick: () => { close(); location.hash = "#member-reviews"; } }, "Member reviews")),
     h("div", { class: "more-grid" },
       ...TABS.filter(t => !PRIMARY.includes(t[0])).map(([id, label]) => h("button", { type: "button", class: "more-item" + (S.tab === id ? " cur" : ""), onclick: () => { close(); go(id); } }, icon(id), h("span", null, label))),
       h("button", { type: "button", class: "more-item", onclick: () => { close(); openSettings(); } }, h("span", { "aria-hidden": "true", style: "display:inline-grid", html: $("#open-settings svg").outerHTML }), h("span", null, "Settings"))));
@@ -810,7 +819,7 @@ function render() {
   renderTabs();
   const v = $("#view"); v.textContent = "";
   const wrap = h("section", { class: "view stack" });
-  ({ today: viewToday, plan: viewPlan, bible: viewBible, memory: viewMemory, saved: viewSaved, notes: viewNotes, sermons: viewSermons, study: viewStudy, prayer: viewPrayer, library: viewLibrary, join: viewJoin, review: viewReview, reviews: viewAppReviews })[S.tab](wrap);
+  ({ today: viewToday, plan: viewPlan, bible: viewBible, memory: viewMemory, saved: viewSaved, notes: viewNotes, sermons: viewSermons, study: viewStudy, prayer: viewPrayer, library: viewLibrary, join: viewJoin, review: viewReview, reviews: viewAppReviews, memberReviews: viewMemberReviews })[S.tab](wrap);
   v.append(wrap);
   renderSelbar();
   if (S.tab !== "today") hideDevoBar();
@@ -2282,7 +2291,7 @@ let fbAuth = null, fdb = null, fbLoading = null;
 const SH = { user: null, spaces: null, unsubSpaces: null, sub: {}, data: {}, error: "", folder: null };
 const meEmail = () => ((SH.user && SH.user.email) || "").toLowerCase();
 const meName = () => Sync.name || (SH.user && SH.user.displayName) || meEmail();
-const shRefresh = () => { if (["prayer", "study", "library", "join", "review", "reviews"].includes(S.tab)) safeRerender(); };
+const shRefresh = () => { if (["prayer", "study", "library", "join", "review", "reviews", "memberReviews"].includes(S.tab)) safeRerender(); };
 function loadScriptOnce(src) {
   if (document.querySelector(`script[data-src="${src}"]`)) return Promise.resolve();
   return new Promise((res, rej) => { const el = document.createElement("script"); el.src = src; el.dataset.src = src; el.onload = res; el.onerror = () => rej(new Error("load " + src)); document.head.append(el); });
@@ -3314,25 +3323,35 @@ function openRateApp(preset) {
   let stars = preset || 0;
   const starRow = h("div", { class: "stars", role: "radiogroup", "aria-label": "Rating" });
   const label = h("div", { class: "muted small" }, "Tap a star");
-  const paint = () => { [...starRow.children].forEach((b, i) => { b.classList.toggle("on", i < stars); b.setAttribute("aria-checked", i + 1 === stars ? "true" : "false"); }); label.textContent = L[stars] || "Tap a star"; };
+  const paint = () => { [...starRow.children].forEach((b, i) => { b.classList.toggle("on", i < stars); b.setAttribute("aria-checked", i + 1 === stars ? "true" : "false"); }); label.textContent = L[stars] || "Tap a star"; if (typeof paintShare === "function") paintShare(); };
   for (let i = 1; i <= 5; i++) starRow.append(h("button", { type: "button", role: "radio", "aria-label": i + (i > 1 ? " stars" : " star"), onclick: () => { stars = i; paint(); } }, "★"));
   const text = h("textarea", { class: "field", id: "rate-text", rows: "4", maxlength: "2000", placeholder: "What do you like? What should be better? Any feature you wish it had?" });
   const showName = h("input", { type: "checkbox", id: "rate-name", checked: true });
+  const share = h("input", { type: "checkbox", id: "rate-share", checked: true });
+  const shareNote = h("div", { class: "muted small" });
+  const paintShare = () => { shareNote.textContent = stars && stars < 3 ? "1★ and 2★ reviews are only seen by the app owner." : share.checked ? "It will appear in Member reviews." : "Only the app owner will see it."; };
+  share.addEventListener("change", paintShare);
   const msg = h("div", { class: "small", "aria-live": "polite" });
   body.append(h("b", { class: "rate-q" }, "How is A Day With Jesus helping you?"), starRow, label, text,
-    h("label", { class: "row", style: "gap:8px;font-size:14px" }, showName, "Show my name to the app owner"),
+    h("label", { class: "row", style: "gap:8px;font-size:14px" }, showName, "Show my name"),
+    h("label", { class: "share-opt" }, share, h("span", null, h("b", null, "Let other users see my review"), shareNote)),
     h("div", null, h("button", { class: "btn primary", type: "button", onclick: async () => {
       if (!stars) { msg.textContent = "Choose 1 to 5 stars first."; return; }
-      const data = { uid: SH.user.uid, stars, text: text.value.trim().slice(0, 2000), showName: showName.checked, name: showName.checked ? meName() : "", updated: Date.now() };
+      const data = { uid: SH.user.uid, stars, text: text.value.trim().slice(0, 2000), showName: showName.checked, name: showName.checked ? meName() : "", share: share.checked, updated: Date.now() };
       try {
         await reviewRef(SH.user.uid).set({ ...data, created: S.myReviewCreated || Date.now() });
+        const pub = pubReviewRef(SH.user.uid);
+        if (share.checked && stars >= 3) {
+          let hidden = false; try { const d = await pub.get(); if (d.exists) hidden = !!d.data().hidden; } catch {}
+          await pub.set({ uid: SH.user.uid, stars, text: data.text, name: data.name, hidden, updated: data.updated });
+        } else { try { await pub.delete(); } catch {} }
         localStorage_set("rated", "1");
         body.textContent = ""; body.append(h("span", { class: "chip ok", style: "justify-self:center" }, "Thank you!"), h("p", { style: "margin:0;text-align:center" }, "Your review was sent to the app owner. You can change it anytime — your latest review replaces the old one."));
       } catch (e) { msg.textContent = "Couldn’t send it. Check your connection and try again."; }
     } }, "Send review")), msg,
-    h("p", { class: "muted small", style: "margin:0" }, "Only the app owner can read reviews."));
-  paint();
-  reviewRef(SH.user.uid).get().then(d => { if (d.exists) { const x = d.data(); stars = preset || x.stars || 0; text.value = x.text || ""; showName.checked = x.showName !== false; S.myReviewCreated = x.created; paint(); } }).catch(() => {});
+    h("button", { class: "btn sm ghost", type: "button", style: "justify-self:center", onclick: () => { close(); location.hash = "#member-reviews"; } }, "Read member reviews"));
+  paint(); paintShare();
+  reviewRef(SH.user.uid).get().then(d => { if (d.exists) { const x = d.data(); stars = preset || x.stars || 0; text.value = x.text || ""; showName.checked = x.showName !== false; share.checked = !!x.share; S.myReviewCreated = x.created; paint(); autosize(text); } }).catch(() => {});
 }
 function checkReviewAdmin() {
   if (!fdb || !SH.user || SH.reviewAdminChecked) return;
@@ -3344,6 +3363,7 @@ function viewAppReviews(root) {
   root.append(h("div", null, h("div", { class: "eyebrow" }, "Only you can see this"), h("h2", { class: "title" }, "App reviews")));
   if (!SH.user) { root.append(h("div", { class: "loading" }, "Connecting…")); if (Sync.token) fbSignIn(Sync.token); return; }
   checkReviewAdmin();
+  if (SH.reviewAdmin && !SH.pubAllUnsub) SH.pubAllUnsub = fdb.collection("publicReviews").onSnapshot(sn => { SH.pubAll = new Map(sn.docs.map(d => [d.id, d.data()])); safeRerender(); }, () => {});
   if (!SH.reviewAdmin) { root.append(h("div", { class: "empty" }, h("b", null, SH.reviewAdminChecked ? "This page is for the app owner" : "Loading…"), h("span", null, "Reviews can only be read by the account named in the Firebase rules."))); return; }
   const all = (SH.reviews || []).slice().sort((a, b) => (b.updated || 0) - (a.updated || 0));
   const n = all.length, avg = n ? all.reduce((a, r) => a + (r.stars || 0), 0) / n : 0;
@@ -3359,7 +3379,11 @@ function viewAppReviews(root) {
   list.forEach(r => root.append(h("article", { class: "panel stack", style: "gap:6px" },
     h("div", { class: "spread" }, h("b", null, r.showName && r.name ? r.name : "Anonymous"), h("span", { class: "muted small" }, fmtTs(r.updated || r.created))),
     h("div", { class: "rv-stars" }, "★".repeat(r.stars || 0) + "☆".repeat(5 - (r.stars || 0))),
-    h("p", { style: "margin:0;white-space:pre-wrap" }, (r.text || "").trim() || h("span", { class: "muted" }, "(no comment)")))));
+    h("p", { style: "margin:0;white-space:pre-wrap" }, (r.text || "").trim() || h("span", { class: "muted" }, "(no comment)")),
+    (() => { const pd = SH.pubAll && SH.pubAll.get(r.id); const shown = pd && !pd.hidden;
+      const label = r.stars < 3 ? "Private (1–2★)" : !pd ? "Private (member’s choice)" : shown ? "Shown to users" : "Hidden by you";
+      return h("div", { class: "spread", style: "gap:8px" }, h("span", { class: "chip" + (shown ? " ok" : "") }, label),
+        pd ? h("button", { class: "btn sm", type: "button", onclick: () => pubReviewRef(r.id).update({ hidden: !pd.hidden }).catch(fbErr) }, pd.hidden ? "Show" : "Hide") : null); })())));
   if (n) root.append(h("div", null, h("button", { class: "btn sm", type: "button", onclick: () => {
     const q = (v) => `"${String(v == null ? "" : v).replace(/"/g, '""')}"`;
     const csv = ["Name,Stars,Comment,Date", ...all.map(r => [r.showName && r.name ? r.name : "Anonymous", r.stars, r.text || "", new Date(r.updated || r.created).toISOString().slice(0, 10)].map(q).join(","))].join("\n");
@@ -3394,6 +3418,52 @@ function askDrivePerm() {
       h("button", { class: "btn primary gbtn", type: "button", style: "justify-content:center", onclick: () => signIn("consent") }, googleG(), "Sign in again and tick both boxes"),
       h("button", { class: "btn", type: "button", style: "justify-content:center", onclick: close }, "Continue without it"))));
 }
+
+
+/* ---- Member reviews: 3★–5★ reviews that members chose to share ---- */
+const pubReviewRef = (id) => fdb.collection("publicReviews").doc(id);
+function viewMemberReviews(root) {
+  root.append(h("div", null, h("div", { class: "eyebrow" }, "What members are saying"), h("h2", { class: "title" }, "Member reviews")));
+  if (!FB_ON) { root.append(h("div", { class: "empty" }, h("b", null, "Reviews aren’t set up in this copy of the app."))); return; }
+  if (!fdb) { root.append(h("div", { class: "loading" }, "Loading…")); fbInit().then(() => { if (S.tab === "memberReviews") render(); }).catch(() => {}); return; }
+  if (!SH.pubUnsub) SH.pubUnsub = fdb.collection("publicReviews").where("hidden", "==", false).onSnapshot(
+    sn => { SH.pub = sn.docs.map(d => ({ id: d.id, ...d.data() })).filter(r => r.stars >= 3); if (S.tab === "memberReviews") safeRerender(); },
+    () => { SH.pub = []; SH.pubUnsub = null; if (S.tab === "memberReviews") safeRerender(); });
+  if (!SH.pub) { root.append(h("div", { class: "loading" }, "Loading reviews…")); return; }
+  const list = SH.pub.slice().sort((a, b) => b.updated - a.updated);
+  root.append(h("section", { class: "panel row", style: "gap:14px;flex-wrap:nowrap" }, h("b", { style: "font-family:var(--read);font-size:34px" }, String(list.length)),
+    h("span", null, h("b", null, list.length === 1 ? "review shared by a member" : "reviews shared by members"), h("div", { class: "muted small" }, "Reviews of 3★ to 5★ that members chose to share"))));
+  if (!list.length) root.append(h("div", { class: "empty" }, h("b", null, "No shared reviews yet"), h("span", null, "Be the first to tell others how the app helps you.")));
+  list.forEach(r => root.append(h("article", { class: "panel stack", style: "gap:6px" },
+    h("div", { class: "spread" }, h("b", null, r.name || "A member"), h("span", { class: "muted small" }, fmtTs(r.updated))),
+    h("div", { class: "rv-stars" }, "★".repeat(r.stars) + "☆".repeat(5 - r.stars)),
+    (r.text || "").trim() ? h("p", { style: "margin:0;white-space:pre-wrap" }, r.text) : null)));
+  root.append(h("div", { style: "text-align:center" }, h("button", { class: "btn primary", type: "button", onclick: () => openRateApp() }, icon("star"), "Write your own review")));
+}
+
+
+/* ---- every writing box grows as you type (phone, tablet and computer) ---- */
+function autosize(t) {
+  if (!t || t.tagName !== "TEXTAREA" || !t.isConnected || !t.offsetParent) return;
+  const cs = getComputedStyle(t);
+  const extra = cs.boxSizing === "border-box" ? parseFloat(cs.borderTopWidth) + parseFloat(cs.borderBottomWidth) : -(parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom));
+  const y = window.scrollY;
+  t.style.height = "auto";
+  t.style.height = Math.ceil(t.scrollHeight + extra) + "px";
+  if (window.scrollY !== y) window.scrollTo(0, y);   // keep the page still while measuring
+}
+function autosizeAll(root) { (root || document).querySelectorAll("textarea").forEach(autosize); }
+document.addEventListener("input", (e) => { if (e.target.tagName === "TEXTAREA") autosize(e.target); }, true);
+document.addEventListener("focusin", (e) => { if (e.target.tagName === "TEXTAREA") autosize(e.target); });
+new MutationObserver((muts) => {
+  for (const m of muts) for (const n of m.addedNodes) {
+    if (n.nodeType !== 1) continue;
+    if (n.tagName === "TEXTAREA" || n.querySelector?.("textarea")) { requestAnimationFrame(() => autosizeAll(n.tagName === "TEXTAREA" ? n.parentNode : n)); }
+  }
+}).observe(document.body, { childList: true, subtree: true });
+let resizeT = 0;
+window.addEventListener("resize", () => { clearTimeout(resizeT); resizeT = setTimeout(() => autosizeAll(), 150); });
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => autosizeAll());
 
 /* ================= START ================= */
 async function start() {
