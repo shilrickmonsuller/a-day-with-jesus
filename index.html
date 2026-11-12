@@ -450,6 +450,12 @@ input, select, textarea { font-size: 16px; }
 .inst ol { margin: 0; padding: 0 14px 12px 32px; display: grid; gap: 4px; font-size: 14px; }
 .join-card { background: var(--paper); border: 1px solid var(--line); border-radius: 16px; padding: 24px 18px; display: grid; gap: 12px; justify-items: center; text-align: center; }
 .avatar { flex: none; width: 34px; height: 34px; border-radius: 50%; background: var(--indigo-soft); color: var(--indigo); display: grid; place-items: center; font-weight: 800; }
+.chaprow.today { border: 2px solid var(--accent); }
+.devo-foot { justify-items: center; }
+.devo-foot > .row { justify-content: center; }
+.devo-credit { text-align: center; }
+.dmark { background: var(--hlc); color: inherit; border-radius: 3px; padding: 1px 0; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+.devo-body { -webkit-user-select: text; user-select: text; }
 
 </style>
 <header class="topbar gutter">
@@ -628,7 +634,7 @@ const S = {
   devo: { date: null, ed: null }, memColl: "lamp2",
   studies: [], studyQ: "", activeStudy: null, studyEditing: false,
   prayers: [], prayerMode: "meetings", prayerFilter: "praying", prayerPerson: "", prayerForm: null, answering: null,
-  hlt: {}, hlFilter: "", journalCh: 0, collapse: {}, library: [], libTab: "mine", libQ: "", libFilter: "all", libShareOpen: null, libMode: "file", libUploading: "", libGroup: "",
+  hlt: {}, dhl: {}, hlFilter: "", journalCh: 0, collapse: {}, library: [], libTab: "mine", libQ: "", libFilter: "all", libShareOpen: null, libMode: "file", libUploading: "", libGroup: "",
   activeMeeting: null, meetingPerson: "", spaceForm: null, editingItem: null, studyMode: "one", activeStudyId: null, studyLocal: false, uploading: {},
 };
 let BIBLE = null, MEMORY = null, PLAN = null;
@@ -636,7 +642,7 @@ const VERSIONS = { KJV: { file: "kjv.json", name: "King James Version" }, BSB: {
 const BIBLE_CACHE = {}, bibleLoads = {};
 const curVer = () => (VERSIONS[S.settings.bibleVersion] ? S.settings.bibleVersion : "KJV");
 const KV_KEYS = { progress: "progress3y" };
-const saveKV = (k) => { if (k === "progress") stampProgress(); else if (k === "settings" || k === "mem") stampKV(k); const p = DB.put("kv", S[k], KV_KEYS[k] || k).catch(() => {}); if (k === "progress" || k === "settings" || k === "mem" || k === "hlt") localChanged(); return p; };
+const saveKV = (k) => { if (k === "progress") stampProgress(); else if (k === "settings" || k === "mem") stampKV(k); const p = DB.put("kv", S[k], KV_KEYS[k] || k).catch(() => {}); if (k === "progress" || k === "settings" || k === "mem" || k === "hlt" || k === "dhl") localChanged(); return p; };
 
 /* ---------- plan ---------- */
 function buildPlan() {
@@ -768,6 +774,7 @@ function render() {
   ({ today: viewToday, plan: viewPlan, bible: viewBible, memory: viewMemory, saved: viewSaved, notes: viewNotes, sermons: viewSermons, study: viewStudy, prayer: viewPrayer, library: viewLibrary, join: viewJoin })[S.tab](wrap);
   v.append(wrap);
   renderSelbar();
+  if (S.tab !== "today") hideDevoBar();
 }
 function rerenderKeepScroll() { const y = window.scrollY; render(); window.scrollTo(0, y); }
 
@@ -845,14 +852,14 @@ function viewToday(root) {
   const body = h("div", { class: "devo-main" },
     h("p", { class: "devo-key" }, h("span", null, verse.replace(/[.,;:]?$/, "") + " "), "— ",
       p ? h("button", { class: "devo-ref", type: "button", onclick: () => openChapter(p.b, p.c, { hl: p.verses }) }, ref) : h("span", { class: "devo-ref" }, ref)),
-    h("div", { class: "devo-body" }, paras.map(t => h("p", null, t))),
+    h("div", { class: "devo-body", "data-dk": date.slice(5) + "|" + ed }, paras.map((t, i) => devoPara(t, i, date.slice(5) + "|" + ed))),
     h("hr", { class: "devo-rule" }),
     h("div", { class: "devo-foot" },
       h("div", { class: "row" },
         h("button", { class: "btn sm soft", type: "button", onclick: () => { newNote({ title: `Reflection · ${fmtDate(date, { month: "short", day: "numeric" })}`, ref, body: `“${verse}” — ${ref}\n\n` }); go("notes"); } }, icon("notes"), "Write a reflection"),
         h("button", { class: "btn sm", type: "button", disabled: S.saved.some(s => s.ref === ref) ? true : null, onclick: async () => { await addSaved({ ref, text: verse, translation: "KJV", note: "From the daily devotional" }); toast("Verse saved"); rerenderKeepScroll(); } }, icon("saved"), S.saved.some(s => s.ref === ref) ? "Saved" : "Save verse"),
         nivLink(ref, "Read in NIV"))),
-    h("p", { class: "muted small" }, "Charles H. Spurgeon, Morning and Evening (1866). Public domain."));
+    h("p", { class: "muted small devo-credit" }, "Charles H. Spurgeon, Morning and Evening (1866). Public domain."));
 
   root.append(h("article", { class: "devo" },
     heroArt(),
@@ -889,38 +896,16 @@ function viewPlan(root) {
       h("button", { class: "btn sm primary", type: "button", onclick: async () => { S.settings.start = ymd(new Date()); S.progress = {}; await saveKV("settings"); await saveKV("progress"); S.viewDay = null; render(); } }, "Start again")));
   }
 
-  root.append(h("div", { class: "dayhead" },
-    h("div", { class: "eyebrow" }, `Year ${Math.ceil(day / 365)} · Day ${day} of ${PLAN_DAYS}`),
-    h("div", { class: "spread" },
-      h("h2", { class: "title", style: "font-size:clamp(22px,4vw,28px)" }, fmtDate(date, { weekday: "long", month: "long", day: "numeric", year: "numeric" })),
-      h("div", { class: "daynav" },
-        h("button", { class: "icon-btn", type: "button", "aria-label": "Previous day", disabled: day <= 1 ? true : null, onclick: () => { S.viewDay = Math.max(1, day - 1); render(); } }, icon("left")),
-        day !== cur ? h("button", { class: "btn sm", type: "button", onclick: () => { S.viewDay = null; render(); } }, "Today") : null,
-        h("button", { class: "icon-btn", type: "button", "aria-label": "Next day", disabled: day >= PLAN_DAYS ? true : null, onclick: () => { S.viewDay = Math.min(PLAN_DAYS, day + 1); render(); } }, icon("right"))))));
-
-  const list = PLAN[day - 1];
-  const done = new Set(S.progress[day] || []);
-  const nDone = list.filter(r => done.has(chapKey(r))).length;
-  root.append(collapseSec("plan-read", true, "Today’s reading", `${summarize(list)} · ${nDone} of ${list.length} read`, null, () => {
-    const box = h("div", { class: "stack", style: "gap:8px" });
-    list.forEach(r => {
-      const k = chapKey(r), on = done.has(k), ck = `pch:${day}:${k}`, open = isOpenKey(ck, false);
-      box.append(h("div", { class: "crow chaprow" + (on ? " read" : "") },
-        h("div", { class: "chaprow-head" },
-          h("button", { class: "check", type: "button", role: "checkbox", "aria-checked": on ? "true" : "false", "aria-label": "Mark " + chapName(r) + " as read", html: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">${ICONS.check}</svg>`,
-            onclick: () => { const st = new Set(S.progress[day] || []); on ? st.delete(k) : st.add(k); S.progress[day] = [...st]; saveKV("progress"); rerenderKeepScroll(); } }),
-          h("button", { type: "button", class: "crow-head", "aria-expanded": open ? "true" : "false", onclick: () => { setOpenKey(ck, !open); rerenderKeepScroll(); } },
-            h("span", { class: "crow-text" }, h("b", { class: "name" }, chapName(r)), h("span", { class: "lane" }, r.lane)), chevronSvg(open))),
-        open ? h("div", { class: "crow-body row", style: "gap:6px" },
-          h("button", { class: "btn sm soft", type: "button", onclick: () => openChapter(r.b, r.c, { back: day }) }, "Read chapter"),
-          nivLink(chapName(r), "NIV")) : null));
-    });
-    if (list.length > 1) box.append(h("div", null, h("button", { class: "btn sm ghost", type: "button", onclick: () => { S.progress[day] = done.size >= list.length ? [] : list.map(chapKey); saveKV("progress"); rerenderKeepScroll(); } }, nDone === list.length ? "Clear all" : "Mark all read")));
-    return box;
-  }));
-  root.append(journalPanel(day, date, list));
-  readByBook(root, list);
+  readByBook(root, PLAN[cur - 1], cur);
 }
+/* open the book and chapter in Read by book and scroll to it */
+function goToChapter(r) {
+  S.todayMode = "day";
+  setOpenKey(`pbg:${r.b < 39 ? "ot" : "nt"}`, true); setOpenKey(`pbb:${r.b}`, true); setOpenKey(`pbc:${r.b}.${r.c}`, true);
+  if (S.tab !== "plan") go("plan"); else render();
+  requestAnimationFrame(() => { const el = document.getElementById(`pc-${r.b}-${r.c}`); if (el) el.scrollIntoView({ block: "start", behavior: "smooth" }); });
+}
+
 function viewPlanList(root, cur) {
   root.append(h("p", { class: "muted small", style: "margin:0" }, `About one chapter a day through the whole Bible, moving between Old Testament books, New Testament books, and Psalms and Proverbs. Started ${fmtDate(S.settings.start, { month: "long", day: "numeric", year: "numeric" })}. Change the start date in Settings.`));
   const months = new Map();
@@ -934,7 +919,7 @@ function viewPlanList(root, cur) {
       if (rows.childElementCount) return;
       days.forEach(n => {
         const list = PLAN[n - 1], d = (S.progress[n] || []).length;
-        rows.append(h("button", { type: "button", class: "plan-row" + (n === cur ? " current" : ""), id: "plan-" + n, onclick: () => { S.viewDay = n; S.todayMode = "day"; render(); window.scrollTo(0, 0); } },
+        rows.append(h("button", { type: "button", class: "plan-row" + (n === cur ? " current" : ""), id: "plan-" + n, onclick: () => goToChapter(list[0]) },
           h("div", null, h("div", { class: "dn" }, "Day " + n), h("div", { class: "dd" }, fmtDate(dateForDay(n), { weekday: "short", month: "short", day: "numeric" }))),
           h("div", { class: "refs" }, summarize(list)),
           d >= list.length ? h("span", { class: "chip ok" }, "Done") : d ? h("span", { class: "chip gold" }, `${d}/${list.length}`) : h("span")));
@@ -984,19 +969,11 @@ function soapEditor(b, c, pfx = "soap") {
       h("button", { class: "btn sm ghost", type: "button", onclick: async () => { clearTimeout(timer); const note = remember(build()); await DB.put("notes", note).catch(() => {}); S.activeNote = id; S.editing = true; go("notes"); } }, icon("plus"), "Attach files"),
       status));
 }
-function journalPanel(day, date, list) {
-  const i = Math.min(S.journalCh || 0, list.length - 1), r = list[i];
-  const written = soapWritten(r.b, r.c);
-  return collapseSec("plan-journal", false, "Reading journal", `${chapName(r)} · S.O.A.P. · ${written} of 4 written`, null, () => h("div", { class: "stack", style: "gap:8px" },
-    list.length > 1 ? h("div", { class: "seg seg-wide", role: "group", "aria-label": "Journal for chapter" }, ...list.map((x, j) => h("button", { type: "button", "aria-pressed": j === i ? "true" : "false", onclick: () => { S.journalCh = j; rerenderKeepScroll(); } }, chapName(x)))) : null,
-    h("p", { class: "muted small", style: "margin:0" }, `Write through ${chapName(r)} with S.O.A.P. It’s the same journal you’ll find under Read by book.`),
-    soapEditor(r.b, r.c, "rj")));
-}
 /* Read by book: every book → chapters → read tick, links and S.O.A.P. */
 function chapterRow(b, c, opts = {}) {
-  const on = chapRead(b, c), ck = `pbc:${b}.${c}`, open = isOpenKey(ck, false), name = `${BOOKS[b]} ${c}`;
+  const on = chapRead(b, c), ck = `pbc:${b}.${c}`, open = isOpenKey(ck, !!opts.today), name = `${BOOKS[b]} ${c}`;
   const nW = soapWritten(b, c);
-  return h("div", { class: "crow chaprow" + (on ? " read" : "") },
+  return h("div", { class: "crow chaprow" + (on ? " read" : "") + (opts.today ? " today" : ""), id: `pc-${b}-${c}` },
     h("div", { class: "chaprow-head" },
       h("button", { class: "check", type: "button", role: "checkbox", "aria-checked": on ? "true" : "false", "aria-label": `Mark ${name} as read`, disabled: CHAP_DAY[b + "." + c] ? null : true, html: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">${ICONS.check}</svg>`,
         onclick: () => { setChapRead(b, c, !on); rerenderKeepScroll(); } }),
@@ -1009,17 +986,20 @@ function chapterRow(b, c, opts = {}) {
       h("div", { class: "muted small", style: "font-weight:700;letter-spacing:.06em;text-transform:uppercase" }, "S.O.A.P. journal · " + name),
       soapEditor(b, c)) : null);
 }
-function readByBook(root, todayList) {
+function readByBook(root, todayList, cur) {
   const todayKeys = new Set(todayList.map(chapKey));
   const todayBook = todayList[0] ? todayList[0].b : 0;
-  root.append(h("div", { class: "stack", style: "gap:2px;margin-top:6px" }, h("h3", { class: "sub" }, "Read by book"), h("span", { class: "muted small" }, "All 66 books. Open a book for its chapters, then a chapter for its S.O.A.P. journal.")));
+  root.append(h("div", { class: "spread", style: "margin-top:4px;align-items:flex-end" },
+    h("div", { class: "stack", style: "gap:2px" }, h("h3", { class: "sub" }, "Read by book"),
+      h("span", { class: "muted small" }, "Today: ", h("b", { style: "color:var(--ink)" }, summarize(todayList)), ` · Year ${Math.ceil(cur / 365)} · Day ${cur}`)),
+    h("button", { class: "btn sm soft", type: "button", onclick: () => goToChapter(todayList[0]) }, "Go to today")));
   [["ot", "Old Testament", 0, 39], ["nt", "New Testament", 39, 66]].forEach(([id, label, from, to]) => {
     let total = 0, done = 0;
     for (let b = from; b < to; b++) for (let c = 1; c <= CHAPTERS[b]; c++) { total++; if (chapRead(b, c)) done++; }
     root.append(collapseSec(`pbg:${id}`, todayBook >= from && todayBook < to, label, `${to - from} books · ${done} of ${total} chapters read`, null, () => h("div", { class: "stack", style: "gap:6px" },
       ...Array.from({ length: to - from }, (_, i) => {
         const b = from + i; let d = 0; for (let c = 1; c <= CHAPTERS[b]; c++) if (chapRead(b, c)) d++;
-        return collapseRow(`pbb:${b}`, false,
+        return collapseRow(`pbb:${b}`, b === todayBook,
           h("span", { class: "crow-text" },
             h("span", { class: "spread", style: "gap:8px" }, h("b", { class: "book-name" }, BOOKS[b]), h("span", { class: "muted small" }, `${d} of ${CHAPTERS[b]} read`)),
             h("span", { class: "progress thin" }, h("i", { style: `width:${(d / CHAPTERS[b] * 100).toFixed(1)}%` }))),
@@ -1051,7 +1031,7 @@ function viewBible(root) {
   root.append(h("div", { class: "spread" },
     h("div", { class: "seg", role: "group", "aria-label": "Bible view" },
       ...[["read", "Read"], ["books", "Books"], ["search", "Search"]].map(([m, l]) => h("button", { type: "button", "aria-pressed": B.mode === m ? "true" : "false", onclick: () => { B.mode = m; B.pickBook = null; render(); } }, l))),
-    B.back ? h("button", { class: "btn sm", type: "button", onclick: () => { S.viewDay = B.back === currentDay() ? null : B.back; B.back = null; S.todayMode = "day"; go("plan"); } }, icon("left"), `Back to Day ${B.back}`) : null));
+    B.back ? h("button", { class: "btn sm", type: "button", onclick: () => { B.back = null; goToChapter({ b: B.b, c: B.c }); } }, icon("left"), "Back to plan") : null));
 
   if (B.mode === "books") return bibleBooks(root);
   if (B.mode === "search") return bibleSearch(root);
@@ -1357,7 +1337,7 @@ function viewSaved(root) {
       h("button", { class: "btn primary", type: "button", onclick: () => { S.savedForm = { ref: "", text: "", translation: "NIV", note: "" }; render(); } }, icon("plus"), "Add a verse"))));
   if (S.savedForm) root.append(savedForm());
   root.append(h("div", { class: "seg", role: "group", "aria-label": "Filter" },
-    ...[["all", `All (${all.length})`], ["todo", "To memorize"], ["done", "Memorized"], ["hl", `Highlights (${Object.values(S.hlt).filter(x => x.c).length})`]].map(([k, l]) => h("button", { type: "button", "aria-pressed": S.savedFilter === k ? "true" : "false", onclick: () => { S.savedFilter = k; render(); } }, l))));
+    ...[["all", `All (${all.length})`], ["todo", "To memorize"], ["done", "Memorized"], ["hl", `Highlights (${Object.values(S.hlt).filter(x => x.c).length + Object.values(S.dhl).filter(x => x.c).length})`]].map(([k, l]) => h("button", { type: "button", "aria-pressed": S.savedFilter === k ? "true" : "false", onclick: () => { S.savedFilter = k; render(); } }, l))));
   if (S.savedFilter === "hl") return viewHighlights(root);
   if (!list.length) {
     root.append(h("div", { class: "empty" }, h("b", null, all.length ? "Nothing in this list" : "Save verses you want to review"),
@@ -1389,11 +1369,13 @@ function viewSaved(root) {
   root.append(listEl);
 }
 function viewHighlights(root) {
+  const devo = Object.entries(S.dhl).filter(([, x]) => x.c);
   const keys = Object.entries(S.hlt).filter(([, x]) => x.c).map(([k, x]) => { const [b, c, v] = k.split(".").map(Number); return { b, c, v, color: x.c }; })
     .sort((a, b) => a.b - b.b || a.c - b.c || a.v - b.v);
-  if (!keys.length) { root.append(h("div", { class: "empty" }, h("b", null, "No highlights yet"), h("span", null, "In the Bible tab, tap verses and choose a color."), h("button", { class: "btn soft", type: "button", onclick: () => go("bible") }, "Open the Bible"))); return; }
+  if (!keys.length && !devo.length) { root.append(h("div", { class: "empty" }, h("b", null, "No highlights yet"), h("span", null, "In the Bible tab, tap verses and choose a color. In Today, select words and choose a color."), h("button", { class: "btn soft", type: "button", onclick: () => go("bible") }, "Open the Bible"))); return; }
   if (!BIBLE) { root.append(h("div", { class: "loading" }, "Loading…")); loadBible().then(() => { if (S.tab === "saved") render(); }).catch(() => {}); return; }
-  const colors = [...new Set(keys.map(k => k.color))];
+  if (devo.length && !DEVOS) { root.append(h("div", { class: "loading" }, "Loading…")); loadDevos().then(() => { if (S.tab === "saved") render(); }).catch(() => {}); return; }
+  const colors = [...new Set([...keys.map(k => k.color), ...devo.map(([, x]) => x.c)])];
   if (colors.length > 1) root.append(h("div", { class: "row people-chips" }, h("button", { type: "button", class: "chip" + (S.hlFilter ? "" : " sel"), onclick: () => { S.hlFilter = ""; render(); } }, "All colors"),
     ...HL_COLORS.filter(([k]) => colors.includes(k)).map(([k, l]) => h("button", { type: "button", class: "chip" + (S.hlFilter === k ? " sel" : ""), onclick: () => { S.hlFilter = S.hlFilter === k ? "" : k; render(); } }, h("span", { class: "dot c-" + k }), l))));
   const listEl = h("div", { class: "mem-list" });
@@ -1405,6 +1387,20 @@ function viewHighlights(root) {
       h("div", { class: "acts" },
         h("button", { class: "btn sm soft", type: "button", onclick: () => openChapter(k.b, k.c, { hl: new Set([k.v]) }) }, "Read chapter"), nivLink(ref),
         h("button", { class: "btn sm ghost", type: "button", onclick: () => { S.hlt[`${k.b}.${k.c}.${k.v}`] = { c: "", t: Date.now() }; saveKV("hlt"); rerenderKeepScroll(); } }, "Remove highlight"))));
+  });
+  // from the Today devotional
+  devo.filter(([, x]) => !S.hlFilter || x.c === S.hlFilter).sort((a, b) => a[1].k.localeCompare(b[1].k) || a[1].p - b[1].p || a[1].s - b[1].s).forEach(([id, x]) => {
+    const [md, ed] = x.k.split("|");
+    const entry = DEVOS && DEVOS[md]; if (!entry) return;
+    const para = (entry[ed][2].split(/\n+/).map(t => t.trim()).filter(Boolean))[x.p] || "";
+    const snippet = para.slice(x.s, x.e);
+    const yr = new Date().getFullYear(), date = `${yr}-${md}`;
+    listEl.append(h("article", { class: "mem hl-card c-" + x.c },
+      h("div", { class: "top" }, h("div", { class: "ref" }, `Today · ${fmtDate(date, { month: "short", day: "numeric" })} ${ed === "m" ? "Morning" : "Evening"}`), h("span", { class: "chip" }, "Spurgeon")),
+      h("p", { class: "txt" }, snippet),
+      h("div", { class: "acts" },
+        h("button", { class: "btn sm soft", type: "button", onclick: () => { S.devo.date = date === ymd(new Date()) ? null : date; S.devo.ed = ed; go("today"); } }, "Open reading"),
+        h("button", { class: "btn sm ghost", type: "button", onclick: () => { S.dhl[id] = { ...x, c: "", t: Date.now() }; saveKV("dhl"); rerenderKeepScroll(); } }, "Remove highlight"))));
   });
   root.append(listEl);
 }
@@ -1998,8 +1994,8 @@ async function acceptAccount() {
 async function hasLocalData() { for (const s of SYNC_STORES) if ((await DB.all(s)).length) return true; return false; }
 async function clearDevice() {
   for (const s of [...SYNC_STORES, "files"]) await DB.clear(s);
-  for (const k of ["progress3y", "mem", "hlt", "tombs", "progressT", "kvT"]) await DB.del("kv", k).catch(() => {});
-  S.notes = []; S.saved = []; S.sermons = []; S.studies = []; S.prayers = []; S.library = []; S.progress = {}; S.mem = {}; S.hlt = {};
+  for (const k of ["progress3y", "mem", "hlt", "dhl", "tombs", "progressT", "kvT"]) await DB.del("kv", k).catch(() => {});
+  S.notes = []; S.saved = []; S.sermons = []; S.studies = []; S.prayers = []; S.library = []; S.progress = {}; S.mem = {}; S.hlt = {}; S.dhl = {};
   TOMBS = {}; KVT = {}; PROGT = {}; lastProgress = {};
   S.activeNote = S.activeSermon = S.activeStudy = null;
 }
@@ -2050,7 +2046,7 @@ async function buildLocalDoc() {
   for (const s of SYNC_STORES) { stores[s] = {}; (await DB.all(s)).forEach(r => { stores[s][r.id] = r; }); }
   const progress = {};
   Object.keys(S.progress).forEach(d => { progress[d] = { k: S.progress[d], t: PROGT[d] || 0 }; });
-  return { v: 1, kv: { settings: { val: S.settings, t: KVT.settings || 0 }, mem: S.mem, hlt: S.hlt, progress }, stores, tombs: { ...TOMBS } };
+  return { v: 1, kv: { settings: { val: S.settings, t: KVT.settings || 0 }, mem: S.mem, hlt: S.hlt, dhl: S.dhl, progress }, stores, tombs: { ...TOMBS } };
 }
 function mergeDocs(local, remote) {
   remote = remote || {}; const rkv = remote.kv || {};
@@ -2072,6 +2068,8 @@ function mergeDocs(local, remote) {
   for (const [k, v] of Object.entries(local.kv.mem || {})) if (!out.kv.mem[k] || (v.t || 0) > (out.kv.mem[k].t || 0)) out.kv.mem[k] = v;
   out.kv.hlt = { ...(rkv.hlt || {}) };
   for (const [k, v] of Object.entries(local.kv.hlt || {})) if (!out.kv.hlt[k] || (v.t || 0) > (out.kv.hlt[k].t || 0)) out.kv.hlt[k] = v;
+  out.kv.dhl = { ...(rkv.dhl || {}) };
+  for (const [k, v] of Object.entries(local.kv.dhl || {})) if (!out.kv.dhl[k] || (v.t || 0) > (out.kv.dhl[k].t || 0)) out.kv.dhl[k] = v;
   out.kv.progress = { ...(rkv.progress || {}) };
   for (const [d, v] of Object.entries(local.kv.progress || {})) if (!out.kv.progress[d] || (v.t || 0) > (out.kv.progress[d].t || 0)) out.kv.progress[d] = v;
   return out;
@@ -2087,6 +2085,7 @@ async function applyMerged(doc) {
   for (const k of Object.keys(TOMBS)) if (k.startsWith("files:")) await DB.rawDel("files", k.slice(6)).catch(() => {});
   const st = doc.kv.settings;
   if (st && (st.t || 0) > (KVT.settings || 0)) { S.settings = { ...S.settings, ...st.val }; KVT.settings = st.t; await DB.put("kv", S.settings, "settings"); await DB.put("kv", KVT, "kvT"); applyTheme(); changed = true; }
+  if (doc.kv.dhl && JSON.stringify(doc.kv.dhl) !== JSON.stringify(S.dhl)) { S.dhl = doc.kv.dhl; await DB.put("kv", S.dhl, "dhl"); changed = true; }
   if (doc.kv.hlt && JSON.stringify(doc.kv.hlt) !== JSON.stringify(S.hlt)) { S.hlt = doc.kv.hlt; await DB.put("kv", S.hlt, "hlt"); changed = true; }
   if (JSON.stringify(doc.kv.mem) !== JSON.stringify(S.mem)) { S.mem = doc.kv.mem; await DB.put("kv", S.mem, "mem"); changed = true; }
   const prog = {}; const pt = {};
@@ -3055,13 +3054,87 @@ function viewJoin(root) {
   if (!isStandalone()) root.append(installCard);
 }
 
+
+/* ================= TODAY HIGHLIGHTER ================= */
+// S.dhl[id] = { k: "MM-DD|m|e", p: paragraph, s: start, e: end, c: color ("" = removed), t }
+function devoHls(dk, p) { return Object.entries(S.dhl).filter(([, x]) => x.c && x.k === dk && x.p === p).map(([id, x]) => ({ id, ...x })).sort((a, b) => a.t - b.t); }
+function devoPara(text, p, dk) {
+  const hls = devoHls(dk, p);
+  if (!hls.length) return h("p", { "data-p": p }, text);
+  const col = new Array(text.length).fill("");
+  hls.forEach(x => { for (let i = Math.max(0, x.s); i < Math.min(text.length, x.e); i++) col[i] = x.c; });
+  const el = h("p", { "data-p": p });
+  let i = 0;
+  while (i < text.length) { let j = i; while (j < text.length && col[j] === col[i]) j++; const seg = text.slice(i, j); el.append(col[i] ? h("mark", { class: "dmark c-" + col[i] }, seg) : document.createTextNode(seg)); i = j; }
+  return el;
+}
+function offsetIn(pEl, node, off) {
+  const w = document.createTreeWalker(pEl, NodeFilter.SHOW_TEXT); let n, total = 0;
+  if (node.nodeType !== 3) { // element boundary: count text before child index
+    const r = document.createRange(); r.setStart(pEl, 0); r.setEnd(node, off); return r.toString().length;
+  }
+  while ((n = w.nextNode())) { if (n === node) return total + off; total += n.nodeValue.length; }
+  return total;
+}
+let devoSel = null, devoBarHold = 0;
+function readDevoSelection() {
+  const sel = window.getSelection(); if (!sel || sel.isCollapsed || !sel.rangeCount) return null;
+  const body = document.querySelector(".devo-body"); if (!body) return null;
+  const r = sel.getRangeAt(0); if (!body.contains(r.commonAncestorContainer) && r.commonAncestorContainer !== body && !r.commonAncestorContainer.contains?.(body)) return null;
+  const dk = body.dataset.dk, pieces = [];
+  body.querySelectorAll("p[data-p]").forEach(pEl => {
+    if (!r.intersectsNode(pEl)) return;
+    const len = pEl.textContent.length;
+    const s = pEl.contains(r.startContainer) ? offsetIn(pEl, r.startContainer, r.startOffset) : 0;
+    const e = pEl.contains(r.endContainer) ? offsetIn(pEl, r.endContainer, r.endOffset) : len;
+    if (e > s) pieces.push({ p: +pEl.dataset.p, s, e });
+  });
+  return pieces.length ? { dk, pieces, text: sel.toString().trim() } : null;
+}
+function devoHighlight(color) {
+  const d = devoSel; if (!d) return;
+  const t = Date.now();
+  if (color) d.pieces.forEach((x, i) => { S.dhl[uid("dh")] = { k: d.dk, p: x.p, s: x.s, e: x.e, c: color, t: t + i }; });
+  else d.pieces.forEach(x => devoHls(d.dk, x.p).forEach(h0 => { if (h0.s < x.e && h0.e > x.s) S.dhl[h0.id] = { ...S.dhl[h0.id], c: "", t }; }));
+  saveKV("dhl"); devoSel = null; try { window.getSelection().removeAllRanges(); } catch {}
+  hideDevoBar(); rerenderKeepScroll(); toast(color ? "Highlighted" : "Highlight removed");
+}
+function hideDevoBar() { document.querySelectorAll(".devo-hlbar").forEach(e => e.remove()); }
+function showDevoBar() {
+  hideDevoBar();
+  const d = devoSel; if (!d) return;
+  const overlaps = d.pieces.some(x => devoHls(d.dk, x.p).some(h0 => h0.s < x.e && h0.e > x.s));
+  const keep = (e) => { e.preventDefault(); devoBarHold = Date.now(); };
+  const btn = (props, ...kids) => h("button", { type: "button", onpointerdown: keep, onmousedown: keep, ...props }, ...kids);
+  const bar = h("div", { class: "selbar devo-hlbar", role: "toolbar", "aria-label": "Highlight selected text" },
+    h("div", { class: "hl-row" }, h("span", { class: "count" }, "Highlight"),
+      h("span", { class: "hl-swatches", role: "group", "aria-label": "Highlight color" }, ...HL_COLORS.map(([k, l]) => btn({ class: "swatch c-" + k, "aria-label": "Highlight " + l, title: l, onclick: () => devoHighlight(k) })),
+        overlaps ? btn({ class: "btn sm hl-clear", onclick: () => devoHighlight("") }, "Remove") : null)),
+    h("div", { class: "row-acts" },
+      btn({ class: "btn sm", onclick: () => { copyText(d.text); } }, icon("copy"), "Copy"),
+      btn({ class: "btn sm", onclick: () => { const date = S.devo.date || ymd(new Date()); const ed = d.dk.split("|")[1]; newNote({ title: `Reflection · ${fmtDate(date, { month: "short", day: "numeric" })}`, ref: "", body: `“${d.text}” — C. H. Spurgeon, ${ed === "m" ? "Morning" : "Evening"}, ${fmtDate(date, { month: "long", day: "numeric" })}\n\n` }); devoSel = null; hideDevoBar(); go("notes"); } }, icon("notes"), "Add to notes"),
+      btn({ class: "btn sm", "aria-label": "Close", onclick: () => { devoSel = null; try { window.getSelection().removeAllRanges(); } catch {} hideDevoBar(); } }, icon("x"))));
+  document.body.append(bar);
+}
+let devoSelT = 0;
+document.addEventListener("selectionchange", () => {
+  if (S.tab !== "today") return;
+  clearTimeout(devoSelT);
+  devoSelT = setTimeout(() => {
+    const d = readDevoSelection();
+    if (d) { devoSel = d; showDevoBar(); }
+    else if (Date.now() - devoBarHold > 600) { devoSel = null; hideDevoBar(); }
+  }, 250);
+});
+
 /* ================= START ================= */
 async function start() {
   PLAN = buildPlan();
   PLAN.forEach((l, i) => l.forEach(r => { CHAP_DAY[chapKey(r)] = i + 1; }));
   try {
-    const [settings, progress, mem, pos, hlt] = await Promise.all(["settings", "progress3y", "mem", "biblePos", "hlt"].map(k => DB.get("kv", k).catch(() => null)));
+    const [settings, progress, mem, pos, hlt, dhl] = await Promise.all(["settings", "progress3y", "mem", "biblePos", "hlt", "dhl"].map(k => DB.get("kv", k).catch(() => null)));
     if (hlt) S.hlt = hlt;
+    if (dhl) S.dhl = dhl;
     if (settings) S.settings = { ...S.settings, ...settings }; else saveKV("settings");
     if (progress) S.progress = progress;
     if (mem) S.mem = mem;
