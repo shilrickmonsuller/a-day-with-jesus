@@ -1,0 +1,1668 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="A daily devotional with a 3-year Bible reading plan, memory verses, prayer list, Bible study log, sermon notes and a private journal.">
+<meta name="theme-color" content="#f1f3f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#10152a" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="A Day With Jesus">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon.ico" sizes="32x32">
+<link rel="icon" href="icons/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<style>body{margin:0}img{max-width:100%}</style>
+</head>
+<body>
+<title>A Day With Jesus</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%231b2440%22/%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2242%22%20r%3D%2215%22%20fill%3D%22%23e5a94c%22/%3E%3Crect%20x%3D%220%22%20y%3D%2242%22%20width%3D%2264%22%20height%3D%2222%22%20fill%3D%22%231b2440%22/%3E%3Crect%20x%3D%229%22%20y%3D%2240.5%22%20width%3D%2246%22%20height%3D%223.5%22%20rx%3D%221.75%22%20fill%3D%22%23f1f3f7%22/%3E%3Crect%20x%3D%2230.25%22%20y%3D%2210%22%20width%3D%223.5%22%20height%3D%2230%22%20rx%3D%221.75%22%20fill%3D%22%23f1f3f7%22/%3E%3Crect%20x%3D%2223%22%20y%3D%2217%22%20width%3D%2218%22%20height%3D%223.5%22%20rx%3D%221.75%22%20fill%3D%22%23f1f3f7%22/%3E%3C/svg%3E">
+<style>
+/* Layout: phone-first app shell. Sticky title bar, one scrolling content column, tab bar fixed to the bottom on phones and inline under the title on wide screens. */
+:root {
+  --bg: #f1f3f7;
+  --paper: #ffffff;
+  --ink: #1b2440;
+  --muted: #5b6580;
+  --line: #dde2ec;
+  --accent: #b5761c;       /* sunrise gold */
+  --accent-soft: #f7ecd8;
+  --indigo: #33437a;
+  --indigo-soft: #e6eaf6;
+  --ok: #2f7a4f;
+  --ok-soft: #e1f1e7;
+  --danger: #a8372f;
+  --hl: rgba(229, 172, 66, .28);
+  --read: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  --ui: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --read-size: 18px;
+  --sky-top: #f6e6c8; --sky-bot: #fbf3e6; --hill-far: #a9b3c9; --hill-near: #7d8aa8;
+  --bridge-sky: #eef1f8; --bridge-cliff: #c9d1e3; --bridge-chasm: #2a3352; --bridge-chasm-text: #f1c27a; --bridge-cross: #8a5a22; --bridge-label: #1b2440;
+  --nav-h: 64px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #10152a; --paper: #182039; --ink: #e7eaf3; --muted: #9aa4bd; --line: #2a3352;
+    --accent: #e4a94c; --accent-soft: #33291a; --indigo: #aab8ea; --indigo-soft: #222c4c;
+    --ok: #6cc796; --ok-soft: #173326; --danger: #ef8077; --hl: rgba(228, 169, 76, .25); --sky-top: #2a2f4d; --sky-bot: #1a2038; --hill-far: #39436a; --hill-near: #2b3456; --bridge-sky: #1b2240; --bridge-cliff: #34406a; --bridge-chasm: #0b0f1f; --bridge-chasm-text: #e4a94c; --bridge-cross: #d39a52; --bridge-label: #e7eaf3; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #10152a; --paper: #182039; --ink: #e7eaf3; --muted: #9aa4bd; --line: #2a3352;
+  --accent: #e4a94c; --accent-soft: #33291a; --indigo: #aab8ea; --indigo-soft: #222c4c;
+  --ok: #6cc796; --ok-soft: #173326; --danger: #ef8077; --hl: rgba(228, 169, 76, .25); --sky-top: #2a2f4d; --sky-bot: #1a2038; --hill-far: #39436a; --hill-near: #2b3456; --bridge-sky: #1b2240; --bridge-cliff: #34406a; --bridge-chasm: #0b0f1f; --bridge-chasm-text: #e4a94c; --bridge-cross: #d39a52; --bridge-label: #e7eaf3; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); }
+body { color: var(--ink); font-family: var(--ui); font-size: 15px; line-height: 1.5; -webkit-tap-highlight-color: transparent; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--bg); }
+button, input, select, textarea { font: inherit; color: inherit; }
+a { color: var(--indigo); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.gutter { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.shell { max-width: 860px; margin: 0 auto; }
+
+/* Title bar */
+.topbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--bg); border-bottom: 1px solid var(--line); }
+.topbar .shell { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 10px; }
+.brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.brand h1 { margin: 0; font-family: var(--read); font-weight: 600; font-size: 20px; letter-spacing: -0.01em; white-space: nowrap; }
+.icon-btn { display: inline-grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--line); background: var(--paper); cursor: pointer; flex: none; }
+.icon-btn svg { width: 20px; height: 20px; }
+
+/* Tab bar: bottom bar with "More" on phones, scrolling tab row on tablets and desktops */
+.tabbar { display: flex; gap: 4px; }
+.tabbar button { flex: 1; display: grid; justify-items: center; gap: 2px; border: 0; background: transparent; color: var(--muted); font-size: 11.5px; font-weight: 600; padding: 8px 4px; border-radius: 12px; cursor: pointer; min-width: 0; white-space: nowrap; }
+.tabbar button svg { width: 24px; height: 24px; }
+.tabbar button[aria-current="page"] { color: var(--ink); }
+.tabbar button[aria-current="page"] svg { color: var(--accent); }
+.tabbar button span:last-child { overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+@media (max-width: 699px) {
+  .tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 25; background: var(--paper); border-top: 1px solid var(--line);
+    padding: 4px max(6px, env(safe-area-inset-right, 0px)) calc(4px + env(safe-area-inset-bottom, 0px)) max(6px, env(safe-area-inset-left, 0px)); gap: 0; }
+  .tabbar .secondary-tab { display: none; }
+  .tabbar button { min-height: 54px; font-size: 11px; }
+  main { padding-bottom: calc(var(--nav-h) + 28px + env(safe-area-inset-bottom, 0px)) !important; }
+  .selbar, .toast { bottom: calc(var(--nav-h) + 12px + env(safe-area-inset-bottom, 0px)) !important; }
+  .topbar .shell { padding-block: 8px; }
+  .brand h1 { font-size: 18px; }
+}
+@media (min-width: 700px) {
+  .tabbar-wrap { border-bottom: 1px solid var(--line); background: var(--bg); position: sticky; top: calc(env(safe-area-inset-top, 0px) + 61px); z-index: 19; }
+  .tabbar { padding-block: 6px; overflow-x: auto; scrollbar-width: none; }
+  .tabbar::-webkit-scrollbar { display: none; }
+  .tabbar .more-tab { display: none; }
+  .tabbar button { flex: 0 0 auto; display: flex; justify-content: center; align-items: center; gap: 7px; font-size: 14px; padding: 9px 13px; }
+  .tabbar button svg { width: 20px; height: 20px; }
+  .tabbar button[aria-current="page"] { background: var(--paper); box-shadow: 0 0 0 1px var(--line); }
+}
+@media (min-width: 1100px) { .tabbar { justify-content: center; } }
+.more-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.more-item { display: grid; justify-items: center; gap: 8px; padding: 18px 8px; border-radius: 16px; border: 1px solid var(--line); background: var(--bg); cursor: pointer; font-weight: 700; font-size: 13.5px; color: var(--ink); text-align: center; }
+.more-item svg { width: 28px; height: 28px; color: var(--accent); }
+.more-item.cur { border-color: var(--accent); background: var(--accent-soft); }
+
+main { padding-block: 22px 56px; }
+[hidden] { display: none !important; }
+.eyebrow { font-size: 11.5px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); }
+.muted { color: var(--muted); }
+.small { font-size: 13px; }
+.stack { display: grid; gap: 16px; }
+.row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.spread { display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.panel { background: var(--paper); border: 1px solid var(--line); border-radius: 16px; padding: 18px; min-width: 0; }
+h2.title { font-family: var(--read); font-weight: 600; font-size: clamp(24px, 4.5vw, 32px); line-height: 1.15; margin: 4px 0 0; text-wrap: balance; letter-spacing: -0.01em; }
+h3.sub { margin: 0; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-weight: 600; font-size: 14px; border-radius: 11px; padding: 9px 14px; cursor: pointer; border: 1px solid var(--line); background: var(--paper); color: var(--ink); text-decoration: none; line-height: 1.2; }
+.btn.primary { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.btn.soft { background: var(--indigo-soft); border-color: transparent; color: var(--indigo); }
+.btn.ghost { background: transparent; }
+.btn.danger { color: var(--danger); }
+.btn.sm { padding: 6px 10px; font-size: 13px; border-radius: 9px; }
+.btn:disabled { opacity: .5; cursor: default; }
+.btn svg { width: 16px; height: 16px; }
+.chip { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 700; padding: 3px 9px; border-radius: 999px; background: var(--indigo-soft); color: var(--indigo); }
+.chip.gold { background: var(--accent-soft); color: var(--accent); }
+.chip.ok { background: var(--ok-soft); color: var(--ok); }
+.seg { display: inline-flex; background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 3px; gap: 2px; flex-wrap: wrap; }
+.seg button { border: 0; background: transparent; padding: 6px 12px; border-radius: 9px; font-weight: 600; font-size: 13px; color: var(--muted); cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+input.field, textarea.field, select.field { font-size: 16px; width: 100%; background: var(--bg); border: 1px solid var(--line); border-radius: 11px; padding: 10px 12px; }
+textarea.field { font-family: var(--read); font-size: 16px; line-height: 1.65; resize: vertical; }
+label.lbl { display: grid; gap: 6px; font-size: 12px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
+label.lbl > * { text-transform: none; letter-spacing: 0; font-weight: 400; color: var(--ink); font-size: 15px; }
+
+/* Today */
+.dayhead { display: grid; gap: 6px; }
+.daynav { display: flex; align-items: center; gap: 6px; }
+.progress { height: 8px; border-radius: 99px; background: var(--line); overflow: hidden; }
+.progress > i { display: block; height: 100%; background: var(--accent); border-radius: 99px; }
+.stats { display: flex; gap: 18px; flex-wrap: wrap; font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.stats b { color: var(--ink); font-size: 15px; }
+.chap { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; padding: 12px 0; border-top: 1px solid var(--line); }
+.chap:first-of-type { border-top: 0; }
+.check { width: 26px; height: 26px; border-radius: 8px; border: 2px solid var(--line); background: var(--paper); display: grid; place-items: center; cursor: pointer; padding: 0; }
+.check svg { width: 16px; height: 16px; opacity: 0; color: var(--paper); }
+.check[aria-checked="true"] { background: var(--ok); border-color: var(--ok); }
+.check[aria-checked="true"] svg { opacity: 1; }
+.chap .name { font-family: var(--read); font-size: 17px; font-weight: 600; }
+.chap .lane { font-size: 12px; color: var(--muted); }
+.verse-card { background: var(--paper); border: 1px solid var(--line); border-radius: 16px; padding: 20px; display: grid; gap: 10px; }
+.verse-card blockquote { margin: 0; font-family: var(--read); font-size: 18px; line-height: 1.6; font-style: italic; }
+.verse-card .ref { font-weight: 800; font-size: 13px; letter-spacing: .05em; color: var(--indigo); }
+.soap { display: grid; gap: 12px; }
+.soap textarea { min-height: 84px; }
+.saved-note { font-size: 12.5px; color: var(--muted); min-height: 1em; }
+.banner { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; background: var(--indigo-soft); color: var(--indigo); border-radius: 14px; padding: 12px 14px; font-size: 14px; }
+
+/* Plan list */
+.plan-list { display: grid; gap: 6px; }
+.plan-row { display: grid; grid-template-columns: 56px 1fr auto; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 12px; background: var(--paper); border: 1px solid var(--line); text-align: left; cursor: pointer; width: 100%; }
+.plan-row.current { border-color: var(--accent); box-shadow: inset 3px 0 0 var(--accent); }
+.plan-row .dn { font-weight: 800; font-variant-numeric: tabular-nums; }
+.plan-row .dd { font-size: 12px; color: var(--muted); }
+.plan-row .refs { font-size: 13.5px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.plan-month { margin: 14px 0 4px; font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+
+/* Bible */
+.bible-bar { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; align-items: center; }
+.bible-bar select { min-width: 0; }
+.chapter-title { font-family: var(--read); font-size: 28px; font-weight: 600; margin: 0; }
+.verses { font-family: var(--read); font-size: var(--read-size); line-height: 1.8; }
+.verses p { margin: 0; padding: 3px 6px; border-radius: 8px; cursor: pointer; }
+.verses p sup { font-family: var(--ui); font-size: .6em; font-weight: 700; color: var(--accent); margin-right: 6px; vertical-align: .45em; }
+.verses p.sel { background: var(--indigo-soft); }
+.verses p.saved { text-decoration: underline; text-decoration-color: var(--accent); text-decoration-thickness: 2px; text-underline-offset: 4px; }
+.verses p.hl { background: var(--hl); }
+.sc { font-variant: small-caps; letter-spacing: .03em; }
+.selbar { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 26; display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; background: var(--ink); color: var(--paper); padding: 8px; border-radius: 16px; box-shadow: 0 10px 30px rgba(10, 15, 35, .3); width: max-content; max-width: calc(100% - 24px); }
+.selbar .btn { background: transparent; border-color: transparent; color: var(--paper); }
+.selbar .count { align-self: center; font-size: 13px; font-weight: 700; padding: 0 8px; }
+.search-results { display: grid; gap: 6px; }
+.result { text-align: left; padding: 12px 14px; border-radius: 12px; background: var(--paper); border: 1px solid var(--line); cursor: pointer; width: 100%; }
+.result b { display: block; font-size: 12.5px; color: var(--indigo); margin-bottom: 2px; }
+.result span { font-family: var(--read); font-size: 15.5px; }
+.result mark { background: var(--hl); color: inherit; border-radius: 3px; }
+.book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 6px; }
+.book-grid button, .chap-grid button { border: 1px solid var(--line); background: var(--paper); border-radius: 10px; padding: 9px 8px; cursor: pointer; font-size: 13.5px; font-weight: 600; text-align: left; }
+.chap-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(48px, 1fr)); gap: 6px; }
+.chap-grid button { text-align: center; font-variant-numeric: tabular-nums; }
+.book-grid button.cur, .chap-grid button.cur { border-color: var(--accent); background: var(--accent-soft); }
+
+/* Memory + saved cards */
+.mem-list { display: grid; gap: 10px; }
+.mem { background: var(--paper); border: 1px solid var(--line); border-radius: 14px; padding: 16px; display: grid; gap: 8px; min-width: 0; }
+.mem.week { border-color: var(--accent); }
+.mem .top { display: flex; justify-content: space-between; gap: 8px; align-items: start; flex-wrap: wrap; }
+.mem .ref { font-weight: 800; color: var(--indigo); font-size: 14px; }
+.mem .topic { font-size: 12.5px; color: var(--muted); font-weight: 600; }
+.mem .txt { font-family: var(--read); font-size: 16.5px; line-height: 1.6; margin: 0; }
+.mem .acts { display: flex; gap: 6px; flex-wrap: wrap; }
+.sec-head { display: flex; align-items: baseline; gap: 10px; margin-top: 10px; }
+.sec-head b { font-family: var(--read); font-size: 20px; }
+.btn.on { background: var(--ok-soft); color: var(--ok); border-color: transparent; }
+
+/* Notes */
+.journal { display: grid; grid-template-columns: 280px 1fr; gap: 14px; align-items: start; }
+@media (max-width: 759px) { .journal { grid-template-columns: 1fr; } .journal.editing .note-list { display: none; } .journal:not(.editing) .editor-col { display: none; } }
+.note-list { display: grid; gap: 8px; min-width: 0; }
+.note-item { text-align: left; display: grid; gap: 3px; padding: 12px 14px; border-radius: 12px; background: var(--paper); border: 1px solid var(--line); width: 100%; min-width: 0; cursor: pointer; }
+.note-item.active { border-color: var(--ink); box-shadow: inset 3px 0 0 var(--accent); }
+.note-item .nt { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.note-item .nm { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; display: flex; gap: 6px; flex-wrap: wrap; }
+.note-item .ns { font-size: 13px; color: var(--muted); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.editor { display: grid; gap: 12px; }
+.editor textarea.body { min-height: 240px; }
+.attach-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.att { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--bg); display: grid; min-width: 0; }
+.att img { width: 100%; height: 120px; object-fit: cover; display: block; background: var(--line); }
+.att audio, .att video { width: 100%; display: block; }
+.att .meta { padding: 8px 10px; display: grid; gap: 4px; font-size: 12.5px; min-width: 0; }
+.att .meta .nm { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.att .doc { height: 72px; display: grid; place-items: center; color: var(--indigo); font-weight: 800; font-size: 13px; letter-spacing: .06em; background: var(--indigo-soft); }
+.att.wide { grid-column: 1 / -1; }
+.dropzone { border: 2px dashed var(--line); border-radius: 12px; padding: 14px; text-align: center; color: var(--muted); font-size: 13.5px; }
+.dropzone.over { border-color: var(--accent); background: var(--accent-soft); }
+
+.empty { text-align: center; padding: 32px 18px; color: var(--muted); background: var(--paper); border: 1px dashed var(--line); border-radius: 16px; display: grid; gap: 10px; justify-items: center; }
+.empty b { font-family: var(--read); font-size: 18px; color: var(--ink); }
+.confirm { display: inline-flex; gap: 6px; align-items: center; flex-wrap: wrap; font-size: 13px; }
+
+/* Overlay (practice, settings) */
+.overlay { position: fixed; inset: 0; z-index: 40; background: rgba(8, 12, 28, .55); display: grid; place-items: end center; padding: 12px; padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px)); padding-top: calc(12px + env(safe-area-inset-top, 0px)); }
+@media (min-width: 760px) { .overlay { place-items: center; } }
+.sheet { background: var(--paper); color: var(--ink); width: 100%; max-width: 560px; max-height: 100%; overflow: auto; border-radius: 20px; padding: 20px; display: grid; gap: 14px; }
+.flash { display: grid; gap: 14px; text-align: center; }
+.flash .ref { font-family: var(--read); font-size: 26px; font-weight: 600; }
+.flash .txt { font-family: var(--read); font-size: 19px; line-height: 1.65; min-height: 120px; display: grid; place-items: center; padding: 16px; border-radius: 14px; background: var(--bg); }
+.flash .txt.hidden { color: var(--muted); font-style: italic; font-size: 15px; }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(20px + env(safe-area-inset-bottom, 0px)); z-index: 50; background: var(--ink); color: var(--paper); padding: 10px 16px; border-radius: 12px; font-size: 14px; font-weight: 600; box-shadow: 0 8px 24px rgba(10, 15, 35, .3); max-width: calc(100% - 32px); }
+.loading { display: grid; place-items: center; gap: 10px; padding: 40px 0; color: var(--muted); }
+@media (prefers-reduced-motion: no-preference) {
+  .view { animation: rise .3s ease both; }
+  @keyframes rise { from { transform: translateY(6px); } to { transform: none; } }
+}
+
+/* Inputs: 16px stops iPhone from zooming in on focus */
+input, select, textarea { font-size: 16px; }
+.seg-wide { display: flex; width: 100%; }
+.seg-wide button { flex: 1; }
+.seg button { min-height: 36px; }
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; }
+@media (max-width: 520px) { .two { grid-template-columns: 1fr; } .more-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.panel.inset { background: var(--bg); border-style: dashed; }
+.log-item { border-left: 3px solid var(--accent); padding: 4px 0 4px 12px; display: grid; gap: 4px; }
+.log-text { font-family: var(--read); font-size: 16px; line-height: 1.6; white-space: pre-wrap; }
+.dz-hint { margin-right: 4px; }
+@media (hover: none) { .dz-hint { display: none; } }
+.chip.sel { background: var(--ink); color: var(--paper); }
+.people-chips .chip { cursor: pointer; border: 0; font-size: 13px; padding: 6px 12px; }
+.prayer-card.answered { border-color: var(--ok); }
+.answer { background: var(--ok-soft); color: var(--ok); border-radius: 12px; padding: 10px 12px; display: grid; gap: 4px; font-size: 14.5px; }
+.answer div { color: var(--ink); font-family: var(--read); font-size: 16px; }
+.flash-hl { box-shadow: 0 0 0 3px var(--accent); transition: box-shadow .3s; }
+.plan-month-box { background: var(--paper); border: 1px solid var(--line); border-radius: 14px; padding: 4px 12px; }
+.plan-month-box > summary { cursor: pointer; display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: baseline; padding: 10px 0; font-weight: 700; list-style: none; }
+.plan-month-box > summary::-webkit-details-marker { display: none; }
+.plan-month-box > summary::after { content: "▾"; color: var(--muted); }
+.plan-month-box[open] > summary::after { content: "▴"; }
+.plan-month-box .plan-list { padding-bottom: 10px; }
+@media (max-width: 520px) { .chap { grid-template-columns: auto 1fr; } .chap-acts { grid-column: 2; } }
+
+/* Bridge illustration */
+.bridge-art svg { width: 100%; height: auto; display: block; }
+.bridge-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.bridge-steps li { display: grid; grid-template-columns: 30px 1fr; gap: 10px; align-items: start; }
+.bridge-num { width: 28px; height: 28px; border-radius: 50%; background: var(--ink); color: var(--paper); display: grid; place-items: center; font-weight: 800; font-size: 14px; }
+.bridge-steps .chip { cursor: pointer; border: 0; }
+
+/* Daily devotional (Today) */
+.devo { display: grid; gap: 18px; }
+.devo-hero { width: min(340px, 82%); aspect-ratio: 8 / 3; margin: 0 auto; border-radius: 0 0 170px 170px / 0 0 128px 128px; overflow: hidden; max-width: 100%; }
+.devo-hero svg { width: 100%; height: 100%; display: block; }
+.devo-head { text-align: center; display: grid; gap: 6px; justify-items: center; }
+.devo-title { font-family: var(--read); font-weight: 600; font-size: clamp(28px, 6vw, 42px); line-height: 1.12; margin: 0; text-wrap: balance; letter-spacing: -0.015em; max-width: 20ch; }
+.devo-by { font-size: 12px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.devo-grid { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 36px; align-items: start; }
+.devo-aside { display: grid; gap: 28px; position: sticky; top: 130px; }
+.devo-aside-label { font-size: 11.5px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.devo-date { display: flex; align-items: center; gap: 6px; }
+.devo-date .icon-btn { width: 36px; height: 36px; }
+.devo-date-label { position: relative; display: inline-flex; align-items: center; gap: 4px; font-family: var(--read); font-weight: 600; font-size: 16px; cursor: pointer; padding: 6px 4px; }
+.devo-date-label svg { width: 16px; height: 16px; }
+.devo-date-input { position: absolute; inset: 0; opacity: 0; width: 100%; cursor: pointer; }
+.devo-editions { display: grid; gap: 6px; justify-items: start; }
+.devo-editions button { border: 0; background: transparent; padding: 4px 0; font-size: 15px; color: var(--muted); cursor: pointer; font-weight: 600; }
+.devo-editions button[aria-pressed="true"] { color: var(--ink); text-decoration: underline; text-underline-offset: 5px; text-decoration-thickness: 2px; text-decoration-color: var(--accent); }
+.devo-main { display: grid; gap: 18px; max-width: 64ch; }
+.devo-key { font-family: var(--read); font-style: italic; font-size: 20px; line-height: 1.5; margin: 0; }
+.devo-ref { font-style: normal; font-weight: 700; color: var(--accent); background: none; border: 0; padding: 0; font: inherit; font-style: normal; text-decoration: underline; text-underline-offset: 4px; cursor: pointer; }
+.devo-body p { font-family: var(--read); font-size: var(--read-size); line-height: 1.8; margin: 0 0 1.05em; }
+.devo-body p:first-child::first-letter { font-size: 2.6em; float: left; line-height: .9; padding: 6px 8px 0 0; color: var(--accent); font-weight: 600; }
+.devo-rule { border: 0; border-top: 1px solid var(--accent); opacity: .4; margin: 4px 0; width: 100%; }
+.devo-foot { display: grid; gap: 14px; }
+.devo-plan { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; align-items: center; text-align: left; background: var(--paper); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; cursor: pointer; color: var(--ink); font-size: 15px; }
+.devo-plan .devo-aside-label { grid-column: 1 / -1; color: var(--accent); }
+.devo-plan svg { width: 18px; height: 18px; color: var(--muted); }
+@media (max-width: 759px) {
+  .devo-grid { grid-template-columns: 1fr; gap: 18px; }
+  .devo-aside { position: static; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; border-block: 1px solid var(--line); padding-block: 8px; }
+  .devo-editions { display: flex; align-items: center; gap: 14px; }
+  .devo-editions .devo-aside-label { display: none; }
+  .devo-key { font-size: 18.5px; }
+}
+.bridge-art { max-width: 620px; width: 100%; margin: 0 auto; }
+.devo-date-label { white-space: nowrap; }
+@media (min-width: 760px) { .devo-grid { grid-template-columns: 200px minmax(0, 1fr); } .devo-date .icon-btn { width: 32px; height: 32px; } }
+@media (min-width: 700px) { .tabbar.shell { max-width: 1120px; } .tabbar button { padding: 9px 11px; gap: 6px; } }
+
+</style>
+<header class="topbar gutter">
+  <div class="shell">
+    <div class="brand">
+      <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true">
+        <circle cx="15" cy="19" r="7.5" fill="var(--accent)"/>
+        <rect x="1" y="19" width="28" height="11" fill="var(--bg)"/>
+        <line x1="3" y1="20" x2="27" y2="20" stroke="var(--ink)" stroke-width="2" stroke-linecap="round"/>
+        <line x1="15" y1="4" x2="15" y2="15" stroke="var(--ink)" stroke-width="2" stroke-linecap="round"/>
+        <line x1="10.5" y1="8" x2="19.5" y2="8" stroke="var(--ink)" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <h1>A Day With Jesus</h1>
+    </div>
+    <button class="icon-btn" id="open-settings" type="button" aria-label="Settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+    </button>
+  </div>
+</header>
+<div class="tabbar-wrap gutter">
+  <nav class="tabbar shell" id="tabbar" aria-label="Sections"></nav>
+</div>
+<main class="gutter">
+  <div class="shell" id="view"></div>
+</main>
+<div id="layer"></div>
+
+<script>
+"use strict";
+/* ============ A Day With Jesus ============ */
+const BOOKS = ["Genesis","Exodus","Leviticus","Numbers","Deuteronomy","Joshua","Judges","Ruth","1 Samuel","2 Samuel","1 Kings","2 Kings","1 Chronicles","2 Chronicles","Ezra","Nehemiah","Esther","Job","Psalms","Proverbs","Ecclesiastes","Song of Solomon","Isaiah","Jeremiah","Lamentations","Ezekiel","Daniel","Hosea","Joel","Amos","Obadiah","Jonah","Micah","Nahum","Habakkuk","Zephaniah","Haggai","Zechariah","Malachi","Matthew","Mark","Luke","John","Acts","Romans","1 Corinthians","2 Corinthians","Galatians","Ephesians","Philippians","Colossians","1 Thessalonians","2 Thessalonians","1 Timothy","2 Timothy","Titus","Philemon","Hebrews","James","1 Peter","2 Peter","1 John","2 John","3 John","Jude","Revelation"];
+const CHAPTERS = [50,40,27,36,34,24,21,4,31,24,22,25,29,36,10,13,10,42,150,31,12,8,66,52,5,48,12,14,3,9,1,4,7,3,3,3,2,14,4,28,16,24,21,28,16,16,13,6,6,4,4,5,3,6,4,3,1,13,5,5,3,5,1,1,1,22];
+const PLAN_DAYS = 1095;
+const NIV_NOTICE = "Scripture quotations marked NIV are taken from the Holy Bible, New International Version®, NIV®. Copyright © 1973, 1978, 1984 by Biblica, Inc.™ Used by permission. All rights reserved worldwide.";
+
+/* ---------- small helpers ---------- */
+const $ = (s, r = document) => r.querySelector(s);
+const pad = (n) => String(n).padStart(2, "0");
+function esc(s) { return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
+function h(tag, props, ...kids) {
+  const el = document.createElement(tag);
+  for (const [k, v] of Object.entries(props || {})) {
+    if (v == null || v === false) continue;
+    if (k === "class") el.className = v;
+    else if (k === "html") el.innerHTML = v;
+    else if (k.startsWith("on") && typeof v === "function") el.addEventListener(k.slice(2), v);
+    else if (k === "value") el.value = v;
+    else el.setAttribute(k, v === true ? "" : v);
+  }
+  for (const k of kids.flat(Infinity)) {
+    if (k == null || k === false) continue;
+    el.append(k instanceof Node ? k : document.createTextNode(String(k)));
+  }
+  return el;
+}
+const ICONS = {
+  today: '<path d="M12 3v2M5.6 5.6l1.4 1.4M3 12h2M19 12h2M17 7l1.4-1.4"/><path d="M7 16a5 5 0 0 1 10 0"/><path d="M3 20h18"/>',
+  bible: '<path d="M4 4.5A1.5 1.5 0 0 1 5.5 3H20v16H5.5A1.5 1.5 0 0 0 4 20.5z"/><path d="M4 20.5A1.5 1.5 0 0 0 5.5 22H20v-3"/><path d="M12 7v7M9.5 9.5h5"/>',
+  lamp: '<path d="M8 14c-2.5 0-5-1-5-3h18c0 2-2.5 3-5 3"/><path d="M8 14l1 4h6l1-4"/><path d="M12 11c-1.5-1.5-1.5-4 0-7 1.5 3 1.5 5.5 0 7z"/><path d="M8 21h8"/>',
+  saved: '<path d="M6 3h12v18l-6-4-6 4z"/>',
+  notes: '<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/>',
+  check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+  left: '<path d="M15 18l-6-6 6-6"/>', right: '<path d="M9 18l6-6-6-6"/>',
+  ext: '<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
+  clip: '<path d="M21 11.5l-8.5 8.5a5 5 0 0 1-7-7L14 4.5a3.3 3.3 0 0 1 4.7 4.7l-8.6 8.6a1.7 1.7 0 0 1-2.4-2.4L15.5 7.5"/>',
+  x: '<path d="M6 6l12 12M18 6L6 18"/>', search: '<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>',
+  plan: '<rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4M7.5 13.5l2 2 4-4"/>',
+  memory: '<path d="M8 14c-2.5 0-5-1-5-3h18c0 2-2.5 3-5 3"/><path d="M8 14l1 4h6l1-4"/><path d="M12 11c-1.5-1.5-1.5-4 0-7 1.5 3 1.5 5.5 0 7z"/><path d="M8 21h8"/>',
+  study: '<circle cx="9" cy="7.5" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 4.5a3 3 0 0 1 0 6M18 14a5 5 0 0 1 3 6"/>',
+  prayer: '<path d="M12 21V11.5l-2.5-6a1.5 1.5 0 0 0-2.8 1L8 12l-3.4 3.4a2 2 0 0 0-.6 1.4V21"/><path d="M12 21V11.5l2.5-6a1.5 1.5 0 0 1 2.8 1L16 12l3.4 3.4a2 2 0 0 1 .6 1.4V21"/>',
+  more: '<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>',
+  down: '<path d="M6 9l6 6 6-6"/>',
+  sermons: '<path d="M12 3a3 3 0 0 1 3 3v5a3 3 0 0 1-6 0V6a3 3 0 0 1 3-3z"/><path d="M19 11a7 7 0 0 1-14 0M12 18v3M8 21h8"/>',
+  play: '<path d="M7 4l13 8-13 8z"/>', plus: '<path d="M12 5v14M5 12h14"/>', copy: '<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h10"/>',
+};
+function icon(name) { return h("span", { "aria-hidden": "true", style: "display:inline-grid", html: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[name]}</svg>` }); }
+let toastTimer;
+function toast(msg) {
+  document.querySelectorAll(".toast").forEach(t => t.remove());
+  const t = h("div", { class: "toast", role: "status" }, msg);
+  document.body.append(t); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.remove(), 2600);
+}
+function ymd(d) { return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; }
+function parseYmd(s) { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); }
+function diffDays(a, b) { return Math.round((parseYmd(b) - parseYmd(a)) / 864e5); }
+function addDays(s, n) { const d = parseYmd(s); d.setDate(d.getDate() + n); return ymd(d); }
+function fmtDate(s, opts) { return parseYmd(s).toLocaleDateString(undefined, opts || { weekday: "long", month: "long", day: "numeric", year: "numeric" }); }
+function fmtTs(ts) { return new Date(ts).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" }); }
+function uid(p) { return p + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+function nivUrl(ref) { return "https://www.biblegateway.com/passage/?search=" + encodeURIComponent(ref) + "&version=NIV"; }
+function nivLink(ref, label = "NIV") { return h("a", { class: "btn sm ghost", href: nivUrl(ref), target: "_blank", rel: "noopener", title: "Read " + ref + " in the NIV on BibleGateway" }, label, icon("ext")); }
+function fmtBytes(n) { return n < 1024 ? n + " B" : n < 1048576 ? (n / 1024).toFixed(0) + " KB" : (n / 1048576).toFixed(1) + " MB"; }
+async function copyText(t) {
+  try { await navigator.clipboard.writeText(t); toast("Copied"); }
+  catch { const ta = h("textarea", { style: "position:fixed;opacity:0" }); ta.value = t; document.body.append(ta); ta.select(); try { document.execCommand("copy"); toast("Copied"); } catch { toast("Select the text and copy it manually"); } ta.remove(); }
+}
+
+/* ---------- storage (IndexedDB, with in-memory fallback) ---------- */
+const DB = (() => {
+  let dbp = null, mem = null;
+  const STORES = ["kv", "notes", "files", "saved", "sermons", "studies", "prayers"];
+  function open() {
+    if (dbp) return dbp;
+    dbp = new Promise((res, rej) => {
+      try {
+        const r = indexedDB.open("a-day-with-jesus", 3);
+        r.onupgradeneeded = () => { const d = r.result; STORES.forEach(s => { if (!d.objectStoreNames.contains(s)) d.createObjectStore(s, s === "kv" ? undefined : { keyPath: "id" }); }); };
+        r.onsuccess = () => res(r.result);
+        r.onerror = () => rej(r.error);
+        r.onblocked = () => rej(new Error("blocked"));
+      } catch (e) { rej(e); }
+    }).catch(() => { mem = Object.fromEntries(STORES.map(s => [s, new Map()])); return null; });
+    return dbp;
+  }
+  async function run(store, mode, fn) {
+    const d = await open();
+    if (!d) return fn(null, mem[store]);
+    return new Promise((res, rej) => {
+      const t = d.transaction(store, mode); const r = fn(t.objectStore(store));
+      t.oncomplete = () => res(r && "result" in r ? r.result : r);
+      t.onerror = () => rej(t.error); t.onabort = () => rej(t.error);
+    });
+  }
+  return {
+    persistent: async () => !!(await open()),
+    get: (s, k) => run(s, "readonly", (o, m) => o ? o.get(k) : m.get(k)),
+    put: (s, v, k) => run(s, "readwrite", (o, m) => o ? (k === undefined ? o.put(v) : o.put(v, k)) : (m.set(k === undefined ? v.id : k, v), null)),
+    del: (s, k) => run(s, "readwrite", (o, m) => o ? o.delete(k) : (m.delete(k), null)),
+    all: (s) => run(s, "readonly", (o, m) => o ? o.getAll() : [...m.values()]),
+    clear: (s) => run(s, "readwrite", (o, m) => o ? o.clear() : (m.clear(), null)),
+  };
+})();
+
+/* ---------- state ---------- */
+const S = {
+  settings: { start: ymd(new Date()), theme: "system", fontSize: 18 },
+  progress: {},      // { "day": ["b.c", ...] }
+  mem: {},           // { "A1": {m: true, t: ts} }
+  saved: [],
+  notes: [],
+  tab: "today",
+  todayMode: "day",
+  viewDay: null,
+  bible: { b: 42, c: 1, mode: "read", sel: new Set(), hl: null, back: null, pickBook: null, q: "", results: null },
+  lampSec: "all", lampStatus: "all",
+  savedFilter: "all", savedForm: null,
+  notesFilter: "all", notesQ: "", activeNote: null, editing: false,
+  sermons: [], sermonFilter: "all", sermonQ: "", activeSermon: null, sermonEditing: false,
+  devo: { date: null, ed: null }, memColl: "lamp2",
+  studies: [], studyQ: "", activeStudy: null, studyEditing: false,
+  prayers: [], prayerMode: "others", prayerFilter: "praying", prayerPerson: "", prayerForm: null, answering: null,
+};
+let BIBLE = null, bibleLoading = null, MEMORY = null, PLAN = null;
+const KV_KEYS = { progress: "progress3y" };
+const saveKV = (k) => DB.put("kv", S[k], KV_KEYS[k] || k).catch(() => {});
+
+/* ---------- plan ---------- */
+function buildPlan() {
+  // Whole books, interleaved: Old Testament, New Testament, and Psalms/Proverbs in portions.
+  const ot = [], nt = [], wis = [];
+  const block = (b, from, to) => ({ b, from, to, n: to - from + 1 });
+  for (let b = 0; b < 39; b++) {
+    if (b === 18) { for (let c = 1; c <= 150; c += 10) wis.push(block(18, c, Math.min(150, c + 9))); }
+    else if (b === 19) { wis.push(block(19, 1, 10), block(19, 11, 20), block(19, 21, 31)); }
+    else ot.push(block(b, 1, CHAPTERS[b]));
+  }
+  for (let b = 39; b < 66; b++) nt.push(block(b, 1, CHAPTERS[b]));
+  const streams = [ot, nt, wis].map(list => ({ list, i: 0, done: 0, total: list.reduce((a, x) => a + x.n, 0) }));
+  const chapters = [];
+  for (;;) {
+    const open = streams.filter(st => st.i < st.list.length);
+    if (!open.length) break;
+    const st = open.reduce((a, x) => (x.done / x.total < a.done / a.total ? x : a));
+    const bk = st.list[st.i++]; st.done += bk.n;
+    const lane = bk.b === 18 ? "Psalms" : bk.b === 19 ? "Proverbs" : bk.b < 39 ? "Old Testament" : "New Testament";
+    for (let c = bk.from; c <= bk.to; c++) chapters.push({ b: bk.b, c, lane });
+  }
+  const N = chapters.length, days = [];
+  for (let d = 0; d < PLAN_DAYS; d++) days.push(chapters.slice(Math.floor(d * N / PLAN_DAYS), Math.floor((d + 1) * N / PLAN_DAYS)));
+  return days;
+}
+const chapKey = (r) => r.b + "." + r.c;
+const chapName = (r) => BOOKS[r.b] + " " + r.c;
+function summarize(list) {
+  const out = []; let i = 0;
+  while (i < list.length) {
+    let j = i; while (j + 1 < list.length && list[j + 1].b === list[i].b && list[j + 1].c === list[j].c + 1) j++;
+    out.push(BOOKS[list[i].b] + " " + list[i].c + (j > i ? "–" + list[j].c : "")); i = j + 1;
+  }
+  return out.join(" · ");
+}
+function currentDay() { return Math.min(Math.max(diffDays(S.settings.start, ymd(new Date())) + 1, 1), PLAN_DAYS); }
+function planFinished() { return diffDays(S.settings.start, ymd(new Date())) + 1 > PLAN_DAYS; }
+function dateForDay(n) { return addDays(S.settings.start, n - 1); }
+function dayDone(n) { const done = S.progress[n] || []; return PLAN[n - 1].every(r => done.includes(chapKey(r))); }
+function streak() {
+  let n = currentDay(), s = 0;
+  if (!dayDone(n)) n--;
+  while (n >= 1 && dayDone(n)) { s++; n--; }
+  return s;
+}
+function totals() {
+  let all = 0, done = 0, days = 0;
+  PLAN.forEach((list, i) => { all += list.length; const d = (S.progress[i + 1] || []).length; done += Math.min(d, list.length); if (dayDone(i + 1)) days++; });
+  return { all, done, days };
+}
+
+/* ---------- references ---------- */
+function findBook(name) {
+  const n = name.trim().toLowerCase().replace(/\s+/g, " ").replace(/^psalm$/, "psalms").replace(/^song of songs$/, "song of solomon");
+  let i = BOOKS.findIndex(b => b.toLowerCase() === n);
+  if (i < 0) i = BOOKS.findIndex(b => b.toLowerCase().replace(/\s/g, "") === n.replace(/\s/g, ""));
+  return i;
+}
+function parseRef(ref) {
+  const m = /^\s*((?:[123]\s*)?[A-Za-z][A-Za-z ]*?)\s*(\d+)(?::([\d\s,\-–]+))?\s*$/.exec(ref || "");
+  if (!m) return null;
+  const b = findBook(m[1]); if (b < 0) return null;
+  const c = +m[2]; if (c < 1 || c > CHAPTERS[b]) return null;
+  const vs = new Set();
+  (m[3] || "").split(",").forEach(part => {
+    const [a, z] = part.split(/[-–]/).map(x => parseInt(x, 10));
+    if (!isNaN(a)) for (let v = a; v <= (isNaN(z) ? a : z); v++) vs.add(v);
+  });
+  return { b, c, verses: vs };
+}
+function refFor(b, c, nums) {
+  const s = [...nums].sort((x, y) => x - y); const parts = []; let i = 0;
+  while (i < s.length) { let j = i; while (j + 1 < s.length && s[j + 1] === s[j] + 1) j++; parts.push(j > i ? s[i] + "-" + s[j] : String(s[i])); i = j + 1; }
+  return `${BOOKS[b]} ${c}:${parts.join(", ")}`;
+}
+function lordify(t) { return esc(t).replace(/\bLORD\b/g, '<span class="sc">Lord</span>').replace(/\bGOD\b/g, '<span class="sc">God</span>'); }
+
+/* ---------- Bible loading ---------- */
+function loadBible() {
+  if (BIBLE) return Promise.resolve(BIBLE);
+  if (!bibleLoading) bibleLoading = fetch("kjv.json").then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(d => { BIBLE = d; return d; })
+    .catch(e => { bibleLoading = null; throw e; });
+  return bibleLoading;
+}
+function openChapter(b, c, opts = {}) {
+  S.bible.b = b; S.bible.c = c; S.bible.mode = "read"; S.bible.sel.clear();
+  S.bible.hl = opts.hl || null; S.bible.back = opts.back || null;
+  DB.put("kv", { b, c }, "biblePos").catch(() => {});
+  go("bible");
+}
+
+/* ---------- routing ---------- */
+const TABS = [["today", "Today"], ["plan", "Plan"], ["bible", "Bible"], ["memory", "Memory"], ["prayer", "Prayer"], ["study", "Bible Study"], ["notes", "Notes"], ["sermons", "Sermons"], ["saved", "Saved"]];
+const PRIMARY = ["today", "plan", "bible", "memory"];
+function go(tab) { if (location.hash !== "#" + tab) location.hash = "#" + tab; else render(); }
+function readHash() { let t = location.hash.slice(1); if (t === "lamp") t = "memory"; S.tab = TABS.some(x => x[0] === t) ? t : "today"; }
+function renderTabs() {
+  const nav = $("#tabbar"); nav.textContent = "";
+  TABS.forEach(([id, label]) => nav.append(h("button", { type: "button", class: PRIMARY.includes(id) ? "primary-tab" : "secondary-tab", "aria-current": S.tab === id ? "page" : null, onclick: () => go(id) }, icon(id), h("span", null, label))));
+  nav.append(h("button", { type: "button", class: "more-tab", "aria-current": PRIMARY.includes(S.tab) ? null : "page", "aria-haspopup": "dialog", onclick: openMore }, icon("more"), h("span", null, PRIMARY.includes(S.tab) ? "More" : (TABS.find(t => t[0] === S.tab) || [, "More"])[1])));
+}
+function openMore() {
+  const layer = $("#layer");
+  const close = () => { layer.textContent = ""; };
+  const sheet = h("div", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": "More sections" },
+    h("div", { class: "spread" }, h("h2", { class: "title", style: "font-size:22px;margin:0" }, "More"), h("button", { class: "icon-btn", type: "button", "aria-label": "Close", onclick: close }, icon("x"))),
+    h("div", { class: "more-grid" },
+      ...TABS.filter(t => !PRIMARY.includes(t[0])).map(([id, label]) => h("button", { type: "button", class: "more-item" + (S.tab === id ? " cur" : ""), onclick: () => { close(); go(id); } }, icon(id), h("span", null, label))),
+      h("button", { type: "button", class: "more-item", onclick: () => { close(); openSettings(); } }, h("span", { "aria-hidden": "true", style: "display:inline-grid", html: $("#open-settings svg").outerHTML }), h("span", null, "Settings"))));
+  layer.textContent = "";
+  layer.append(h("div", { class: "overlay", onclick: (e) => { if (e.target === e.currentTarget) close(); } }, sheet));
+}
+let objectUrls = [];
+function render() {
+  objectUrls.forEach(u => URL.revokeObjectURL(u)); objectUrls = [];
+  renderTabs();
+  const v = $("#view"); v.textContent = "";
+  const wrap = h("section", { class: "view stack" });
+  ({ today: viewToday, plan: viewPlan, bible: viewBible, memory: viewMemory, saved: viewSaved, notes: viewNotes, sermons: viewSermons, study: viewStudy, prayer: viewPrayer })[S.tab](wrap);
+  v.append(wrap);
+  renderSelbar();
+}
+function rerenderKeepScroll() { const y = window.scrollY; render(); window.scrollTo(0, y); }
+
+/* ================= TODAY: daily devotional ================= */
+let installEvt = null;
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+const isStandalone = () => matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+let DEVOS = null, devosLoading = null;
+function loadDevos() {
+  if (DEVOS) return Promise.resolve(DEVOS);
+  if (!devosLoading) devosLoading = fetch("devotionals.json").then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(d => { DEVOS = d; return d; }).catch(e => { devosLoading = null; throw e; });
+  return devosLoading;
+}
+const defaultEdition = () => (new Date().getHours() < 15 ? "m" : "e");
+function devoTitle(verse) {
+  const t = verse.replace(/\s+/g, " ").trim().replace(/[.;:,]+$/, "");
+  if (t.length <= 60) return t;
+  const cut = t.slice(0, 60);
+  const i = Math.max(cut.lastIndexOf(","), cut.lastIndexOf(";"), cut.lastIndexOf(":"));
+  return (i > 24 ? cut.slice(0, i) : cut.slice(0, cut.lastIndexOf(" "))) + "…";
+}
+function heroArt() {
+  return h("div", { class: "devo-hero", "aria-hidden": "true", html: `<svg viewBox="0 0 320 120" preserveAspectRatio="xMidYMax slice">
+    <defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--sky-top)"/><stop offset="1" stop-color="var(--sky-bot)"/></linearGradient></defs>
+    <rect width="320" height="120" fill="url(#sky)"/>
+    <circle cx="160" cy="92" r="26" fill="var(--accent)" opacity=".9"/>
+    <path d="M0 96 L46 70 L82 86 L128 58 L170 84 L214 62 L258 82 L292 68 L320 80 V120 H0Z" fill="var(--hill-far)"/>
+    <path d="M0 108 L60 90 L120 104 L180 88 L240 102 L320 92 V120 H0Z" fill="var(--hill-near)"/>
+    <path d="M160 40 V66 M152 48 H168" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round"/>
+  </svg>` });
+}
+function viewToday(root) {
+  if (!isStandalone() && !localStorage_get("installHidden") && (installEvt || isIOS)) {
+    root.append(h("div", { class: "banner" },
+      h("span", null, installEvt ? "Install A Day With Jesus on this device to use it offline." : "To install on iPhone: tap Share, then Add to Home Screen."),
+      h("div", { class: "row" },
+        installEvt ? h("button", { class: "btn sm primary", type: "button", onclick: doInstall }, "Install") : null,
+        h("button", { class: "btn sm ghost", type: "button", onclick: () => { localStorage_set("installHidden", "1"); render(); } }, "Hide"))));
+  }
+  if (!DEVOS) {
+    const box = h("div", { class: "loading" }, h("b", null, "Opening today’s devotional…"));
+    root.append(box);
+    loadDevos().then(() => { if (S.tab === "today") render(); }).catch(() => { box.textContent = ""; box.append(h("b", null, "Today’s devotional couldn’t be loaded."), h("span", { class: "small" }, "Connect to the internet once so the app can save it for offline use."), h("button", { class: "btn", type: "button", onclick: render }, "Try again")); });
+    return;
+  }
+  const today = ymd(new Date());
+  const date = S.devo.date || today;
+  const ed = S.devo.ed || defaultEdition();
+  const entry = DEVOS[date.slice(5)] || DEVOS["02-28"];
+  const [ref, verse, text] = entry[ed];
+  const p = parseRef(ref);
+  const setDate = (d) => { S.devo.date = d === today ? null : d; render(); window.scrollTo(0, 0); };
+  const setEd = (e) => { S.devo.ed = e; render(); };
+
+  const dateInput = h("input", { type: "date", id: "devo-date", class: "devo-date-input", value: date, "aria-label": "Choose a date", onchange: (e) => { if (e.target.value) setDate(e.target.value); } });
+  const datePicker = h("div", { class: "devo-date" },
+    h("button", { class: "icon-btn", type: "button", "aria-label": "Previous day", onclick: () => setDate(addDays(date, -1)) }, icon("left")),
+    h("label", { class: "devo-date-label" }, h("span", null, fmtDate(date, { month: "long", day: "numeric" })), icon("down"), dateInput),
+    h("button", { class: "icon-btn", type: "button", "aria-label": "Next day", onclick: () => setDate(addDays(date, 1)) }, icon("right")));
+  const editions = h("div", { class: "devo-editions", role: "group", "aria-label": "Edition" },
+    h("div", { class: "devo-aside-label" }, "Edition"),
+    ...[["m", "Morning"], ["e", "Evening"]].map(([k, l]) => h("button", { type: "button", "aria-pressed": ed === k ? "true" : "false", onclick: () => setEd(k) }, l)));
+
+  const paras = text.split(/\n+/).map(s => s.trim()).filter(Boolean);
+  const planDay = currentDay();
+  const body = h("div", { class: "devo-main" },
+    h("p", { class: "devo-key" }, h("span", null, verse.replace(/[.,;:]?$/, "") + " "), "— ",
+      p ? h("button", { class: "devo-ref", type: "button", onclick: () => openChapter(p.b, p.c, { hl: p.verses }) }, ref) : h("span", { class: "devo-ref" }, ref)),
+    h("div", { class: "devo-body" }, paras.map(t => h("p", null, t))),
+    h("hr", { class: "devo-rule" }),
+    h("div", { class: "devo-foot" },
+      h("button", { class: "devo-plan", type: "button", onclick: () => { S.viewDay = null; go("plan"); } },
+        h("span", { class: "devo-aside-label" }, "Bible reading plan"),
+        h("span", null, `Year ${Math.ceil(planDay / 365)} · Day ${planDay}: `, h("b", null, summarize(PLAN[planDay - 1]))), icon("right")),
+      h("div", { class: "row" },
+        h("button", { class: "btn sm soft", type: "button", onclick: () => { newNote({ title: `Reflection · ${fmtDate(date, { month: "short", day: "numeric" })}`, ref, body: `“${verse}” — ${ref}\n\n` }); go("notes"); } }, icon("notes"), "Write a reflection"),
+        h("button", { class: "btn sm", type: "button", disabled: S.saved.some(s => s.ref === ref) ? true : null, onclick: async () => { await addSaved({ ref, text: verse, translation: "KJV", note: "From the daily devotional" }); toast("Verse saved"); rerenderKeepScroll(); } }, icon("saved"), S.saved.some(s => s.ref === ref) ? "Saved" : "Save verse"),
+        nivLink(ref, "Read in NIV"))),
+    h("p", { class: "muted small" }, "Charles H. Spurgeon, Morning and Evening (1866). Public domain."));
+
+  root.append(h("article", { class: "devo" },
+    heroArt(),
+    h("header", { class: "devo-head" },
+      date !== today ? h("button", { class: "btn sm", type: "button", onclick: () => setDate(today) }, "Back to today") : null,
+      h("h2", { class: "devo-title" }, devoTitle(verse)),
+      h("div", { class: "devo-by" }, "By C. H. Spurgeon")),
+    h("div", { class: "devo-grid" },
+      h("aside", { class: "devo-aside" }, datePicker, editions),
+      body)));
+}
+
+/* ================= PLAN: 3-year Bible reading ================= */
+function viewPlan(root) {
+  const cur = currentDay();
+  const day = S.viewDay || cur;
+  const date = dateForDay(day);
+  const t = totals();
+  root.append(h("div", null, h("div", { class: "eyebrow" }, "Bible in three years"), h("h2", { class: "title" }, "Reading plan")));
+  root.append(h("div", { class: "spread" },
+    h("div", { class: "seg", role: "group", "aria-label": "Plan view" },
+      h("button", { type: "button", "aria-pressed": S.todayMode === "day" ? "true" : "false", onclick: () => { S.todayMode = "day"; render(); } }, "Day"),
+      h("button", { type: "button", "aria-pressed": S.todayMode === "plan" ? "true" : "false", onclick: () => { S.todayMode = "plan"; render(); } }, "Full plan")),
+    h("div", { class: "stats" },
+      h("span", null, h("b", null, streak()), " day streak"),
+      h("span", null, h("b", null, t.days), ` of ${PLAN_DAYS} days`),
+      h("span", null, h("b", null, Math.round(t.done / t.all * 100) + "%"), " of the Bible"))));
+  root.append(h("div", { class: "progress", "aria-label": "Plan progress" }, h("i", { style: `width:${(t.done / t.all * 100).toFixed(1)}%` })));
+
+  if (S.todayMode === "plan") return viewPlanList(root, cur);
+
+  if (planFinished() && day === cur) {
+    root.append(h("div", { class: "banner" }, h("span", null, "You finished the three-year plan. Start again from today?"),
+      h("button", { class: "btn sm primary", type: "button", onclick: async () => { S.settings.start = ymd(new Date()); S.progress = {}; await saveKV("settings"); await saveKV("progress"); S.viewDay = null; render(); } }, "Start again")));
+  }
+
+  root.append(h("div", { class: "dayhead" },
+    h("div", { class: "eyebrow" }, `Year ${Math.ceil(day / 365)} · Day ${day} of ${PLAN_DAYS}`),
+    h("div", { class: "spread" },
+      h("h2", { class: "title", style: "font-size:clamp(22px,4vw,28px)" }, fmtDate(date, { weekday: "long", month: "long", day: "numeric", year: "numeric" })),
+      h("div", { class: "daynav" },
+        h("button", { class: "icon-btn", type: "button", "aria-label": "Previous day", disabled: day <= 1 ? true : null, onclick: () => { S.viewDay = Math.max(1, day - 1); render(); } }, icon("left")),
+        day !== cur ? h("button", { class: "btn sm", type: "button", onclick: () => { S.viewDay = null; render(); } }, "Today") : null,
+        h("button", { class: "icon-btn", type: "button", "aria-label": "Next day", disabled: day >= PLAN_DAYS ? true : null, onclick: () => { S.viewDay = Math.min(PLAN_DAYS, day + 1); render(); } }, icon("right"))))));
+
+  const list = PLAN[day - 1];
+  const done = new Set(S.progress[day] || []);
+  const reading = h("div", { class: "panel" },
+    h("div", { class: "spread", style: "margin-bottom:6px" },
+      h("h3", { class: "sub" }, "Today’s reading"),
+      list.length > 1 ? h("button", { class: "btn sm ghost", type: "button", onclick: () => { S.progress[day] = done.size === list.length ? [] : list.map(chapKey); saveKV("progress"); rerenderKeepScroll(); } }, done.size === list.length ? "Clear all" : "Mark all read") : null));
+  list.forEach(r => {
+    const k = chapKey(r), on = done.has(k);
+    reading.append(h("div", { class: "chap" },
+      h("button", { class: "check", type: "button", role: "checkbox", "aria-checked": on ? "true" : "false", "aria-label": "Mark " + chapName(r) + " as read", html: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">${ICONS.check}</svg>`,
+        onclick: () => { const s = new Set(S.progress[day] || []); on ? s.delete(k) : s.add(k); S.progress[day] = [...s]; saveKV("progress"); rerenderKeepScroll(); } }),
+      h("div", null, h("div", { class: "name" }, chapName(r)), h("div", { class: "lane" }, r.lane)),
+      h("div", { class: "row chap-acts" },
+        h("button", { class: "btn sm soft", type: "button", onclick: () => openChapter(r.b, r.c, { back: day }) }, "Read"),
+        nivLink(chapName(r)))));
+  });
+  root.append(reading);
+  root.append(journalPanel(day, date, list));
+}
+function viewPlanList(root, cur) {
+  root.append(h("p", { class: "muted small", style: "margin:0" }, `About one chapter a day through the whole Bible, moving between Old Testament books, New Testament books, and Psalms and Proverbs. Started ${fmtDate(S.settings.start, { month: "long", day: "numeric", year: "numeric" })}. Change the start date in Settings.`));
+  const months = new Map();
+  PLAN.forEach((list, i) => { const n = i + 1, m = dateForDay(n).slice(0, 7); if (!months.has(m)) months.set(m, []); months.get(m).push(n); });
+  const curMonth = dateForDay(cur).slice(0, 7);
+  const wrap = h("div", { class: "stack", style: "gap:8px" });
+  months.forEach((days, m) => {
+    const doneDays = days.filter(dayDone).length;
+    const rows = h("div", { class: "plan-list" });
+    const fill = () => {
+      if (rows.childElementCount) return;
+      days.forEach(n => {
+        const list = PLAN[n - 1], d = (S.progress[n] || []).length;
+        rows.append(h("button", { type: "button", class: "plan-row" + (n === cur ? " current" : ""), id: "plan-" + n, onclick: () => { S.viewDay = n; S.todayMode = "day"; render(); window.scrollTo(0, 0); } },
+          h("div", null, h("div", { class: "dn" }, "Day " + n), h("div", { class: "dd" }, fmtDate(dateForDay(n), { weekday: "short", month: "short", day: "numeric" }))),
+          h("div", { class: "refs" }, summarize(list)),
+          d >= list.length ? h("span", { class: "chip ok" }, "Done") : d ? h("span", { class: "chip gold" }, `${d}/${list.length}`) : h("span")));
+      });
+    };
+    const det = h("details", { class: "plan-month-box", open: m === curMonth ? true : null, ontoggle: (e) => { if (e.target.open) fill(); } },
+      h("summary", null, h("span", null, fmtDate(m + "-01", { month: "long", year: "numeric" })), h("span", { class: "muted small" }, `${doneDays}/${days.length} days · Days ${days[0]}–${days[days.length - 1]}`)),
+      rows);
+    if (m === curMonth) fill();
+    wrap.append(det);
+  });
+  root.append(wrap);
+  requestAnimationFrame(() => { const el = document.getElementById("plan-" + cur); if (el) el.scrollIntoView({ block: "center" }); });
+}
+function readChapterBtn(ref, backDay) {
+  const p = parseRef(ref);
+  return p ? h("button", { class: "btn sm soft", type: "button", onclick: () => openChapter(p.b, p.c, { hl: p.verses, back: backDay || null }) }, "Read whole chapter") : null;
+}
+function journalId(date) { return "journal-" + date; }
+function journalPanel(day, date, list) {
+  const id = journalId(date);
+  const existing = S.notes.find(n => n.id === id);
+  const soap = existing ? { ...existing.soap } : { s: "", o: "", a: "", p: "" };
+  const status = h("div", { class: "saved-note", "aria-live": "polite" }, existing ? "Saved " + fmtTs(existing.updated) : "");
+  let timer;
+  const build = () => { const prev = S.notes.find(n => n.id === id); return { ...(prev || { id, kind: "journal", created: Date.now(), attachments: [], body: "" }), title: `Plan Day ${day} · ${fmtDate(date, { month: "short", day: "numeric" })}`, ref: summarize(list), date, day, soap: { ...soap }, updated: Date.now() }; };
+  const store = async (note) => { await DB.put("notes", note); const i = S.notes.findIndex(n => n.id === id); i >= 0 ? S.notes[i] = note : S.notes.push(note); };
+  const save = () => { clearTimeout(timer); timer = setTimeout(async () => { try { await store(build()); status.textContent = "Saved"; } catch { status.textContent = "Couldn’t save. Your device storage may be full."; } }, 600); };
+  const field = (k, label, ph) => h("label", { class: "lbl" }, label,
+    h("textarea", { class: "field", id: `soap-${k}`, placeholder: ph, oninput: (e) => { soap[k] = e.target.value; status.textContent = "Saving…"; save(); } }, soap[k] || ""));
+  return h("div", { class: "panel soap" },
+    h("div", { class: "spread" }, h("h3", { class: "sub" }, "Reading journal"),
+      h("button", { class: "btn sm ghost", type: "button", onclick: async () => { clearTimeout(timer); await store(build()).catch(() => {}); S.activeNote = id; S.editing = true; go("notes"); } }, icon("clip"), "Attach files")),
+    h("p", { class: "muted small", style: "margin:0" }, "Write through today’s chapter with S.O.A.P."),
+    field("s", "Scripture — a verse that stood out", "Copy a verse here, or select verses in the Bible tab and tap Journal"),
+    field("o", "Observation — what does it say?", "What do you notice about God, people, or the situation?"),
+    field("a", "Application — what will I do?", "One way to live this out today"),
+    field("p", "Prayer", "Talk to Jesus about what you read"),
+    status);
+}
+
+/* ================= BIBLE ================= */
+function viewBible(root) {
+  if (!BIBLE) {
+    const box = h("div", { class: "loading" }, h("b", null, "Opening the Bible…"), h("span", { class: "small" }, "This happens once, then it works offline."));
+    root.append(box);
+    loadBible().then(() => { if (S.tab === "bible") render(); }).catch(() => { box.textContent = ""; box.append(h("b", null, "The Bible couldn’t be loaded."), h("span", { class: "small" }, "Connect to the internet once so the app can save it for offline use."), h("button", { class: "btn", type: "button", onclick: render }, "Try again")); });
+    return;
+  }
+  const B = S.bible;
+  root.append(h("div", { class: "spread" },
+    h("div", { class: "seg", role: "group", "aria-label": "Bible view" },
+      ...[["read", "Read"], ["books", "Books"], ["search", "Search"]].map(([m, l]) => h("button", { type: "button", "aria-pressed": B.mode === m ? "true" : "false", onclick: () => { B.mode = m; B.pickBook = null; render(); } }, l))),
+    B.back ? h("button", { class: "btn sm", type: "button", onclick: () => { S.viewDay = B.back === currentDay() ? null : B.back; B.back = null; S.todayMode = "day"; go("plan"); } }, icon("left"), `Back to Day ${B.back}`) : null));
+
+  if (B.mode === "books") return bibleBooks(root);
+  if (B.mode === "search") return bibleSearch(root);
+
+  const verses = BIBLE.text[B.b][B.c - 1];
+  const savedSet = savedVersesIn(B.b, B.c);
+  root.append(h("div", { class: "bible-bar" },
+    h("button", { class: "btn", type: "button", style: "justify-content:flex-start", onclick: () => { B.mode = "books"; B.pickBook = B.b; render(); } }, `${BOOKS[B.b]} ${B.c}`, h("span", { class: "muted small" }, "· KJV")),
+    h("button", { class: "icon-btn", type: "button", "aria-label": "Previous chapter", onclick: () => stepChapter(-1) }, icon("left")),
+    h("button", { class: "icon-btn", type: "button", "aria-label": "Next chapter", onclick: () => stepChapter(1) }, icon("right"))));
+  root.append(h("div", { class: "spread" },
+    h("h2", { class: "chapter-title" }, BOOKS[B.b] === "Psalms" ? `Psalm ${B.c}` : `${BOOKS[B.b]} ${B.c}`),
+    nivLink(`${BOOKS[B.b]} ${B.c}`, "Read in NIV")));
+  root.append(h("p", { class: "muted small", style: "margin:-8px 0 0" }, "Tap verses to save, copy, or write about them."));
+  const vEl = h("div", { class: "verses" });
+  verses.forEach((t, i) => {
+    const n = i + 1;
+    const cls = [B.sel.has(n) ? "sel" : "", savedSet.has(n) ? "saved" : "", B.hl && B.hl.has(n) ? "hl" : ""].join(" ").trim();
+    vEl.append(h("p", { class: cls || null, id: "v" + n, role: "button", tabindex: "0", "aria-pressed": B.sel.has(n) ? "true" : "false",
+      onclick: () => toggleVerse(n), onkeydown: (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleVerse(n); } },
+      html: `<sup>${n}</sup>${lordify(t)}` }));
+  });
+  root.append(vEl);
+  root.append(h("div", { class: "spread" },
+    h("button", { class: "btn", type: "button", onclick: () => stepChapter(-1) }, icon("left"), "Previous"),
+    h("button", { class: "btn", type: "button", onclick: () => stepChapter(1) }, "Next", icon("right"))));
+  if (B.hl && B.hl.size) requestAnimationFrame(() => { const el = document.getElementById("v" + Math.min(...B.hl)); if (el) el.scrollIntoView({ block: "center" }); });
+}
+function toggleVerse(n) {
+  const B = S.bible; B.sel.has(n) ? B.sel.delete(n) : B.sel.add(n);
+  const el = document.getElementById("v" + n); if (el) { el.classList.toggle("sel", B.sel.has(n)); el.setAttribute("aria-pressed", B.sel.has(n) ? "true" : "false"); }
+  renderSelbar();
+}
+function stepChapter(d) {
+  const B = S.bible; let b = B.b, c = B.c + d;
+  if (c < 1) { b = (b + 65) % 66; c = CHAPTERS[b]; } else if (c > CHAPTERS[b]) { b = (b + 1) % 66; c = 1; }
+  B.b = b; B.c = c; B.sel.clear(); B.hl = null;
+  DB.put("kv", { b, c }, "biblePos").catch(() => {});
+  render(); window.scrollTo(0, 0);
+}
+function bibleBooks(root) {
+  const B = S.bible;
+  if (B.pickBook != null) {
+    const b = B.pickBook;
+    root.append(h("div", { class: "spread" }, h("h2", { class: "chapter-title" }, BOOKS[b]), h("button", { class: "btn sm", type: "button", onclick: () => { B.pickBook = null; render(); } }, "All books")));
+    root.append(h("div", { class: "chap-grid" }, Array.from({ length: CHAPTERS[b] }, (_, i) => h("button", { type: "button", class: b === B.b && i + 1 === B.c ? "cur" : null, onclick: () => openChapter(b, i + 1, { back: B.back }) }, i + 1))));
+    return;
+  }
+  const grid = (from, to) => h("div", { class: "book-grid" }, BOOKS.slice(from, to).map((name, i) => h("button", { type: "button", class: from + i === B.b ? "cur" : null, onclick: () => { B.pickBook = from + i; render(); } }, name)));
+  root.append(h("h3", { class: "sub" }, "Old Testament"), grid(0, 39), h("h3", { class: "sub" }, "New Testament"), grid(39, 66));
+}
+function bibleSearch(root) {
+  const B = S.bible;
+  const input = h("input", { class: "field", id: "bible-q", type: "search", placeholder: "Search the KJV, e.g. “shepherd” or “love one another”", value: B.q, enterkeyhint: "search" });
+  const form = h("form", { class: "row", style: "flex-wrap:nowrap", onsubmit: (e) => { e.preventDefault(); B.q = input.value.trim(); B.results = runSearch(B.q); render(); } },
+    input, h("button", { class: "btn primary", type: "submit" }, icon("search"), "Search"));
+  root.append(form);
+  if (!B.results) { root.append(h("p", { class: "muted small" }, "Searches every verse of the King James Version. You can also type a reference like John 3:16.")); setTimeout(() => input.focus(), 50); return; }
+  if (B.results.ref) {
+    const p = B.results.ref;
+    root.append(h("button", { class: "result", type: "button", onclick: () => openChapter(p.b, p.c, { hl: p.verses.size ? p.verses : null }) }, h("b", null, "Go to"), h("span", null, `${BOOKS[p.b]} ${p.c}${p.verses.size ? ":" + [...p.verses].join(",") : ""}`)));
+  }
+  const list = B.results.hits;
+  root.append(h("div", { class: "muted small" }, list.length ? `${list.length >= 300 ? "First 300" : list.length} verses found` : (B.results.ref ? "" : "No verses found. Try fewer or different words.")));
+  const re = B.q.length >= 2 ? new RegExp("(" + B.q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + ")", "ig") : null;
+  root.append(h("div", { class: "search-results" }, list.map(([b, c, v]) => {
+    const t = BIBLE.text[b][c - 1][v - 1];
+    return h("button", { class: "result", type: "button", onclick: () => openChapter(b, c, { hl: new Set([v]) }) },
+      h("b", null, `${BOOKS[b]} ${c}:${v}`), h("span", { html: re ? esc(t).replace(re, "<mark>$1</mark>") : esc(t) }));
+  })));
+}
+function runSearch(q) {
+  const ref = parseRef(q);
+  const hits = [];
+  if (q.length >= 2 && !ref) {
+    const needle = q.toLowerCase();
+    outer: for (let b = 0; b < 66; b++) for (let c = 0; c < BIBLE.text[b].length; c++) { const ch = BIBLE.text[b][c]; for (let v = 0; v < ch.length; v++) if (ch[v].toLowerCase().includes(needle)) { hits.push([b, c + 1, v + 1]); if (hits.length >= 300) break outer; } }
+  }
+  return { ref, hits };
+}
+function selectionText() {
+  const B = S.bible; const nums = [...B.sel].sort((a, b) => a - b);
+  return { ref: refFor(B.b, B.c, nums), text: nums.map(n => BIBLE.text[B.b][B.c - 1][n - 1]).join(" ") };
+}
+function renderSelbar() {
+  document.querySelectorAll(".selbar").forEach(e => e.remove());
+  if (S.tab !== "bible" || !S.bible.sel.size || S.bible.mode !== "read") return;
+  const bar = h("div", { class: "selbar", role: "toolbar", "aria-label": "Selected verses" },
+    h("span", { class: "count" }, `${S.bible.sel.size} selected`),
+    h("button", { class: "btn sm", type: "button", onclick: async () => { const s = selectionText(); await addSaved({ ref: s.ref, text: s.text, translation: "KJV" }); S.bible.sel.clear(); render(); toast("Saved " + s.ref); } }, icon("saved"), "Save"),
+    h("button", { class: "btn sm", type: "button", onclick: () => { const s = selectionText(); copyText(`${s.text}\n— ${s.ref} (KJV)`); } }, icon("copy"), "Copy"),
+    h("button", { class: "btn sm", type: "button", onclick: () => addToJournal() }, "Journal"),
+    h("button", { class: "btn sm", type: "button", onclick: () => { const s = selectionText(); newNote({ title: s.ref, ref: s.ref, body: `“${s.text}” — ${s.ref} (KJV)\n\n` }); S.bible.sel.clear(); go("notes"); } }, icon("notes"), "Note"),
+    h("button", { class: "btn sm", type: "button", onclick: () => { const s = selectionText(); newSermon({ scripture: s.ref, content: `“${s.text}” — ${s.ref} (KJV)\n\n` }); S.bible.sel.clear(); go("sermons"); } }, icon("sermons"), "Sermon"),
+    h("button", { class: "btn sm", type: "button", "aria-label": "Clear selection", onclick: () => { S.bible.sel.clear(); render(); } }, icon("x")));
+  document.body.append(bar);
+}
+async function addToJournal() {
+  const s = selectionText();
+  const day = S.bible.back || currentDay(); const date = dateForDay(day); const id = journalId(date);
+  const prev = S.notes.find(n => n.id === id);
+  const note = { ...(prev || { id, kind: "journal", created: Date.now(), attachments: [], body: "", soap: { s: "", o: "", a: "", p: "" } }),
+    title: `Day ${day} · ${fmtDate(date, { month: "short", day: "numeric" })}`, ref: summarize(PLAN[day - 1]), date, day, updated: Date.now() };
+  note.soap = { ...note.soap, s: (note.soap.s ? note.soap.s + "\n" : "") + `${s.text} (${s.ref})` };
+  await DB.put("notes", note); const i = S.notes.findIndex(n => n.id === id); i >= 0 ? S.notes[i] = note : S.notes.push(note);
+  S.bible.sel.clear(); render(); toast(`Added to Day ${day} journal`);
+}
+
+/* ================= MY MEMORY VERSES ================= */
+const collections = () => (MEMORY ? MEMORY.collections : []);
+const getColl = (id) => collections().find(c => c.id === id);
+function memKey(c, s, v) { return c.id === "lamp2" ? s.id + v.n : `${c.id}:${s.id}${v.n}`; }
+function kjvText(ref) {
+  if (!BIBLE) return "";
+  const p = parseRef(ref); if (!p || !p.verses.size) return "";
+  return [...p.verses].sort((a, b) => a - b).map(n => BIBLE.text[p.b][p.c - 1][n - 1]).filter(Boolean).join(" ");
+}
+function memFlat(id = "lamp2") {
+  const c = getColl(id); if (!c) return [];
+  return c.sections.flatMap(s => s.verses.map(v => ({ ...v, sec: s.id, secName: s.name, key: memKey(c, s, v), coll: c.id, trans: c.translation.split(" ")[0], text: v.text || kjvText(v.ref) })));
+}
+function weekVerses(day) {
+  const flat = memFlat("lamp2"); if (!flat.length) return [];
+  const i = (Math.floor((day - 1) / 7) * 2) % flat.length;
+  return [flat[i], flat[(i + 1) % flat.length]];
+}
+const isMem = (key) => !!(S.mem[key] && S.mem[key].m);
+function memCard(v) { return { key: v.key, kind: "mem", ref: v.ref, text: v.text, topic: `${v.sec}${v.n} · ${v.topic}`, trans: v.trans }; }
+function setMem(key, on) { S.mem[key] = { m: on, t: Date.now() }; saveKV("mem"); }
+
+function bridgeIllustration() {
+  const steps = [
+    ["1", "God loves you", ["John 3:16"]],
+    ["2", "All have sinned", ["Romans 3:23"]],
+    ["3", "Sin brings death and judgment", ["Romans 6:23", "Hebrews 9:27"]],
+    ["4", "Christ is the only bridge", ["Romans 5:8", "1 Timothy 2:5", "John 14:6", "1 Corinthians 15:3-4"]],
+    ["5", "Receive him by faith", ["Ephesians 2:8-9", "Romans 10:9-10"]],
+    ["6", "You can be sure of eternal life", ["John 5:24"]],
+  ];
+  const svg = `<svg viewBox="0 0 520 250" role="img" aria-label="Bridge illustration: people on one cliff and God on the other, separated by the chasm of sin, joined by the cross of Christ">
+    <rect x="0" y="0" width="520" height="250" rx="16" fill="var(--bridge-sky)"/>
+    <path d="M0 120 H178 L196 250 H0Z" fill="var(--bridge-cliff)"/>
+    <path d="M520 120 H342 L324 250 H520Z" fill="var(--bridge-cliff)"/>
+    <path d="M196 250 L178 120 H342 L324 250Z" fill="var(--bridge-chasm)"/>
+    <text x="260" y="214" text-anchor="middle" font-size="15" font-weight="700" fill="var(--bridge-chasm-text)" font-family="system-ui, sans-serif">SIN · DEATH · JUDGMENT</text>
+    <rect x="160" y="112" width="200" height="14" rx="3" fill="var(--bridge-cross)"/>
+    <rect x="252" y="42" width="16" height="92" rx="3" fill="var(--bridge-cross)"/>
+    <rect x="232" y="62" width="56" height="13" rx="3" fill="var(--bridge-cross)"/>
+    <text x="78" y="150" text-anchor="middle" font-size="18" font-weight="800" fill="var(--bridge-label)" font-family="system-ui, sans-serif">PEOPLE</text>
+    <text x="442" y="150" text-anchor="middle" font-size="18" font-weight="800" fill="var(--bridge-label)" font-family="system-ui, sans-serif">GOD</text>
+    <text x="442" y="172" text-anchor="middle" font-size="13" fill="var(--bridge-label)" font-family="system-ui, sans-serif">Eternal life</text>
+    <text x="78" y="172" text-anchor="middle" font-size="13" fill="var(--bridge-label)" font-family="system-ui, sans-serif">Separated by sin</text>
+    <text x="260" y="34" text-anchor="middle" font-size="14" font-weight="800" fill="var(--bridge-label)" font-family="system-ui, sans-serif">JESUS CHRIST</text>
+    <path d="M70 98 C 150 70, 370 70, 430 96" fill="none" stroke="var(--accent)" stroke-width="3" stroke-dasharray="6 6"/>
+    <path d="M430 96 l-12 -2 l6 10z" fill="var(--accent)"/>
+    ${[[442, 92, "1"], [78, 92, "2"], [208, 186, "3"], [300, 86, "4"], [140, 84, "5"], [478, 112, "6"]].map(([x, y, n]) =>
+      `<g><circle cx="${x}" cy="${y}" r="13" fill="var(--ink)"/><text x="${x}" y="${y + 5}" text-anchor="middle" font-size="14" font-weight="800" fill="var(--paper)" font-family="system-ui, sans-serif">${n}</text></g>`).join("")}
+  </svg>`;
+  return h("div", { class: "panel bridge" },
+    h("div", { class: "spread" }, h("h3", { class: "sub" }, "The Bridge illustration"), h("span", { class: "muted small" }, "Tap a verse to jump to it")),
+    h("div", { class: "bridge-art", html: svg }),
+    h("ol", { class: "bridge-steps" }, steps.map(([n, label, refs]) => h("li", null,
+      h("span", { class: "bridge-num" }, n),
+      h("div", null, h("b", null, label), h("div", { class: "row", style: "gap:6px;margin-top:4px" }, refs.map(r => h("button", { class: "chip", type: "button", onclick: () => { const el = document.querySelector(`[data-ref="${CSS.escape(r)}"]`); if (el) { el.scrollIntoView({ block: "center", behavior: "smooth" }); el.classList.add("flash-hl"); setTimeout(() => el.classList.remove("flash-hl"), 1600); } } }, r))))))),
+    h("p", { class: "muted small", style: "margin:0" }, "Draw it on paper as you explain each step, then read the verse together."));
+}
+
+function viewMemory(root) {
+  if (!MEMORY) { root.append(h("div", { class: "loading" }, "Loading your memory verses…")); return; }
+  const c = getColl(S.memColl) || collections()[0];
+  if (c.translation.startsWith("KJV") && !BIBLE) {
+    root.append(h("div", { class: "loading" }, "Loading verses…"));
+    loadBible().then(() => { if (S.tab === "memory") render(); }).catch(() => {});
+    return;
+  }
+  const flat = memFlat(c.id), mc = flat.filter(v => isMem(v.key)).length;
+  root.append(h("div", null, h("div", { class: "eyebrow" }, "Hide God’s word in your heart"), h("h2", { class: "title" }, "My Memory Verses")));
+  root.append(h("div", { class: "seg seg-wide", role: "group", "aria-label": "Collection" },
+    ...collections().map(x => h("button", { type: "button", "aria-pressed": x.id === c.id ? "true" : "false", onclick: () => { S.memColl = x.id; S.lampSec = "all"; S.lampStatus = "all"; render(); } }, x.id === "tms" ? "TMS" : x.name.replace(" Verses", "")))));
+  root.append(h("div", { class: "panel stack", style: "gap:10px" },
+    h("div", null, h("b", { style: "font-family:var(--read);font-size:19px" }, c.name), h("span", { class: "chip", style: "margin-left:8px" }, c.translation)),
+    h("p", { class: "muted small", style: "margin:0" }, `${flat.length} verses. ${c.source || ""}`),
+    h("div", { class: "spread" }, h("span", null, h("b", null, mc), ` of ${flat.length} memorized`),
+      h("button", { class: "btn sm primary", type: "button", onclick: () => { const set = memFiltered(c); if (!set.length) return toast("No verses match these filters"); openPractice(set.map(memCard), c.id === "tms" ? "TMS practice" : c.name + " practice"); } }, icon("play"), "Practice these")),
+    h("div", { class: "progress" }, h("i", { style: `width:${(mc / flat.length * 100).toFixed(1)}%` }))));
+  if (c.id === "witness") root.append(bridgeIllustration());
+  if (c.sections.length > 1) root.append(h("div", { class: "seg", role: "group", "aria-label": "Section" },
+    h("button", { type: "button", "aria-pressed": S.lampSec === "all" ? "true" : "false", onclick: () => { S.lampSec = "all"; render(); } }, "All"),
+    ...c.sections.map(s => h("button", { type: "button", title: s.name, "aria-pressed": S.lampSec === s.id ? "true" : "false", onclick: () => { S.lampSec = s.id; render(); } }, s.id))));
+  const statuses = [["all", "All"], ...(c.id === "lamp2" ? [["week", "This week"]] : []), ["learning", "Learning"], ["memorized", "Memorized"]];
+  root.append(h("div", { class: "seg", role: "group", "aria-label": "Status" },
+    ...statuses.map(([k, l]) => h("button", { type: "button", "aria-pressed": S.lampStatus === k ? "true" : "false", onclick: () => { S.lampStatus = k; render(); } }, l))));
+  const list = memFiltered(c);
+  if (!list.length) { root.append(h("div", { class: "empty" }, h("b", null, "Nothing here yet"), h("span", null, S.lampStatus === "memorized" ? "Verses you mark as memorized will show here." : "No verses match these filters."))); return; }
+  const week = new Set(c.id === "lamp2" ? weekVerses(currentDay()).map(v => v.key) : []);
+  let lastSec = "";
+  const listEl = h("div", { class: "mem-list" });
+  list.forEach(v => {
+    if (v.sec !== lastSec && c.sections.length > 1) { listEl.append(h("div", { class: "sec-head" }, h("span", { class: "chip gold" }, v.sec), h("b", null, v.secName))); lastSec = v.sec; }
+    const m = isMem(v.key);
+    const isSaved = S.saved.some(s => s.ref === v.ref);
+    listEl.append(h("article", { class: "mem" + (week.has(v.key) ? " week" : ""), "data-ref": v.ref },
+      h("div", { class: "top" }, h("div", null, h("div", { class: "ref" }, v.ref), h("div", { class: "topic" }, `${c.sections.length > 1 ? v.sec + v.n + " · " : v.n + ". "}${v.topic}`)),
+        h("div", { class: "row" }, week.has(v.key) ? h("span", { class: "chip gold" }, "This week") : null, m ? h("span", { class: "chip ok" }, "Memorized") : null)),
+      h("p", { class: "txt", html: v.trans === "KJV" ? lordify(v.text) : esc(v.text) }),
+      h("div", { class: "acts" },
+        h("button", { class: "btn sm", type: "button", onclick: () => openPractice([memCard(v)], v.ref) }, icon("play"), "Practice"),
+        h("button", { class: "btn sm" + (m ? " on" : ""), type: "button", "aria-pressed": m ? "true" : "false", onclick: () => { setMem(v.key, !m); rerenderKeepScroll(); } }, icon("check"), m ? "Memorized" : "Mark memorized"),
+        h("button", { class: "btn sm", type: "button", disabled: isSaved ? true : null, onclick: async () => { await addSaved({ ref: v.ref, text: v.text, translation: v.trans, note: `${c.id === "tms" ? "TMS" : c.name} · ${v.topic}` }); toast("Saved for review"); rerenderKeepScroll(); } }, icon("saved"), isSaved ? "Saved" : "Save"),
+        readChapterBtn(v.ref), nivLink(v.ref))));
+  });
+  root.append(listEl);
+  if (c.id === "lamp2") root.append(h("p", { class: "muted small" }, NIV_NOTICE));
+}
+function memFiltered(c) {
+  const week = new Set(c.id === "lamp2" ? weekVerses(currentDay()).map(v => v.key) : []);
+  return memFlat(c.id).filter(v => (S.lampSec === "all" || v.sec === S.lampSec) && (
+    S.lampStatus === "all" || (S.lampStatus === "week" && week.has(v.key)) ||
+    (S.lampStatus === "memorized" && isMem(v.key)) || (S.lampStatus === "learning" && !isMem(v.key))));
+}
+
+/* ---------- practice flashcards ---------- */
+function firstLetters(t) { return t.replace(/([A-Za-z])[A-Za-z'’]*/g, "$1"); }
+function openPractice(cards, title) {
+  let i = 0, stage = 0, known = 0;
+  const layer = $("#layer");
+  const close = () => { layer.textContent = ""; document.removeEventListener("keydown", onKey); rerenderKeepScroll(); };
+  const onKey = (e) => { if (e.key === "Escape") close(); };
+  document.addEventListener("keydown", onKey);
+  const draw = () => {
+    layer.textContent = "";
+    const sheet = h("div", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": title });
+    if (i >= cards.length) {
+      sheet.append(h("div", { class: "flash" }, h("div", { class: "eyebrow" }, title), h("div", { class: "ref" }, "Well done"),
+        h("p", { class: "muted" }, `You knew ${known} of ${cards.length}. Keep reviewing the rest this week.`),
+        h("div", { class: "row", style: "justify-content:center" }, h("button", { class: "btn", type: "button", onclick: () => { i = 0; stage = 0; known = 0; draw(); } }, "Go again"), h("button", { class: "btn primary", type: "button", onclick: close }, "Done"))));
+    } else {
+      const c = cards[i];
+      const txt = stage === 0 ? h("div", { class: "txt hidden" }, "Say the verse from memory, then check yourself.") : h("div", { class: "txt" }, stage === 1 ? firstLetters(c.text) : c.text);
+      sheet.append(h("div", { class: "spread" }, h("span", { class: "eyebrow" }, `${title} · ${i + 1} of ${cards.length}`), h("button", { class: "icon-btn", type: "button", "aria-label": "Close practice", onclick: close }, icon("x"))),
+        h("div", { class: "flash" }, h("div", { class: "ref" }, c.ref), h("div", { class: "muted small" }, [c.topic, c.trans].filter(Boolean).join(" · ")), txt,
+          stage < 2 ? h("div", { class: "row", style: "justify-content:center" },
+            stage === 0 ? h("button", { class: "btn", type: "button", onclick: () => { stage = 1; draw(); } }, "First-letter hint") : null,
+            h("button", { class: "btn primary", type: "button", onclick: () => { stage = 2; draw(); } }, "Show verse"))
+          : h("div", { class: "row", style: "justify-content:center" },
+            h("button", { class: "btn", type: "button", onclick: () => { i++; stage = 0; draw(); } }, "Still learning"),
+            h("button", { class: "btn primary", type: "button", onclick: async () => { known++; await markKnown(c); i++; stage = 0; draw(); } }, icon("check"), "I know it"))));
+    }
+    layer.append(h("div", { class: "overlay", onclick: (e) => { if (e.target === e.currentTarget) close(); } }, sheet));
+  };
+  draw();
+}
+async function markKnown(c) {
+  if (c.kind === "mem") setMem(c.key, true);
+  else { const s = S.saved.find(x => x.id === c.key); if (s) { s.memorized = true; await DB.put("saved", s); } }
+}
+
+/* ================= SAVED ================= */
+function savedVersesIn(b, c) {
+  const set = new Set();
+  S.saved.forEach(s => { if (s.translation !== "KJV") return; const p = parseRef(s.ref); if (p && p.b === b && p.c === c) p.verses.forEach(v => set.add(v)); });
+  return set;
+}
+async function addSaved(item) {
+  const s = { id: uid("s"), ref: item.ref, text: item.text, translation: item.translation || "", note: item.note || "", memorized: false, created: Date.now() };
+  await DB.put("saved", s); S.saved.push(s); return s;
+}
+function viewSaved(root) {
+  const all = [...S.saved].sort((a, b) => b.created - a.created);
+  const list = all.filter(s => S.savedFilter === "all" || (S.savedFilter === "todo" ? !s.memorized : s.memorized));
+  root.append(h("div", { class: "spread" },
+    h("div", null, h("div", { class: "eyebrow" }, "Review & memorize"), h("h2", { class: "title" }, "Saved verses")),
+    h("div", { class: "row" },
+      h("button", { class: "btn", type: "button", onclick: () => { const set = list.filter(s => !s.memorized); const cards = (set.length ? set : list).map(s => ({ key: s.id, kind: "saved", ref: s.ref, text: s.text, topic: s.note, trans: s.translation })); if (!cards.length) return toast("Save a verse first"); openPractice(cards, "Saved verses"); } }, icon("play"), "Review"),
+      h("button", { class: "btn primary", type: "button", onclick: () => { S.savedForm = { ref: "", text: "", translation: "NIV", note: "" }; render(); } }, icon("plus"), "Add a verse"))));
+  if (S.savedForm) root.append(savedForm());
+  root.append(h("div", { class: "seg", role: "group", "aria-label": "Filter" },
+    ...[["all", `All (${all.length})`], ["todo", "To memorize"], ["done", "Memorized"]].map(([k, l]) => h("button", { type: "button", "aria-pressed": S.savedFilter === k ? "true" : "false", onclick: () => { S.savedFilter = k; render(); } }, l))));
+  if (!list.length) {
+    root.append(h("div", { class: "empty" }, h("b", null, all.length ? "Nothing in this list" : "Save verses you want to review"),
+      h("span", null, "In the Bible tab, tap a verse and choose Save. In Lamp 2, tap Save on any card. Or add one yourself, such as an NIV verse from church."),
+      h("button", { class: "btn soft", type: "button", onclick: () => go("bible") }, "Open the Bible")));
+    return;
+  }
+  const listEl = h("div", { class: "mem-list" });
+  list.forEach(s => {
+    const delSlot = h("span");
+    const p = parseRef(s.ref);
+    listEl.append(h("article", { class: "mem" },
+      h("div", { class: "top" }, h("div", null, h("div", { class: "ref" }, s.ref), s.note ? h("div", { class: "topic" }, s.note) : null),
+        h("div", { class: "row" }, s.translation ? h("span", { class: "chip" }, s.translation) : null, s.memorized ? h("span", { class: "chip ok" }, "Memorized") : null)),
+      h("p", { class: "txt", html: s.translation === "KJV" ? lordify(s.text) : esc(s.text) }),
+      h("div", { class: "muted small" }, "Saved " + fmtTs(s.created)),
+      h("div", { class: "acts" },
+        h("button", { class: "btn sm", type: "button", onclick: () => openPractice([{ key: s.id, kind: "saved", ref: s.ref, text: s.text, topic: s.note, trans: s.translation }], s.ref) }, icon("play"), "Practice"),
+        h("button", { class: "btn sm" + (s.memorized ? " on" : ""), type: "button", onclick: async () => { s.memorized = !s.memorized; await DB.put("saved", s); rerenderKeepScroll(); } }, icon("check"), s.memorized ? "Memorized" : "Mark memorized"),
+        p ? h("button", { class: "btn sm soft", type: "button", onclick: () => openChapter(p.b, p.c, { hl: p.verses }) }, "Read chapter") : null,
+        nivLink(s.ref),
+        h("button", { class: "btn sm ghost", type: "button", onclick: () => { S.savedForm = { ...s }; render(); window.scrollTo(0, 0); } }, "Edit"),
+        delSlot)));
+    const showDel = () => { delSlot.textContent = ""; delSlot.append(h("button", { class: "btn sm ghost danger", type: "button", onclick: () => {
+      delSlot.textContent = ""; delSlot.append(h("span", { class: "confirm" }, "Remove?", h("button", { class: "btn sm danger", type: "button", onclick: async () => { await DB.del("saved", s.id); S.saved = S.saved.filter(x => x.id !== s.id); rerenderKeepScroll(); } }, "Remove"), h("button", { class: "btn sm ghost", type: "button", onclick: showDel }, "Keep")));
+    } }, "Remove")); };
+    showDel();
+  });
+  root.append(listEl);
+}
+function savedForm() {
+  const f = S.savedForm;
+  const err = h("div", { class: "small", style: "color:var(--danger)", "aria-live": "polite" });
+  const form = h("form", { class: "panel stack", style: "gap:12px", onsubmit: async (e) => {
+    e.preventDefault();
+    const ref = $("#sf-ref").value.trim(), text = $("#sf-text").value.trim();
+    if (!ref || !text) { err.textContent = "Add both the reference and the verse text."; return; }
+    const data = { ref, text, translation: $("#sf-trans").value, note: $("#sf-note").value.trim() };
+    if (f.id) { const s = S.saved.find(x => x.id === f.id); Object.assign(s, data); await DB.put("saved", s); }
+    else await addSaved(data);
+    S.savedForm = null; render(); toast("Verse saved");
+  } },
+    h("h3", { class: "sub" }, f.id ? "Edit verse" : "Add a verse"),
+    h("div", { style: "display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:10px" },
+      h("label", { class: "lbl" }, "Reference", h("input", { class: "field", id: "sf-ref", placeholder: "e.g. Romans 12:2", value: f.ref })),
+      h("label", { class: "lbl" }, "Translation", h("select", { class: "field", id: "sf-trans" }, ["NIV", "KJV", "ESV", "NLT", "NKJV", "MBBTAG", "Other"].map(t => h("option", { value: t, selected: f.translation === t ? true : null }, t))))),
+    h("label", { class: "lbl" }, "Verse text", h("textarea", { class: "field", id: "sf-text", rows: "4", placeholder: "Type or paste the verse" }, f.text)),
+    h("label", { class: "lbl" }, "Note (optional)", h("input", { class: "field", id: "sf-note", placeholder: "Why this verse matters to you", value: f.note })),
+    err,
+    h("div", { class: "row" }, h("button", { class: "btn primary", type: "submit" }, "Save verse"), h("button", { class: "btn ghost", type: "button", onclick: () => { S.savedForm = null; render(); } }, "Cancel")));
+  setTimeout(() => { const el = $("#sf-ref"); if (el && !f.ref) el.focus(); }, 30);
+  return form;
+}
+
+/* ================= NOTES ================= */
+function newNote(prefill) {
+  const n = { id: uid("n"), kind: "note", title: prefill.title || "", ref: prefill.ref || "", body: prefill.body || "", attachments: [], created: Date.now(), updated: Date.now(), draft: true };
+  S.notes.push(n); S.activeNote = n.id; S.editing = true;
+  return n;
+}
+async function persistNote(n) { const { draft, ...rest } = n; await DB.put("notes", rest); delete n.draft; }
+function noteText(n) { return n.kind === "journal" ? [n.soap && n.soap.s, n.soap && n.soap.o, n.soap && n.soap.a, n.soap && n.soap.p].filter(Boolean).join(" ") : (n.body || ""); }
+function viewNotes(root) {
+  root.append(h("div", { class: "spread" },
+    h("div", null, h("div", { class: "eyebrow" }, "Journal"), h("h2", { class: "title" }, "Notes")),
+    h("button", { class: "btn primary", type: "button", onclick: () => { newNote({ ref: summarize(PLAN[currentDay() - 1]) }); render(); setTimeout(() => { const t = $("#note-title"); if (t) t.focus(); }, 30); } }, icon("plus"), "New note")));
+  const q = S.notesQ.toLowerCase();
+  let list = S.notes.filter(n => (S.notesFilter === "all" || (S.notesFilter === "journal" ? n.kind === "journal" : n.kind !== "journal")))
+    .filter(n => !q || [n.title, n.ref, noteText(n), ...(n.attachments || []).map(a => a.name)].join(" ").toLowerCase().includes(q))
+    .sort((a, b) => b.updated - a.updated);
+  const layout = h("div", { class: "journal" + (S.editing && S.activeNote ? " editing" : "") });
+  const listCol = h("div", { class: "note-list" },
+    h("input", { class: "field", id: "notes-q", type: "search", placeholder: "Search notes", value: S.notesQ, oninput: (e) => { S.notesQ = e.target.value; const pos = e.target.selectionStart; render(); const el = $("#notes-q"); if (el) { el.focus(); el.setSelectionRange(pos, pos); } } }),
+    h("div", { class: "seg", role: "group", "aria-label": "Filter notes" }, ...[["all", "All"], ["note", "Notes"], ["journal", "Journal"]].map(([k, l]) => h("button", { type: "button", "aria-pressed": S.notesFilter === k ? "true" : "false", onclick: () => { S.notesFilter = k; render(); } }, l))));
+  if (!list.length) listCol.append(h("div", { class: "muted small", style: "padding:6px 4px" }, q ? "No notes match your search." : "No notes yet."));
+  list.forEach(n => listCol.append(h("button", { type: "button", class: "note-item" + (n.id === S.activeNote ? " active" : ""), onclick: () => { S.activeNote = n.id; S.editing = true; render(); window.scrollTo(0, 0); } },
+    h("span", { class: "nt" }, n.title || "Untitled note"),
+    h("span", { class: "nm" }, h("span", null, fmtTs(n.updated)), n.kind === "journal" ? h("span", { class: "chip gold" }, "Journal") : null, (n.attachments || []).length ? h("span", { class: "chip" }, `${n.attachments.length} file${n.attachments.length > 1 ? "s" : ""}`) : null),
+    h("span", { class: "ns" }, noteText(n).trim() || n.ref || "Empty"))));
+  const edCol = h("div", { class: "editor-col" });
+  const n = S.notes.find(x => x.id === S.activeNote);
+  if (n) edCol.append(noteEditor(n));
+  else edCol.append(h("div", { class: "empty" }, h("b", null, "Your journal starts here"), h("span", null, "Write what God is showing you. Add photos, documents, or worship songs to any note."),
+    h("button", { class: "btn soft", type: "button", onclick: () => { newNote({ ref: summarize(PLAN[currentDay() - 1]) }); render(); } }, "Write a note")));
+  layout.append(listCol, edCol);
+  root.append(layout);
+}
+function noteEditor(n) {
+  const status = h("span", { class: "saved-note", "aria-live": "polite" }, n.draft ? "" : "Saved " + fmtTs(n.updated));
+  let timer;
+  const save = (now) => {
+    clearTimeout(timer); status.textContent = "Saving…";
+    timer = setTimeout(async () => { n.updated = Date.now(); try { await persistNote(n); status.textContent = "Saved"; } catch { status.textContent = "Couldn’t save. Your device storage may be full."; } }, now ? 0 : 600);
+  };
+  const ed = h("div", { class: "panel editor" });
+  ed.append(h("div", { class: "spread" },
+    h("button", { class: "btn sm ghost", type: "button", onclick: () => { S.editing = false; if (n.draft && !n.title && !n.body) { S.notes = S.notes.filter(x => x !== n); S.activeNote = null; } render(); } }, icon("left"), "All notes"),
+    status));
+  ed.append(h("label", { class: "lbl" }, "Title", h("input", { class: "field", id: "note-title", style: "font-family:var(--read);font-size:19px;font-weight:600", placeholder: "What is God showing you?", value: n.title, oninput: (e) => { n.title = e.target.value; save(); } })));
+  ed.append(h("label", { class: "lbl" }, "Scripture", h("input", { class: "field", id: "note-ref", placeholder: "e.g. Psalm 23", value: n.ref || "", oninput: (e) => { n.ref = e.target.value; save(); } })));
+  if (n.kind === "journal") {
+    n.soap = n.soap || { s: "", o: "", a: "", p: "" };
+    [["s", "Scripture"], ["o", "Observation"], ["a", "Application"], ["p", "Prayer"]].forEach(([k, l]) => ed.append(h("label", { class: "lbl" }, l, h("textarea", { class: "field", id: "note-soap-" + k, rows: "3", oninput: (e) => { n.soap[k] = e.target.value; save(); } }, n.soap[k] || ""))));
+  } else {
+    ed.append(h("label", { class: "lbl" }, "Note", h("textarea", { class: "field body", id: "note-body", placeholder: "Write freely: what stood out, prayers, questions, answered prayers…", oninput: (e) => { n.body = e.target.value; save(); } }, n.body || "")));
+  }
+  ed.append(h("div", { class: "stack", style: "gap:10px" }, h("h3", { class: "sub" }, "Attachments"), attachmentsSection(n, () => persistNote(n))));
+  // Delete
+  const delSlot = h("div");
+  const showDel = () => { delSlot.textContent = ""; delSlot.append(h("button", { class: "btn sm ghost danger", type: "button", onclick: () => {
+    delSlot.textContent = ""; delSlot.append(h("span", { class: "confirm" }, "Delete this note and its files for good?",
+      h("button", { class: "btn sm danger", type: "button", onclick: async () => { for (const a of n.attachments || []) await DB.del("files", a.id).catch(() => {}); await DB.del("notes", n.id).catch(() => {}); S.notes = S.notes.filter(x => x.id !== n.id); S.activeNote = null; S.editing = false; render(); toast("Note deleted"); } }, "Delete"),
+      h("button", { class: "btn sm ghost", type: "button", onclick: showDel }, "Keep")));
+  } }, n.draft ? "Discard" : "Delete note")); };
+  showDel();
+  ed.append(h("div", { class: "spread" }, h("span", { class: "muted small" }, "Created " + fmtTs(n.created)), delSlot));
+  return ed;
+}
+/* ================= SERMONS ================= */
+const SERMON_STATUS = [["idea", "Idea"], ["drafting", "Drafting"], ["ready", "Ready"], ["preached", "Preached"]];
+const statusLabel = (k) => (SERMON_STATUS.find(x => x[0] === k) || SERMON_STATUS[0])[1];
+function newSermon(prefill = {}) {
+  const s = { id: uid("sm"), title: prefill.title || "", status: "idea", scripture: prefill.scripture || "", bigIdea: "", content: prefill.content || "", ideas: [], preachedOn: "", place: "", created: Date.now(), updated: Date.now(), draft: true };
+  S.sermons.push(s); S.activeSermon = s.id; S.sermonEditing = true;
+  return s;
+}
+async function persistSermon(s) { const { draft, ...rest } = s; await DB.put("sermons", rest); delete s.draft; }
+function viewSermons(root) {
+  root.append(h("div", { class: "spread" },
+    h("div", null, h("div", { class: "eyebrow" }, "Sermon preparation"), h("h2", { class: "title" }, "Sermons")),
+    h("button", { class: "btn primary", type: "button", onclick: () => { newSermon(); render(); setTimeout(() => { const t = $("#sm-title"); if (t) t.focus(); }, 30); } }, icon("plus"), "New sermon idea")));
+  const q = S.sermonQ.toLowerCase();
+  const counts = Object.fromEntries(SERMON_STATUS.map(([k]) => [k, S.sermons.filter(s => !s.draft && s.status === k).length]));
+  const list = S.sermons
+    .filter(s => S.sermonFilter === "all" || s.status === S.sermonFilter)
+    .filter(s => !q || [s.title, s.scripture, s.bigIdea, s.content, ...(s.ideas || []).map(i => i.text)].join(" ").toLowerCase().includes(q))
+    .sort((a, b) => b.updated - a.updated);
+  const layout = h("div", { class: "journal" + (S.sermonEditing && S.activeSermon ? " editing" : "") });
+  const listCol = h("div", { class: "note-list" },
+    h("input", { class: "field", id: "sermon-q", type: "search", placeholder: "Search titles, texts, ideas", value: S.sermonQ, oninput: (e) => { S.sermonQ = e.target.value; const pos = e.target.selectionStart; render(); const el = $("#sermon-q"); if (el) { el.focus(); el.setSelectionRange(pos, pos); } } }),
+    h("div", { class: "seg", role: "group", "aria-label": "Filter by status" },
+      h("button", { type: "button", "aria-pressed": S.sermonFilter === "all" ? "true" : "false", onclick: () => { S.sermonFilter = "all"; render(); } }, "All"),
+      ...SERMON_STATUS.map(([k, l]) => h("button", { type: "button", "aria-pressed": S.sermonFilter === k ? "true" : "false", onclick: () => { S.sermonFilter = k; render(); } }, `${l}${counts[k] ? " " + counts[k] : ""}`))));
+  if (!list.length) listCol.append(h("div", { class: "muted small", style: "padding:6px 4px" }, q ? "No sermons match your search." : S.sermonFilter === "all" ? "No sermon ideas yet." : `Nothing marked ${statusLabel(S.sermonFilter)} yet.`));
+  list.forEach(s => listCol.append(h("button", { type: "button", class: "note-item" + (s.id === S.activeSermon ? " active" : ""), onclick: () => { S.activeSermon = s.id; S.sermonEditing = true; render(); window.scrollTo(0, 0); } },
+    h("span", { class: "nt" }, s.title || "Untitled sermon"),
+    h("span", { class: "nm" }, h("span", { class: "chip" + (s.status === "preached" ? " ok" : s.status === "ready" ? " gold" : "") }, statusLabel(s.status)), s.scripture ? h("span", null, s.scripture) : null, h("span", null, fmtTs(s.updated))),
+    h("span", { class: "ns" }, s.bigIdea || (s.content || "").trim() || ((s.ideas || [])[0] || {}).text || "No content yet"))));
+  const edCol = h("div", { class: "editor-col" });
+  const cur = S.sermons.find(x => x.id === S.activeSermon);
+  if (cur) edCol.append(sermonEditor(cur));
+  else edCol.append(h("div", { class: "empty" }, h("b", null, "Catch every sermon idea"),
+    h("span", null, "Jot down a possible title and text the moment it comes. Come back anytime to add new thoughts, build the outline, and mark it Ready or Preached."),
+    h("button", { class: "btn soft", type: "button", onclick: () => { newSermon(); render(); } }, "Start a sermon idea")));
+  layout.append(listCol, edCol);
+  root.append(layout);
+}
+function sermonEditor(s) {
+  const status = h("span", { class: "saved-note", "aria-live": "polite" }, s.draft ? "" : "Saved " + fmtTs(s.updated));
+  let timer;
+  const save = (now) => {
+    clearTimeout(timer); status.textContent = "Saving…";
+    timer = setTimeout(async () => { s.updated = Date.now(); try { await persistSermon(s); status.textContent = "Saved"; } catch { status.textContent = "Couldn’t save. Your device storage may be full."; } }, now ? 0 : 600);
+  };
+  const ed = h("div", { class: "panel editor" });
+  ed.append(h("div", { class: "spread" },
+    h("button", { class: "btn sm ghost", type: "button", onclick: () => { S.sermonEditing = false; if (s.draft && !s.title && !s.content && !s.scripture) { S.sermons = S.sermons.filter(x => x !== s); S.activeSermon = null; } render(); } }, icon("left"), "All sermons"),
+    status));
+  ed.append(h("label", { class: "lbl" }, "Sermon title", h("input", { class: "field", id: "sm-title", style: "font-family:var(--read);font-size:20px;font-weight:600", placeholder: "A possible title", value: s.title, oninput: (e) => { s.title = e.target.value; save(); } })));
+  ed.append(h("div", { class: "seg", role: "group", "aria-label": "Status" }, ...SERMON_STATUS.map(([k, l]) => h("button", { type: "button", "aria-pressed": s.status === k ? "true" : "false", onclick: () => { s.status = k; save(true); rerenderKeepScroll(); } }, l))));
+  const p = parseRef(s.scripture);
+  ed.append(h("label", { class: "lbl" }, "Main scripture", h("input", { class: "field", id: "sm-scripture", placeholder: "e.g. John 15:1-8", value: s.scripture, onchange: () => rerenderKeepScroll(), oninput: (e) => { s.scripture = e.target.value; save(); } })));
+  if (s.scripture) ed.append(h("div", { class: "row", style: "margin-top:-4px" },
+    p ? h("button", { class: "btn sm soft", type: "button", onclick: () => openChapter(p.b, p.c, { hl: p.verses }) }, "Read chapter (KJV)") : null, nivLink(s.scripture, "Read in NIV")));
+  ed.append(h("label", { class: "lbl" }, "Big idea", h("input", { class: "field", id: "sm-bigidea", placeholder: "The one sentence you want people to remember", value: s.bigIdea, oninput: (e) => { s.bigIdea = e.target.value; save(); } })));
+  ed.append(h("label", { class: "lbl" }, "Content — outline or manuscript", h("textarea", { class: "field body", id: "sm-content", style: "min-height:320px",
+    placeholder: "Introduction\n\nI. First point\n   – Scripture\n   – Illustration\n   – Application\n\nII. Second point\n\nConclusion and call to respond",
+    oninput: (e) => { s.content = e.target.value; save(); } }, s.content)));
+
+  // Ideas log
+  const ideaInput = h("textarea", { class: "field", id: "sm-idea", rows: "2", placeholder: "A new thought, illustration, quote, or question…" });
+  const addIdea = async () => {
+    const t = ideaInput.value.trim(); if (!t) return;
+    s.ideas = [{ id: uid("i"), text: t, ts: Date.now() }, ...(s.ideas || [])]; save(true); rerenderKeepScroll(); toast("Idea added");
+  };
+  const ideas = h("div", { class: "stack", style: "gap:8px" });
+  (s.ideas || []).forEach(i => {
+    const rm = h("span");
+    const showRm = () => { rm.textContent = ""; rm.append(h("button", { class: "btn sm ghost danger", type: "button", onclick: () => {
+      rm.textContent = ""; rm.append(h("span", { class: "confirm" }, h("button", { class: "btn sm danger", type: "button", onclick: () => { s.ideas = s.ideas.filter(x => x.id !== i.id); save(true); rerenderKeepScroll(); } }, "Remove"), h("button", { class: "btn sm ghost", type: "button", onclick: showRm }, "Keep")));
+    } }, "Remove")); };
+    showRm();
+    ideas.append(h("div", { style: "border-left:3px solid var(--accent);padding:4px 0 4px 12px;display:grid;gap:4px" },
+      h("div", { style: "font-family:var(--read);font-size:16px;line-height:1.6;white-space:pre-wrap" }, i.text),
+      h("div", { class: "spread" }, h("span", { class: "muted small" }, new Date(i.ts).toLocaleString(undefined, { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" })),
+        h("div", { class: "row", style: "gap:4px" },
+          h("button", { class: "btn sm ghost", type: "button", onclick: () => { s.content = (s.content ? s.content.replace(/\s*$/, "") + "\n\n" : "") + i.text; save(true); rerenderKeepScroll(); toast("Added to content"); } }, "Move to content"),
+          rm))));
+  });
+  ed.append(h("div", { class: "stack", style: "gap:10px" },
+    h("h3", { class: "sub" }, `Ideas log${(s.ideas || []).length ? " · " + s.ideas.length : ""}`),
+    h("p", { class: "muted small", style: "margin:0" }, "Add thoughts as they come. Each one is dated, so you can see how the sermon grew."),
+    ideaInput,
+    h("div", null, h("button", { class: "btn soft", type: "button", onclick: addIdea }, icon("plus"), "Add idea")),
+    ideas));
+
+  if (s.status === "preached") ed.append(h("div", { style: "display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:10px" },
+    h("label", { class: "lbl" }, "Preached on", h("input", { class: "field", type: "date", id: "sm-date", value: s.preachedOn, onchange: (e) => { s.preachedOn = e.target.value; save(true); } })),
+    h("label", { class: "lbl" }, "Where", h("input", { class: "field", id: "sm-place", placeholder: "Church or event", value: s.place, oninput: (e) => { s.place = e.target.value; save(); } }))));
+
+  const delSlot = h("div");
+  const showDel = () => { delSlot.textContent = ""; delSlot.append(h("button", { class: "btn sm ghost danger", type: "button", onclick: () => {
+    delSlot.textContent = ""; delSlot.append(h("span", { class: "confirm" }, "Delete this sermon for good?",
+      h("button", { class: "btn sm danger", type: "button", onclick: async () => { await DB.del("sermons", s.id).catch(() => {}); S.sermons = S.sermons.filter(x => x.id !== s.id); S.activeSermon = null; S.sermonEditing = false; render(); toast("Sermon deleted"); } }, "Delete"),
+      h("button", { class: "btn sm ghost", type: "button", onclick: showDel }, "Keep")));
+  } }, s.draft ? "Discard" : "Delete sermon")); };
+  showDel();
+  ed.append(h("div", { class: "spread" },
+    h("div", { class: "row" }, h("span", { class: "muted small" }, "Started " + fmtTs(s.created)),
+      h("button", { class: "btn sm ghost", type: "button", onclick: () => copyText([s.title, s.scripture, s.bigIdea && "Big idea: " + s.bigIdea, s.content].filter(Boolean).join("\n\n")) }, icon("copy"), "Copy all")),
+    delSlot));
+  return ed;
+}
+
+/* ================= ATTACHMENTS (shared by notes and Bible studies) ================= */
+function attachmentsSection(owner, persist, label = "Add photos, documents or music") {
+  const fileInput = h("input", { type: "file", multiple: true, accept: "image/*,audio/*,video/*,.pdf,.doc,.docx,.txt,.rtf,.ppt,.pptx,.xls,.xlsx,.odt,.pages,.key,.mp3,.m4a,.wav,.aac,.ogg", style: "display:none", onchange: (e) => addFiles(owner, e.target.files, persist) });
+  fileInput.id = "files-" + owner.id;
+  const dz = h("div", { class: "dropzone" }, h("span", { class: "dz-hint" }, "Drop files here, or "),
+    h("button", { class: "btn sm soft", type: "button", onclick: () => fileInput.click() }, icon("clip"), label), fileInput);
+  dz.addEventListener("dragover", (e) => { e.preventDefault(); dz.classList.add("over"); });
+  dz.addEventListener("dragleave", () => dz.classList.remove("over"));
+  dz.addEventListener("drop", (e) => { e.preventDefault(); dz.classList.remove("over"); addFiles(owner, e.dataTransfer.files, persist); });
+  const grid = h("div", { class: "attach-grid" });
+  (owner.attachments || []).forEach(a => grid.append(attachmentTile(owner, a, persist)));
+  return h("div", { class: "stack", style: "gap:10px" }, dz, grid);
+}
+async function addFiles(owner, files, persist) {
+  const arr = [...(files || [])]; if (!arr.length) return;
+  let added = 0;
+  for (const f of arr) {
+    if (f.size > 200 * 1048576) { toast(`${f.name} is over 200 MB, so it wasn’t added`); continue; }
+    const id = uid("f");
+    try {
+      await DB.put("files", { id, blob: f, name: f.name, type: f.type, size: f.size });
+      owner.attachments = owner.attachments || []; owner.attachments.push({ id, name: f.name, type: f.type || "", size: f.size, added: Date.now() }); added++;
+    } catch { toast("Your device is out of storage space for files"); break; }
+  }
+  if (added) { owner.updated = Date.now(); await persist(); toast(`${added} file${added > 1 ? "s" : ""} added`); rerenderKeepScroll(); }
+}
+function attachmentTile(owner, a, persist) {
+  const t = a.type || "";
+  const tile = h("div", { class: "att" + (t.startsWith("audio/") || t.startsWith("video/") ? " wide" : "") });
+  const body = h("div", null, h("div", { class: "doc" }, "…"));
+  const openLink = h("a", { class: "btn sm ghost", download: a.name, target: "_blank", rel: "noopener" }, "Open");
+  tile.append(body);
+  DB.get("files", a.id).then(rec => {
+    body.textContent = "";
+    if (!rec) { body.append(h("div", { class: "doc" }, "MISSING")); return; }
+    const url = URL.createObjectURL(rec.blob); objectUrls.push(url);
+    if (t.startsWith("image/")) body.append(h("a", { href: url, target: "_blank", rel: "noopener" }, h("img", { src: url, alt: a.name, loading: "lazy" })));
+    else if (t.startsWith("audio/")) body.append(h("audio", { controls: true, preload: "metadata", src: url }));
+    else if (t.startsWith("video/")) body.append(h("video", { controls: true, preload: "metadata", src: url, playsinline: true }));
+    else body.append(h("div", { class: "doc" }, (a.name.split(".").pop() || "FILE").toUpperCase().slice(0, 5)));
+    openLink.href = url;
+  }).catch(() => {});
+  const rm = h("span");
+  const showRm = () => { rm.textContent = ""; rm.append(h("button", { class: "btn sm ghost danger", type: "button", onclick: () => {
+    rm.textContent = ""; rm.append(h("span", { class: "confirm" }, h("button", { class: "btn sm danger", type: "button", onclick: async () => { await DB.del("files", a.id).catch(() => {}); owner.attachments = owner.attachments.filter(x => x.id !== a.id); owner.updated = Date.now(); await persist(); rerenderKeepScroll(); } }, "Remove"), h("button", { class: "btn sm ghost", type: "button", onclick: showRm }, "Keep")));
+  } }, "Remove")); };
+  showRm();
+  tile.append(h("div", { class: "meta" }, h("span", { class: "nm", title: a.name }, a.name), h("span", { class: "muted" }, fmtBytes(a.size)), h("div", { class: "row", style: "gap:4px" }, openLink, rm)));
+  return tile;
+}
+function deleteRow(label, question, onDelete) {
+  const slot = h("span");
+  const show = () => { slot.textContent = ""; slot.append(h("button", { class: "btn sm ghost danger", type: "button", onclick: () => {
+    slot.textContent = ""; slot.append(h("span", { class: "confirm" }, question, h("button", { class: "btn sm danger", type: "button", onclick: onDelete }, "Delete"), h("button", { class: "btn sm ghost", type: "button", onclick: show }, "Keep")));
+  } }, label)); };
+  show();
+  return slot;
+}
+
+/* ================= BIBLE STUDY ================= */
+const STUDY_STATUS = [["ongoing", "Ongoing"], ["paused", "Paused"], ["completed", "Completed"]];
+function newStudy() {
+  const s = { id: uid("bs"), name: "", contact: "", status: "ongoing", started: ymd(new Date()), material: "", notes: "", sessions: [], attachments: [], created: Date.now(), updated: Date.now(), draft: true };
+  S.studies.push(s); S.activeStudy = s.id; S.studyEditing = true; return s;
+}
+async function persistStudy(s) { const { draft, ...rest } = s; await DB.put("studies", rest); delete s.draft; }
+function viewStudy(root) {
+  root.append(h("div", { class: "spread" },
+    h("div", null, h("div", { class: "eyebrow" }, "Discipleship"), h("h2", { class: "title" }, "Bible Studies")),
+    h("button", { class: "btn primary", type: "button", onclick: () => { newStudy(); render(); setTimeout(() => { const t = $("#bs-name"); if (t) t.focus(); }, 30); } }, icon("plus"), "New Bible study")));
+  const q = S.studyQ.toLowerCase();
+  const list = S.studies.filter(s => !q || [s.name, s.material, s.notes, s.contact, ...(s.sessions || []).map(x => x.topic + " " + x.notes)].join(" ").toLowerCase().includes(q))
+    .sort((a, b) => (a.status === "completed") - (b.status === "completed") || b.updated - a.updated);
+  const layout = h("div", { class: "journal" + (S.studyEditing && S.activeStudy ? " editing" : "") });
+  const listCol = h("div", { class: "note-list" },
+    h("input", { class: "field", id: "study-q", type: "search", placeholder: "Search names, materials, notes", value: S.studyQ, oninput: (e) => { S.studyQ = e.target.value; const pos = e.target.selectionStart; render(); const el = $("#study-q"); if (el) { el.focus(); el.setSelectionRange(pos, pos); } } }));
+  if (!list.length) listCol.append(h("div", { class: "muted small", style: "padding:6px 4px" }, q ? "No studies match your search." : "No Bible studies yet."));
+  list.forEach(s => {
+    const last = (s.sessions || [])[0];
+    listCol.append(h("button", { type: "button", class: "note-item" + (s.id === S.activeStudy ? " active" : ""), onclick: () => { S.activeStudy = s.id; S.studyEditing = true; render(); window.scrollTo(0, 0); } },
+      h("span", { class: "nt" }, s.name || "New Bible study"),
+      h("span", { class: "nm" }, h("span", { class: "chip" + (s.status === "completed" ? " ok" : s.status === "paused" ? " gold" : "") }, (STUDY_STATUS.find(x => x[0] === s.status) || STUDY_STATUS[0])[1]),
+        h("span", null, `${(s.sessions || []).length} session${(s.sessions || []).length === 1 ? "" : "s"}`), (s.attachments || []).length ? h("span", null, `${s.attachments.length} file${s.attachments.length > 1 ? "s" : ""}`) : null),
+      h("span", { class: "ns" }, [s.material, last ? `Last: ${fmtDate(last.date, { month: "short", day: "numeric" })} · ${last.topic}` : ""].filter(Boolean).join(" — ") || "No sessions yet")));
+  });
+  const edCol = h("div", { class: "editor-col" });
+  const cur = S.studies.find(x => x.id === S.activeStudy);
+  if (cur) edCol.append(studyEditor(cur));
+  else edCol.append(h("div", { class: "empty" }, h("b", null, "Keep track of the people you disciple"),
+    h("span", null, "Add each person or group you study the Bible with. Log every session, keep notes, and attach the lesson material and photos."),
+    h("button", { class: "btn soft", type: "button", onclick: () => { newStudy(); render(); } }, "Add a Bible study")));
+  layout.append(listCol, edCol);
+  root.append(layout);
+}
+function studyEditor(s) {
+  const status = h("span", { class: "saved-note", "aria-live": "polite" }, s.draft ? "" : "Saved " + fmtTs(s.updated));
+  let timer;
+  const persist = () => persistStudy(s);
+  const save = (now) => { clearTimeout(timer); status.textContent = "Saving…"; timer = setTimeout(async () => { s.updated = Date.now(); try { await persist(); status.textContent = "Saved"; } catch { status.textContent = "Couldn’t save. Your device storage may be full."; } }, now ? 0 : 600); };
+  const ed = h("div", { class: "panel editor" });
+  ed.append(h("div", { class: "spread" },
+    h("button", { class: "btn sm ghost", type: "button", onclick: () => { S.studyEditing = false; if (s.draft && !s.name) { S.studies = S.studies.filter(x => x !== s); S.activeStudy = null; } render(); } }, icon("left"), "All studies"), status));
+  ed.append(h("label", { class: "lbl" }, "Name", h("input", { class: "field", id: "bs-name", style: "font-family:var(--read);font-size:20px;font-weight:600", placeholder: "Who you study the Bible with (person or group)", value: s.name, oninput: (e) => { s.name = e.target.value; save(); } })));
+  ed.append(h("div", { class: "seg", role: "group", "aria-label": "Status" }, ...STUDY_STATUS.map(([k, l]) => h("button", { type: "button", "aria-pressed": s.status === k ? "true" : "false", onclick: () => { s.status = k; save(true); rerenderKeepScroll(); } }, l))));
+  ed.append(h("div", { class: "two" },
+    h("label", { class: "lbl" }, "Started", h("input", { class: "field", type: "date", id: "bs-started", value: s.started, onchange: (e) => { s.started = e.target.value; save(true); } })),
+    h("label", { class: "lbl" }, "Contact (optional)", h("input", { class: "field", id: "bs-contact", placeholder: "Phone, Messenger, address…", value: s.contact, oninput: (e) => { s.contact = e.target.value; save(); } }))));
+  ed.append(h("label", { class: "lbl" }, "Study material", h("input", { class: "field", id: "bs-material", placeholder: "e.g. Lamp 1 lessons, Gospel of John, Bridge to Life", value: s.material, oninput: (e) => { s.material = e.target.value; save(); } })));
+  ed.append(h("label", { class: "lbl" }, "Notes", h("textarea", { class: "field", id: "bs-notes", rows: "5", placeholder: "Background, prayer needs, questions they asked, next steps…", oninput: (e) => { s.notes = e.target.value; save(); } }, s.notes)));
+
+  // Sessions
+  const sDate = h("input", { class: "field", type: "date", id: "bs-sdate", value: ymd(new Date()) });
+  const sTopic = h("input", { class: "field", id: "bs-stopic", placeholder: "Lesson or passage, e.g. John 3" });
+  const sNotes = h("textarea", { class: "field", id: "bs-snotes", rows: "3", placeholder: "What you covered, how they responded, what to pray for" });
+  const sessions = h("div", { class: "stack", style: "gap:10px" });
+  (s.sessions || []).forEach(x => sessions.append(h("div", { class: "log-item" },
+    h("div", { class: "spread" }, h("b", null, x.topic || "Session"), h("span", { class: "muted small" }, fmtDate(x.date, { weekday: "short", month: "short", day: "numeric", year: "numeric" }))),
+    x.notes ? h("div", { class: "log-text" }, x.notes) : null,
+    h("div", null, deleteRow("Remove", "Remove this session?", () => { s.sessions = s.sessions.filter(y => y.id !== x.id); save(true); rerenderKeepScroll(); })))));
+  ed.append(h("div", { class: "stack", style: "gap:10px" },
+    h("h3", { class: "sub" }, `Sessions${(s.sessions || []).length ? " · " + s.sessions.length : ""}`),
+    h("div", { class: "panel inset stack", style: "gap:10px" },
+      h("div", { class: "two" }, h("label", { class: "lbl" }, "Date", sDate), h("label", { class: "lbl" }, "Lesson or passage", sTopic)),
+      h("label", { class: "lbl" }, "Session notes", sNotes),
+      h("div", null, h("button", { class: "btn soft", type: "button", onclick: () => {
+        if (!sTopic.value.trim() && !sNotes.value.trim()) { toast("Add the lesson or some notes first"); return; }
+        s.sessions = [{ id: uid("ss"), date: sDate.value || ymd(new Date()), topic: sTopic.value.trim(), notes: sNotes.value.trim() }, ...(s.sessions || [])].sort((a, b) => b.date.localeCompare(a.date));
+        save(true); rerenderKeepScroll(); toast("Session added");
+      } }, icon("plus"), "Add session"))),
+    sessions));
+  ed.append(h("div", { class: "stack", style: "gap:10px" }, h("h3", { class: "sub" }, "Study materials & photos"), attachmentsSection(s, persist, "Add material or photos")));
+  ed.append(h("div", { class: "spread" }, h("span", { class: "muted small" }, "Added " + fmtTs(s.created)),
+    deleteRow(s.draft ? "Discard" : "Delete study", "Delete this study, its sessions and files?", async () => { for (const a of s.attachments || []) await DB.del("files", a.id).catch(() => {}); await DB.del("studies", s.id).catch(() => {}); S.studies = S.studies.filter(x => x.id !== s.id); S.activeStudy = null; S.studyEditing = false; render(); toast("Study deleted"); })));
+  return ed;
+}
+
+/* ================= PRAYER ================= */
+async function savePrayer(p) { p.updated = Date.now(); await DB.put("prayers", p); const i = S.prayers.findIndex(x => x.id === p.id); i >= 0 ? S.prayers[i] = p : S.prayers.push(p); }
+function viewPrayer(root) {
+  root.append(h("div", null, h("div", { class: "eyebrow" }, "Pray without ceasing"), h("h2", { class: "title" }, "Prayer")));
+  root.append(h("div", { class: "seg seg-wide", role: "group", "aria-label": "Prayer list" },
+    h("button", { type: "button", "aria-pressed": S.prayerMode === "others" ? "true" : "false", onclick: () => { S.prayerMode = "others"; S.prayerForm = null; render(); } }, "Prayer requests"),
+    h("button", { type: "button", "aria-pressed": S.prayerMode === "personal" ? "true" : "false", onclick: () => { S.prayerMode = "personal"; S.prayerForm = null; render(); } }, "My personal prayer")));
+  if (S.prayerMode === "personal") return viewPersonalPrayer(root);
+
+  const requests = S.prayers.filter(p => p.kind === "request");
+  const people = [...requests.reduce((m, p) => m.set(p.person, (m.get(p.person) || 0) + (p.status === "answered" ? 0 : 1)), new Map())].filter(([n]) => n).sort((a, b) => b[1] - a[1]);
+  root.append(h("div", { class: "spread" },
+    h("p", { class: "muted small", style: "margin:0" }, `${requests.filter(p => p.status !== "answered").length} praying · ${requests.filter(p => p.status === "answered").length} answered`),
+    h("button", { class: "btn primary", type: "button", onclick: () => { S.prayerForm = { kind: "request", date: ymd(new Date()), person: S.prayerPerson || "", items: "" }; render(); setTimeout(() => { const el = $(S.prayerPerson ? "#pr-items" : "#pr-person"); if (el) el.focus(); }, 30); } }, icon("plus"), "Add prayer request")));
+  if (S.prayerForm && S.prayerForm.kind === "request") root.append(prayerForm(people.map(p => p[0])));
+  if (people.length) root.append(h("div", { class: "row people-chips" },
+    h("button", { class: "chip" + (S.prayerPerson ? "" : " sel"), type: "button", onclick: () => { S.prayerPerson = ""; render(); } }, "Everyone"),
+    ...people.map(([n, c]) => h("button", { class: "chip" + (S.prayerPerson === n ? " sel" : ""), type: "button", onclick: () => { S.prayerPerson = S.prayerPerson === n ? "" : n; render(); } }, n + (c ? ` · ${c}` : "")))));
+  root.append(h("div", { class: "seg", role: "group", "aria-label": "Status" },
+    ...[["praying", "Praying"], ["answered", "Answered"], ["all", "All"]].map(([k, l]) => h("button", { type: "button", "aria-pressed": S.prayerFilter === k ? "true" : "false", onclick: () => { S.prayerFilter = k; render(); } }, l))));
+  const list = requests.filter(p => (!S.prayerPerson || p.person === S.prayerPerson) && (S.prayerFilter === "all" || (S.prayerFilter === "answered" ? p.status === "answered" : p.status !== "answered")))
+    .sort((a, b) => b.date.localeCompare(a.date) || b.created - a.created);
+  if (!list.length) {
+    root.append(h("div", { class: "empty" }, h("b", null, S.prayerFilter === "answered" ? "No answered prayers yet" : "Who can you pray for?"),
+      h("span", null, S.prayerFilter === "answered" ? "When God answers, mark the request as answered and write down what happened." : "Add a person’s name and what they asked you to pray for. Come back to it each day.")));
+    return;
+  }
+  const listEl = h("div", { class: "mem-list" });
+  list.forEach(p => {
+    const answering = S.answering === p.id;
+    const card = h("article", { class: "mem prayer-card" + (p.status === "answered" ? " answered" : "") },
+      h("div", { class: "top" },
+        h("div", null, h("div", { class: "ref" }, p.person || "Prayer request"), h("div", { class: "topic" }, fmtDate(p.date, { weekday: "short", month: "short", day: "numeric", year: "numeric" }))),
+        p.status === "answered" ? h("span", { class: "chip ok" }, "Answered") : h("span", { class: "chip gold" }, "Praying")),
+      h("p", { class: "txt", style: "white-space:pre-wrap" }, p.items));
+    if (p.status === "answered") card.append(h("div", { class: "answer" }, h("b", null, `Answered${p.answeredDate ? " " + fmtDate(p.answeredDate, { month: "short", day: "numeric", year: "numeric" }) : ""}`), p.answerNote ? h("div", { style: "white-space:pre-wrap" }, p.answerNote) : null));
+    if (answering) {
+      const aDate = h("input", { class: "field", type: "date", id: "pr-adate", value: ymd(new Date()) });
+      const aNote = h("textarea", { class: "field", id: "pr-anote", rows: "3", placeholder: "How did God answer?" });
+      card.append(h("div", { class: "panel inset stack", style: "gap:10px" }, h("label", { class: "lbl" }, "Answered on", aDate), h("label", { class: "lbl" }, "What happened", aNote),
+        h("div", { class: "row" },
+          h("button", { class: "btn primary sm", type: "button", onclick: async () => { p.status = "answered"; p.answeredDate = aDate.value; p.answerNote = aNote.value.trim(); await savePrayer(p); S.answering = null; rerenderKeepScroll(); toast("Praise God!"); } }, "Save answer"),
+          h("button", { class: "btn ghost sm", type: "button", onclick: () => { S.answering = null; rerenderKeepScroll(); } }, "Cancel"))));
+      setTimeout(() => aNote.focus(), 30);
+    }
+    card.append(h("div", { class: "acts" },
+      p.status === "answered"
+        ? h("button", { class: "btn sm", type: "button", onclick: async () => { p.status = "praying"; await savePrayer(p); rerenderKeepScroll(); } }, "Still praying")
+        : h("button", { class: "btn sm on", type: "button", onclick: () => { S.answering = p.id; rerenderKeepScroll(); } }, icon("check"), "Mark answered"),
+      h("button", { class: "btn sm ghost", type: "button", onclick: () => { S.prayerForm = { ...p }; render(); window.scrollTo(0, 0); } }, "Edit"),
+      deleteRow("Delete", "Delete this request?", async () => { await DB.del("prayers", p.id); S.prayers = S.prayers.filter(x => x.id !== p.id); rerenderKeepScroll(); })));
+    listEl.append(card);
+  });
+  root.append(listEl);
+}
+function prayerForm(names) {
+  const f = S.prayerForm;
+  const err = h("div", { class: "small", style: "color:var(--danger)", "aria-live": "polite" });
+  const isReq = f.kind === "request";
+  const dl = h("datalist", { id: "pr-names" }, names.map(n => h("option", { value: n })));
+  return h("form", { class: "panel stack", style: "gap:12px", onsubmit: async (e) => {
+    e.preventDefault();
+    const items = $("#pr-items").value.trim();
+    const person = isReq ? $("#pr-person").value.trim() : "";
+    if (!items) { err.textContent = isReq ? "Write what to pray for." : "Write your prayer first."; return; }
+    if (isReq && !person) { err.textContent = "Add the person’s name."; return; }
+    const p = { ...(f.id ? S.prayers.find(x => x.id === f.id) : { id: uid("pr"), kind: f.kind, status: "praying", created: Date.now() }), date: $("#pr-date").value || ymd(new Date()), person, items };
+    await savePrayer(p); S.prayerForm = null; render(); toast(f.id ? "Updated" : "Saved");
+  } },
+    h("h3", { class: "sub" }, f.id ? "Edit" : isReq ? "New prayer request" : "New prayer"),
+    isReq ? h("div", { class: "two" },
+      h("label", { class: "lbl" }, "Date", h("input", { class: "field", type: "date", id: "pr-date", value: f.date })),
+      h("label", { class: "lbl" }, "Name", h("input", { class: "field", id: "pr-person", list: "pr-names", placeholder: "Who is this for?", value: f.person, autocomplete: "off" }), dl))
+      : h("label", { class: "lbl" }, "Date", h("input", { class: "field", type: "date", id: "pr-date", value: f.date })),
+    h("label", { class: "lbl" }, isReq ? "Prayer items" : "My prayer", h("textarea", { class: "field", id: "pr-items", rows: isReq ? "4" : "8", placeholder: isReq ? "One item per line, e.g.\nHealing for her mother\nA job interview on Friday" : "Lord, …" }, f.items)),
+    err,
+    h("div", { class: "row" }, h("button", { class: "btn primary", type: "submit" }, "Save"), h("button", { class: "btn ghost", type: "button", onclick: () => { S.prayerForm = null; render(); } }, "Cancel")));
+}
+function viewPersonalPrayer(root) {
+  const list = S.prayers.filter(p => p.kind === "personal").sort((a, b) => b.date.localeCompare(a.date) || b.created - a.created);
+  root.append(h("div", { class: "spread" },
+    h("p", { class: "muted small", style: "margin:0" }, "Write your own prayers to God: praise, confession, thanks, and requests."),
+    h("button", { class: "btn primary", type: "button", onclick: () => { S.prayerForm = { kind: "personal", date: ymd(new Date()), items: "" }; render(); setTimeout(() => { const el = $("#pr-items"); if (el) el.focus(); }, 30); } }, icon("plus"), "Write a prayer")));
+  if (S.prayerForm && S.prayerForm.kind === "personal") root.append(prayerForm([]));
+  if (!list.length) { root.append(h("div", { class: "empty" }, h("b", null, "Your prayer journal"), h("span", null, "Looking back on old prayers is one of the best ways to see God’s faithfulness."))); return; }
+  const listEl = h("div", { class: "mem-list" });
+  list.forEach(p => listEl.append(h("article", { class: "mem" },
+    h("div", { class: "topic" }, fmtDate(p.date)),
+    h("p", { class: "txt", style: "white-space:pre-wrap" }, p.items),
+    h("div", { class: "acts" },
+      h("button", { class: "btn sm ghost", type: "button", onclick: () => { S.prayerForm = { ...p }; render(); window.scrollTo(0, 0); } }, "Edit"),
+      h("button", { class: "btn sm ghost", type: "button", onclick: () => copyText(p.items) }, icon("copy"), "Copy"),
+      deleteRow("Delete", "Delete this prayer?", async () => { await DB.del("prayers", p.id); S.prayers = S.prayers.filter(x => x.id !== p.id); rerenderKeepScroll(); })))));
+  root.append(listEl);
+}
+
+/* ================= SETTINGS ================= */
+function localStorage_get(k) { try { return localStorage.getItem("adwj-" + k); } catch { return null; } }
+function localStorage_set(k, v) { try { localStorage.setItem("adwj-" + k, v); } catch {} }
+function applyTheme() {
+  const t = S.settings.theme;
+  if (t === "system") document.documentElement.removeAttribute("data-theme"); else document.documentElement.setAttribute("data-theme", t);
+  document.documentElement.style.setProperty("--read-size", (S.settings.fontSize || 18) + "px");
+}
+async function doInstall() { if (!installEvt) return; installEvt.prompt(); try { await installEvt.userChoice; } catch {} installEvt = null; render(); }
+function openSettings() {
+  const layer = $("#layer");
+  const close = () => { layer.textContent = ""; render(); };
+  const storageLine = h("div", { class: "muted small" }, "Checking storage…");
+  const offlineLine = h("div", { class: "muted small" }, "Checking offline status…");
+  const restoreMsg = h("div", { class: "small", "aria-live": "polite" });
+  const sheet = h("div", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": "Settings" },
+    h("div", { class: "spread" }, h("h2", { class: "title", style: "font-size:24px;margin:0" }, "Settings"), h("button", { class: "icon-btn", type: "button", "aria-label": "Close settings", onclick: close }, icon("x"))),
+
+    h("div", { class: "stack", style: "gap:8px" }, h("h3", { class: "sub" }, "Bible reading plan (3 years)"),
+      h("label", { class: "lbl" }, "Start date", h("input", { class: "field", type: "date", id: "set-start", value: S.settings.start, onchange: async (e) => { if (!e.target.value) return; S.settings.start = e.target.value; S.viewDay = null; await saveKV("settings"); toast(`You’re on Day ${currentDay()}`); } })),
+      h("div", { class: "row" },
+        h("button", { class: "btn sm", type: "button", onclick: async () => { S.settings.start = ymd(new Date()); $("#set-start").value = S.settings.start; S.viewDay = null; await saveKV("settings"); toast("Day 1 starts today"); } }, "Start today"),
+        h("button", { class: "btn sm", type: "button", onclick: async () => { S.settings.start = new Date().getFullYear() + "-01-01"; $("#set-start").value = S.settings.start; S.viewDay = null; await saveKV("settings"); toast(`You’re on Day ${currentDay()}`); } }, "Start January 1")),
+      h("p", { class: "muted small", style: "margin:0" }, "Checked chapters stay with their day number when you move the start date.")),
+
+    h("div", { class: "stack", style: "gap:8px" }, h("h3", { class: "sub" }, "Reading"),
+      h("label", { class: "lbl" }, "Bible text size", h("input", { type: "range", id: "set-size", min: "15", max: "26", value: String(S.settings.fontSize || 18), oninput: (e) => { S.settings.fontSize = +e.target.value; applyTheme(); saveKV("settings"); } })),
+      h("div", { class: "seg", role: "group", "aria-label": "Theme" }, ...[["system", "System"], ["light", "Light"], ["dark", "Dark"]].map(([k, l]) => h("button", { type: "button", "aria-pressed": S.settings.theme === k ? "true" : "false", onclick: (e) => { S.settings.theme = k; applyTheme(); saveKV("settings"); [...e.target.parentNode.children].forEach(b => b.setAttribute("aria-pressed", b === e.target ? "true" : "false")); } }, l)))),
+
+    h("div", { class: "stack", style: "gap:8px" }, h("h3", { class: "sub" }, "Install & offline"),
+      isStandalone() ? h("div", { class: "chip ok", style: "justify-self:start" }, "Installed on this device")
+        : installEvt ? h("button", { class: "btn primary", type: "button", style: "justify-self:start", onclick: doInstall }, "Install on this device")
+        : h("p", { class: "small", style: "margin:0" }, isIOS ? "iPhone or iPad: open this page in Safari, tap the Share button, then Add to Home Screen." : "Android: open the browser menu (⋮) and tap Install app or Add to Home screen."),
+      offlineLine, storageLine,
+      h("button", { class: "btn sm", type: "button", style: "justify-self:start", onclick: async () => { try { const ok = await navigator.storage.persist(); toast(ok ? "Your data is protected from automatic cleanup" : "Your browser didn’t allow it. Install the app and try again."); } catch { toast("This browser doesn’t support it"); } } }, "Protect my data from cleanup")),
+
+    h("div", { class: "stack", style: "gap:8px" }, h("h3", { class: "sub" }, "Backup"),
+      h("p", { class: "muted small", style: "margin:0" }, "Your notes, sermons, prayers, Bible studies, files and progress live only on this device. Download a backup now and then, and use it to move to a new phone."),
+      h("div", { class: "row" },
+        h("button", { class: "btn", type: "button", onclick: exportBackup }, "Download backup"),
+        h("label", { class: "btn" }, "Restore from backup", h("input", { type: "file", accept: "application/json,.json", style: "display:none", onchange: (e) => importBackup(e.target.files[0], restoreMsg) }))),
+      restoreMsg),
+
+    h("div", { class: "stack", style: "gap:6px" }, h("h3", { class: "sub" }, "About"),
+      h("p", { class: "muted small", style: "margin:0" }, "Daily devotional: C. H. Spurgeon, Morning and Evening (1866, public domain). Bible text: King James Version (public domain), stored on your device. NIV buttons open BibleGateway and need internet. Memory verses: your Lamp 2 plan (NIV 1984), Witnessing verses and the Navigators’ Topical Memory System (KJV text)."),
+      h("p", { class: "muted small", style: "margin:0" }, NIV_NOTICE))
+  );
+  layer.textContent = "";
+  layer.append(h("div", { class: "overlay", onclick: (e) => { if (e.target === e.currentTarget) close(); } }, sheet));
+  (async () => {
+    try { const est = await navigator.storage.estimate(); const p = navigator.storage.persisted ? await navigator.storage.persisted() : false; storageLine.textContent = `Using ${fmtBytes(est.usage || 0)} of storage${p ? " · protected" : ""}`; } catch { storageLine.textContent = ""; }
+    try { const has = "caches" in window && await caches.match("kjv.json"); offlineLine.textContent = has ? "Ready offline: the Bible and app are saved on this device." : "Offline mode turns on after the app is opened from its web address once."; } catch { offlineLine.textContent = ""; }
+  })();
+}
+function blobToDataUrl(b) { return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = () => rej(r.error); r.readAsDataURL(b); }); }
+async function exportBackup() {
+  try {
+    toast("Preparing backup…");
+    const files = await DB.all("files");
+    const fileData = [];
+    for (const f of files) fileData.push({ id: f.id, name: f.name, type: f.type, size: f.size, data: await blobToDataUrl(f.blob) });
+    const data = { app: "a-day-with-jesus", version: 1, exported: new Date().toISOString(), settings: S.settings, progress: S.progress, mem: S.mem, saved: S.saved, notes: S.notes.filter(n => !n.draft), sermons: S.sermons.filter(x => !x.draft), studies: S.studies.filter(x => !x.draft), prayers: S.prayers, files: fileData };
+    const blob = new Blob([JSON.stringify(data)], { type: "application/json" });
+    const a = h("a", { href: URL.createObjectURL(blob), download: `a-day-with-jesus-backup-${ymd(new Date())}.json` });
+    document.body.append(a); a.click(); a.remove();
+    toast("Backup downloaded");
+  } catch { toast("Couldn’t create the backup"); }
+}
+async function importBackup(file, msg) {
+  if (!file) return;
+  try {
+    const data = JSON.parse(await file.text());
+    if (data.app !== "a-day-with-jesus") throw new Error("not ours");
+    msg.textContent = "Restoring…";
+    for (const f of data.files || []) { const blob = await (await fetch(f.data)).blob(); await DB.put("files", { id: f.id, blob, name: f.name, type: f.type, size: f.size }); }
+    for (const n of data.notes || []) await DB.put("notes", n);
+    for (const s of data.saved || []) await DB.put("saved", s);
+    for (const s of data.sermons || []) await DB.put("sermons", s);
+    for (const s of data.studies || []) await DB.put("studies", s);
+    for (const s of data.prayers || []) await DB.put("prayers", s);
+    S.settings = { ...S.settings, ...(data.settings || {}) }; S.progress = { ...S.progress, ...(data.progress || {}) }; S.mem = { ...S.mem, ...(data.mem || {}) };
+    await saveKV("settings"); await saveKV("progress"); await saveKV("mem");
+    S.notes = await DB.all("notes"); S.saved = await DB.all("saved"); S.sermons = await DB.all("sermons"); S.studies = await DB.all("studies"); S.prayers = await DB.all("prayers");
+    applyTheme();
+    msg.textContent = `Restored ${(data.notes || []).length} notes, ${(data.sermons || []).length} sermons, ${(data.saved || []).length} saved verses and ${(data.files || []).length} files.`;
+  } catch { msg.textContent = "That file isn’t an A Day With Jesus backup."; }
+}
+
+/* ================= START ================= */
+async function start() {
+  PLAN = buildPlan();
+  try {
+    const [settings, progress, mem, pos] = await Promise.all(["settings", "progress3y", "mem", "biblePos"].map(k => DB.get("kv", k).catch(() => null)));
+    if (settings) S.settings = { ...S.settings, ...settings }; else saveKV("settings");
+    if (progress) S.progress = progress;
+    if (mem) S.mem = mem;
+    if (pos) { S.bible.b = pos.b; S.bible.c = pos.c; }
+    S.notes = await DB.all("notes").catch(() => []);
+    S.saved = await DB.all("saved").catch(() => []);
+    S.sermons = await DB.all("sermons").catch(() => []);
+    S.studies = await DB.all("studies").catch(() => []);
+    S.prayers = await DB.all("prayers").catch(() => []);
+  } catch {}
+  applyTheme();
+  readHash();
+  render();
+  if (!(await DB.persistent())) toast("This browser can’t save data, so changes last only until you close the page");
+  fetch("memory.json").then(r => r.json()).then(d => { MEMORY = d; if (S.tab === "memory") rerenderKeepScroll(); }).catch(() => {});
+  loadBible().then(() => { if (S.tab === "bible") render(); }).catch(() => {});
+}
+window.addEventListener("hashchange", () => { readHash(); if (S.tab !== "bible") S.bible.sel.clear(); render(); window.scrollTo(0, 0); });
+window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); installEvt = e; if (S.tab === "today") rerenderKeepScroll(); });
+$("#open-settings").addEventListener("click", openSettings);
+// Re-check the day when the app comes back to the foreground (e.g. the next morning)
+let lastDay = ymd(new Date());
+document.addEventListener("visibilitychange", () => { if (!document.hidden && ymd(new Date()) !== lastDay) { lastDay = ymd(new Date()); S.viewDay = null; render(); } });
+if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
+  navigator.serviceWorker.register("sw.js").catch(() => {});
+}
+start();
+
+</script>
+</body>
+</html>
