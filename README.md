@@ -26,4 +26,4 @@ When someone signs in with Google, their notes, sermons, prayers, Bible studies,
 
 ## Updating the app later
 
-Upload the new files over the old ones (Add file → Upload files). GitHub replaces files with the same name. Change the `CACHE` name at the top of `sw.js` (e.g. from `adwj-v6` to `adwj-v7`) so phones pick up the new version.
+Upload the new files over the old ones (Add file → Upload files). GitHub replaces files with the same name. Change the `CACHE` name at the top of `sw.js` (e.g. from `adwj-v7` to `adwj-v8`) so phones pick up the new version.

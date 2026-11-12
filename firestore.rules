@@ -33,7 +33,7 @@ service cloud.firestore {
 
         allow read: if inSpace();
         allow create: if inSpace()
-          && sub in ['items', 'sessions', 'files']
+          && sub in ['items', 'sessions', 'files', 'library']
           && request.resource.data.authorUid == request.auth.uid;
         allow update: if inSpace()
           && (resource.data.authorUid == request.auth.uid || leadsSpace())

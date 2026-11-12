@@ -1,4 +1,4 @@
-const CACHE = "adwj-v6";
+const CACHE = "adwj-v7";
 const ASSETS = ["./", "index.html", "kjv.json", "bsb.json", "asv.json", "memory.json", "devotionals.json",
   "vendor/firebase-app-compat.js", "vendor/firebase-auth-compat.js", "vendor/firebase-firestore-compat.js", "manifest.webmanifest", "favicon.svg", "favicon.ico", "icons/favicon-32.png", "config.js",
   "icons/icon-192.png", "icons/icon-512.png", "icons/maskable-512.png", "icons/apple-touch-icon.png"];
