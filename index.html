@@ -384,6 +384,28 @@ input, select, textarea { font-size: 16px; }
 .check-box { flex: none; width: 18px; height: 18px; border-radius: 5px; border: 2px solid var(--muted); box-sizing: border-box; display: grid; place-items: center; font-size: 12px; font-weight: 800; color: #fff; }
 .check-box.on { background: var(--ok); border-color: var(--ok); }
 
+/* ---- collapsible sections (v8) ---- */
+.csec-text { display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1; }
+.csec-sub { font-weight: 500; letter-spacing: 0; text-transform: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.csec-body { padding: 0 12px 12px; }
+.mem-sec .cbar-badge { background: var(--accent-soft); color: var(--accent); }
+.mem-sec .cbar-title { text-transform: none; letter-spacing: 0; font-family: var(--read); font-size: 18px; font-weight: 700; }
+.mem-row .ref { font-weight: 800; color: var(--indigo); font-size: 15px; }
+.mem-row .topic { font-size: 12.5px; color: var(--muted); font-weight: 600; }
+.mem-row.week { border-color: var(--accent); }
+.mem-row .txt { font-family: var(--read); font-size: 16.5px; line-height: 1.6; margin: 0; }
+.mem-row .acts { display: flex; gap: 6px; flex-wrap: wrap; }
+.mem-row.flash-hl { outline: 2px solid var(--accent); }
+.chaprow-head { display: flex; align-items: center; gap: 4px; padding-left: 12px; }
+.chaprow-head .crow-head { padding-left: 8px; }
+.chaprow .name { font-family: var(--read); font-size: 17px; font-weight: 600; }
+.chaprow .lane { font-size: 12px; color: var(--muted); }
+.chaprow.read .name { color: var(--muted); }
+.soap-letter { flex: none; width: 34px; height: 34px; border-radius: 9px; display: grid; place-items: center; font-weight: 800; font-size: 15px; background: var(--indigo-soft); color: var(--indigo); }
+.soap-prev { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.soap textarea { min-height: 96px; width: 100%; box-sizing: border-box; }
+.tag-lib { font-size: 11.5px; padding: 2px 8px; }
+
 </style>
 <header class="topbar gutter">
   <div class="shell">
@@ -830,21 +852,24 @@ function viewPlan(root) {
 
   const list = PLAN[day - 1];
   const done = new Set(S.progress[day] || []);
-  const reading = h("div", { class: "panel" },
-    h("div", { class: "spread", style: "margin-bottom:6px" },
-      h("h3", { class: "sub" }, "Today’s reading"),
-      list.length > 1 ? h("button", { class: "btn sm ghost", type: "button", onclick: () => { S.progress[day] = done.size === list.length ? [] : list.map(chapKey); saveKV("progress"); rerenderKeepScroll(); } }, done.size === list.length ? "Clear all" : "Mark all read") : null));
-  list.forEach(r => {
-    const k = chapKey(r), on = done.has(k);
-    reading.append(h("div", { class: "chap" },
-      h("button", { class: "check", type: "button", role: "checkbox", "aria-checked": on ? "true" : "false", "aria-label": "Mark " + chapName(r) + " as read", html: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">${ICONS.check}</svg>`,
-        onclick: () => { const s = new Set(S.progress[day] || []); on ? s.delete(k) : s.add(k); S.progress[day] = [...s]; saveKV("progress"); rerenderKeepScroll(); } }),
-      h("div", null, h("div", { class: "name" }, chapName(r)), h("div", { class: "lane" }, r.lane)),
-      h("div", { class: "row chap-acts" },
-        h("button", { class: "btn sm soft", type: "button", onclick: () => openChapter(r.b, r.c, { back: day }) }, "Read"),
-        nivLink(chapName(r)))));
-  });
-  root.append(reading);
+  const nDone = list.filter(r => done.has(chapKey(r))).length;
+  root.append(collapseSec("plan-read", true, "Today’s reading", `${summarize(list)} · ${nDone} of ${list.length} read`, null, () => {
+    const box = h("div", { class: "stack", style: "gap:8px" });
+    list.forEach(r => {
+      const k = chapKey(r), on = done.has(k), ck = `pch:${day}:${k}`, open = isOpenKey(ck, false);
+      box.append(h("div", { class: "crow chaprow" + (on ? " read" : "") },
+        h("div", { class: "chaprow-head" },
+          h("button", { class: "check", type: "button", role: "checkbox", "aria-checked": on ? "true" : "false", "aria-label": "Mark " + chapName(r) + " as read", html: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">${ICONS.check}</svg>`,
+            onclick: () => { const st = new Set(S.progress[day] || []); on ? st.delete(k) : st.add(k); S.progress[day] = [...st]; saveKV("progress"); rerenderKeepScroll(); } }),
+          h("button", { type: "button", class: "crow-head", "aria-expanded": open ? "true" : "false", onclick: () => { setOpenKey(ck, !open); rerenderKeepScroll(); } },
+            h("span", { class: "crow-text" }, h("b", { class: "name" }, chapName(r)), h("span", { class: "lane" }, r.lane)), chevronSvg(open))),
+        open ? h("div", { class: "crow-body row", style: "gap:6px" },
+          h("button", { class: "btn sm soft", type: "button", onclick: () => openChapter(r.b, r.c, { back: day }) }, "Read chapter"),
+          nivLink(chapName(r), "NIV")) : null));
+    });
+    if (list.length > 1) box.append(h("div", null, h("button", { class: "btn sm ghost", type: "button", onclick: () => { S.progress[day] = done.size >= list.length ? [] : list.map(chapKey); saveKV("progress"); rerenderKeepScroll(); } }, nDone === list.length ? "Clear all" : "Mark all read")));
+    return box;
+  }));
   root.append(journalPanel(day, date, list));
 }
 function viewPlanList(root, cur) {
@@ -880,6 +905,12 @@ function readChapterBtn(ref, backDay) {
   return p ? h("button", { class: "btn sm soft", type: "button", onclick: () => openChapter(p.b, p.c, { hl: p.verses, back: backDay || null }) }, "Read whole chapter") : null;
 }
 function journalId(date) { return "journal-" + date; }
+const SOAP_PARTS = [
+  ["s", "Scripture", "a verse that stood out", "Copy a verse here, or select verses in the Bible tab and tap Journal"],
+  ["o", "Observation", "what does it say?", "What do you notice about God, people, or the situation?"],
+  ["a", "Application", "what will I do?", "One way to live this out today"],
+  ["p", "Prayer", "talk to Jesus", "Talk to Jesus about what you read"],
+];
 function journalPanel(day, date, list) {
   const id = journalId(date);
   const existing = S.notes.find(n => n.id === id);
@@ -887,19 +918,24 @@ function journalPanel(day, date, list) {
   const status = h("div", { class: "saved-note", "aria-live": "polite" }, existing ? "Saved " + fmtTs(existing.updated) : "");
   let timer;
   const build = () => { const prev = S.notes.find(n => n.id === id); return { ...(prev || { id, kind: "journal", created: Date.now(), attachments: [], body: "" }), title: `Plan Day ${day} · ${fmtDate(date, { month: "short", day: "numeric" })}`, ref: summarize(list), date, day, soap: { ...soap }, updated: Date.now() }; };
-  const store = async (note) => { await DB.put("notes", note); const i = S.notes.findIndex(n => n.id === id); i >= 0 ? S.notes[i] = note : S.notes.push(note); };
-  const save = () => { clearTimeout(timer); timer = setTimeout(async () => { try { await store(build()); status.textContent = "Saved"; } catch { status.textContent = "Couldn’t save. Your device storage may be full."; } }, 600); };
-  const field = (k, label, ph) => h("label", { class: "lbl" }, label,
-    h("textarea", { class: "field", id: `soap-${k}`, placeholder: ph, oninput: (e) => { soap[k] = e.target.value; status.textContent = "Saving…"; save(); } }, soap[k] || ""));
-  return h("div", { class: "panel soap" },
-    h("div", { class: "spread" }, h("h3", { class: "sub" }, "Reading journal"),
-      h("button", { class: "btn sm ghost", type: "button", onclick: async () => { clearTimeout(timer); await store(build()).catch(() => {}); S.activeNote = id; S.editing = true; go("notes"); } }, icon("clip"), "Attach files")),
+  // keep the in-memory note current on every keystroke, so opening/closing a part never loses typing
+  const remember = (note) => { const i = S.notes.findIndex(n => n.id === id); i >= 0 ? S.notes[i] = note : S.notes.push(note); return note; };
+  const store = async (note) => { remember(note); await DB.put("notes", note); };
+  const save = () => { const note = remember(build()); clearTimeout(timer); timer = setTimeout(async () => { try { await DB.put("notes", note); status.textContent = "Saved"; } catch { status.textContent = "Couldn’t save. Your device storage may be full."; } }, 600); };
+  const written = SOAP_PARTS.filter(([k]) => (soap[k] || "").trim()).length;
+  return collapseSec(`plan-journal`, false, "Reading journal", `S.O.A.P. · ${written} of 4 written`, null, () => h("div", { class: "stack soap", style: "gap:8px" },
     h("p", { class: "muted small", style: "margin:0" }, "Write through today’s chapter with S.O.A.P."),
-    field("s", "Scripture — a verse that stood out", "Copy a verse here, or select verses in the Bible tab and tap Journal"),
-    field("o", "Observation — what does it say?", "What do you notice about God, people, or the situation?"),
-    field("a", "Application — what will I do?", "One way to live this out today"),
-    field("p", "Prayer", "Talk to Jesus about what you read"),
-    status);
+    ...SOAP_PARTS.map(([k, name, hint, ph]) => {
+      const txt = (soap[k] || "").trim();
+      const preview = txt ? txt.split("\n")[0] : "Not written yet";
+      return collapseRow(`soap:${k}`, false,
+        h("span", { class: "crow-file" }, h("span", { class: "soap-letter" }, k.toUpperCase()),
+          h("span", { class: "crow-text" }, h("b", null, name, h("span", { class: "muted", style: "font-weight:400" }, " — " + hint)), h("span", { class: "muted small soap-prev" }, preview))),
+        () => h("textarea", { class: "field", id: `soap-${k}`, "aria-label": name, placeholder: ph, oninput: (e) => { soap[k] = e.target.value; status.textContent = "Saving…"; save(); } }, soap[k] || ""));
+    }),
+    h("div", { class: "spread" },
+      h("button", { class: "btn sm ghost", type: "button", onclick: async () => { clearTimeout(timer); await store(build()).catch(() => {}); S.activeNote = id; S.editing = true; go("notes"); } }, icon("plus"), "Attach files"),
+      status)));
 }
 
 /* ================= BIBLE ================= */
@@ -1074,13 +1110,18 @@ function bridgeIllustration() {
     ${[[442, 92, "1"], [78, 92, "2"], [208, 186, "3"], [300, 86, "4"], [140, 84, "5"], [478, 112, "6"]].map(([x, y, n]) =>
       `<g><circle cx="${x}" cy="${y}" r="13" fill="var(--ink)"/><text x="${x}" y="${y + 5}" text-anchor="middle" font-size="14" font-weight="800" fill="var(--paper)" font-family="system-ui, sans-serif">${n}</text></g>`).join("")}
   </svg>`;
-  return h("div", { class: "panel bridge" },
-    h("div", { class: "spread" }, h("h3", { class: "sub" }, "The Bridge illustration"), h("span", { class: "muted small" }, "Tap a verse to jump to it")),
+  return collapseSec("mem-bridge", false, "The Bridge illustration", "6 steps · tap a verse to jump to it", null, () => h("div", { class: "bridge stack", style: "gap:12px" },
     h("div", { class: "bridge-art", html: svg }),
     h("ol", { class: "bridge-steps" }, steps.map(([n, label, refs]) => h("li", null,
       h("span", { class: "bridge-num" }, n),
-      h("div", null, h("b", null, label), h("div", { class: "row", style: "gap:6px;margin-top:4px" }, refs.map(r => h("button", { class: "chip", type: "button", onclick: () => { const el = document.querySelector(`[data-ref="${CSS.escape(r)}"]`); if (el) { el.scrollIntoView({ block: "center", behavior: "smooth" }); el.classList.add("flash-hl"); setTimeout(() => el.classList.remove("flash-hl"), 1600); } } }, r))))))),
-    h("p", { class: "muted small", style: "margin:0" }, "Draw it on paper as you explain each step, then read the verse together."));
+      h("div", null, h("b", null, label), h("div", { class: "row", style: "gap:6px;margin-top:4px" }, refs.map(r => h("button", { class: "chip", type: "button", onclick: () => { openMemRef("witness", r); const el = document.querySelector(`[data-ref="${CSS.escape(r)}"]`); if (el) { el.scrollIntoView({ block: "center", behavior: "smooth" }); el.classList.add("flash-hl"); setTimeout(() => el.classList.remove("flash-hl"), 1600); } } }, r))))))),
+    h("p", { class: "muted small", style: "margin:0" }, "Draw it on paper as you explain each step, then read the verse together.")));
+}
+function openMemRef(coll, ref) {
+  const v = memFlat(coll).find(x => x.ref === ref); if (!v) return;
+  const c = getColl(coll);
+  if (c && c.sections.length > 1) setOpenKey(`msec:${coll}:${v.sec}`, true);
+  setOpenKey(`mv:${v.key}`, true); S.lampSec = "all"; S.lampStatus = "all"; rerenderKeepScroll();
 }
 
 function viewMemory(root) {
@@ -1112,22 +1153,33 @@ function viewMemory(root) {
   const list = memFiltered(c);
   if (!list.length) { root.append(h("div", { class: "empty" }, h("b", null, "Nothing here yet"), h("span", null, S.lampStatus === "memorized" ? "Verses you mark as memorized will show here." : "No verses match these filters."))); return; }
   const week = new Set(c.id === "lamp2" ? weekVerses(currentDay()).map(v => v.key) : []);
-  let lastSec = "";
-  const listEl = h("div", { class: "mem-list" });
-  list.forEach(v => {
-    if (v.sec !== lastSec && c.sections.length > 1) { listEl.append(h("div", { class: "sec-head" }, h("span", { class: "chip gold" }, v.sec), h("b", null, v.secName))); lastSec = v.sec; }
+  const verseRow = (v) => {
     const m = isMem(v.key);
-    const isSaved = S.saved.some(s => s.ref === v.ref);
-    listEl.append(h("article", { class: "mem" + (week.has(v.key) ? " week" : ""), "data-ref": v.ref },
-      h("div", { class: "top" }, h("div", null, h("div", { class: "ref" }, v.ref), h("div", { class: "topic" }, `${c.sections.length > 1 ? v.sec + v.n + " · " : v.n + ". "}${v.topic}`)),
-        h("div", { class: "row" }, week.has(v.key) ? h("span", { class: "chip gold" }, "This week") : null, m ? h("span", { class: "chip ok" }, "Memorized") : null)),
-      h("p", { class: "txt", html: v.trans !== "NIV" ? lordify(v.text) : esc(v.text) }),
-      h("div", { class: "acts" },
-        h("button", { class: "btn sm", type: "button", onclick: () => openPractice([memCard(v)], v.ref) }, icon("play"), "Practice"),
-        h("button", { class: "btn sm" + (m ? " on" : ""), type: "button", "aria-pressed": m ? "true" : "false", onclick: () => { setMem(v.key, !m); rerenderKeepScroll(); } }, icon("check"), m ? "Memorized" : "Mark memorized"),
-        h("button", { class: "btn sm", type: "button", disabled: isSaved ? true : null, onclick: async () => { await addSaved({ ref: v.ref, text: v.text, translation: v.trans, note: `${c.id === "tms" ? "TMS" : c.name} · ${v.topic}` }); toast("Saved for review"); rerenderKeepScroll(); } }, icon("saved"), isSaved ? "Saved" : "Save"),
-        readChapterBtn(v.ref), nivLink(v.ref))));
-  });
+    const isSaved = S.saved.some(x => x.ref === v.ref);
+    const row = collapseRow(`mv:${v.key}`, week.has(v.key),
+      h("span", { class: "crow-text" }, h("b", { class: "ref" }, v.ref),
+        h("span", { class: "topic" }, `${c.sections.length > 1 ? v.sec + v.n + " · " : v.n + ". "}${v.topic}`),
+        week.has(v.key) || m ? h("span", { class: "row", style: "gap:6px" }, week.has(v.key) ? h("span", { class: "chip gold" }, "This week") : null, m ? h("span", { class: "chip ok" }, "Memorized") : null) : null),
+      () => h("div", { class: "stack", style: "gap:10px" },
+        h("p", { class: "txt", html: v.trans !== "NIV" ? lordify(v.text) : esc(v.text) }),
+        h("div", { class: "acts" },
+          h("button", { class: "btn sm", type: "button", onclick: () => openPractice([memCard(v)], v.ref) }, icon("play"), "Practice"),
+          h("button", { class: "btn sm" + (m ? " on" : ""), type: "button", "aria-pressed": m ? "true" : "false", onclick: () => { setMem(v.key, !m); rerenderKeepScroll(); } }, icon("check"), m ? "Memorized" : "Mark memorized"),
+          h("button", { class: "btn sm", type: "button", disabled: isSaved ? true : null, onclick: async () => { await addSaved({ ref: v.ref, text: v.text, translation: v.trans, note: `${c.id === "tms" ? "TMS" : c.name} · ${v.topic}` }); toast("Saved for review"); rerenderKeepScroll(); } }, icon("saved"), isSaved ? "Saved" : "Save"),
+          readChapterBtn(v.ref), nivLink(v.ref))), "mem-row" + (week.has(v.key) ? " week" : ""));
+    row.setAttribute("data-ref", v.ref);
+    return row;
+  };
+  const listEl = h("div", { class: "mem-list" });
+  if (c.sections.length > 1) {
+    const secs = [...new Set(list.map(v => v.sec))];
+    secs.forEach((sid, i) => {
+      const vs = list.filter(v => v.sec === sid), all = flat.filter(v => v.sec === sid);
+      const dflt = S.lampSec === sid || vs.some(v => week.has(v.key)) || (!week.size && i === 0);
+      listEl.append(collapseSec(`msec:${c.id}:${sid}`, dflt, all[0].secName, `${all.length} verses · ${all.filter(v => isMem(v.key)).length} memorized`, sid,
+        () => h("div", { class: "stack", style: "gap:8px" }, vs.map(verseRow)), "mem-sec"));
+    });
+  } else list.forEach(v => listEl.append(verseRow(v)));
   root.append(listEl);
   if (c.id === "lamp2") root.append(h("p", { class: "muted small" }, NIV_NOTICE));
 }
@@ -2288,6 +2340,17 @@ function collapseBar(key, label, badge, badgeDark, body) {
       h("span", { class: "cbar-title" }, h("span", { class: "cbar-badge" + (badgeDark ? " dark" : "") }, badge), label), chevronSvg(open)),
     open ? h("div", { class: "cbar-body" }, body()) : null);
 }
+/* A collapsible section card (title row + optional summary), used for Sessions, Shared files, Shared notes, Plan and Memory sections */
+function collapseSec(key, dfltOpen, title, sub, badge, body, cls) {
+  const open = isOpenKey(key, dfltOpen);
+  return h("section", { class: "cbar csec" + (cls ? " " + cls : "") },
+    h("button", { type: "button", class: "cbar-head", "aria-expanded": open ? "true" : "false", onclick: () => { setOpenKey(key, !open); rerenderKeepScroll(); } },
+      h("span", { class: "csec-text" },
+        h("span", { class: "cbar-title" }, badge != null ? h("span", { class: "cbar-badge" }, badge) : null, title),
+        sub ? h("span", { class: "csec-sub muted small" }, sub) : null),
+      chevronSvg(open)),
+    open ? h("div", { class: "csec-body" }, body()) : null);
+}
 /* A collapsible row inside a list (a date, a session, a file, a library item) */
 function collapseRow(key, dfltOpen, head, body, cls) {
   const open = isOpenKey(key, dfltOpen);
@@ -2313,6 +2376,63 @@ function fileBadge(kind, name) {
   return h("span", { class: "fbadge k-" + kind }, label);
 }
 const driveDownload = (id) => `https://drive.google.com/uc?export=download&id=${encodeURIComponent(id)}`;
+
+/* Files in a group: uploads to this group + items shared from members' Libraries */
+function groupFiles(sp, withUploads) {
+  const lib = subData(sp.id, "library"), up = withUploads ? subData(sp.id, "files") : [];
+  if (lib === null || up === null) return null;
+  return [...up.map(f => ({ ...f, src: "up" })), ...lib.map(f => ({ ...f, src: "lib", name: f.title }))].sort((a, b) => b.created - a.created);
+}
+function groupFileRow(sp, f) {
+  const kind = f.src === "lib" ? f.kind : kindOf(f.type, f.name);
+  const mineF = f.authorUid === (SH.user && SH.user.uid);
+  const by = mineF ? "you" : (f.authorName || f.authorEmail);
+  const saved = f.src === "lib" && S.library.some(x => x.id === f.libId || x.libId === f.libId);
+  return collapseRow(`gf:${sp.id}:${f.id}`, false,
+    h("span", { class: "crow-file" }, fileBadge(kind, f.name), h("span", { class: "crow-text" }, h("b", { class: "fname" }, f.name),
+      h("span", { class: "muted small" }, "by " + by + (f.src === "lib" && f.originEmail && f.originEmail !== f.authorEmail ? `, from ${f.originName}` : "")),
+      f.src === "lib" ? h("span", { class: "chip gold tag-lib" }, "From Library") : null)),
+    () => h("div", { class: "stack", style: "gap:8px" },
+      h("span", { class: "muted small" }, [kind === "link" ? hostOf(f.link) : fmtBytes(f.size || 0), "shared " + fmtTs(f.created)].join(" · ")),
+      f.note ? h("div", { class: "log-text" }, f.note) : null,
+      h("div", { class: "row", style: "gap:6px" },
+        h("a", { class: "btn sm", href: f.link, target: "_blank", rel: "noopener" }, kind === "link" ? "Open link" : "Open", icon("ext")),
+        f.driveId ? h("a", { class: "btn sm primary", href: driveDownload(f.driveId), target: "_blank", rel: "noopener" }, "↓ Download") : null,
+        f.src === "lib" && !mineF ? h("button", { type: "button", class: "btn sm", disabled: saved ? true : null, onclick: async () => {
+          await persistLib({ id: uid("lib"), libId: f.libId, kind: f.kind, title: f.title, note: f.note, mime: f.mime, size: f.size, driveId: f.driveId, link: f.link, ownedFile: false, isPublic: true, originName: f.originName, originEmail: f.originEmail, created: Date.now(), updated: Date.now() });
+          toast("Saved to your library"); rerenderKeepScroll();
+        } }, saved ? "Saved" : "Save to my library") : null,
+        f.src === "lib" && (mineF || isOwnerOf(sp)) ? deleteRow("Stop sharing", "Stop sharing this file with the group?", () => delSub(sp.id, "library", f.id)) : null,
+        f.src === "up" && canEditItem(sp, f) ? deleteRow("Remove", "Remove for everyone?", async () => {
+          if (f.authorUid === SH.user.uid && Sync.token) await gfetch(`files/${encodeURIComponent(f.driveId)}`, { method: "DELETE" }).catch(() => {});
+          delSub(sp.id, "files", f.id);
+        }) : null)));
+}
+/* Picker: tick items from my library to share with this group */
+function libPickerFor(sp) {
+  const box = h("div", { class: "share-box" }, h("div", { class: "share-head" }, "Share from my library"));
+  const mine = [...S.library].sort((a, b) => b.created - a.created);
+  if (!mine.length) box.append(h("p", { class: "muted small", style: "margin:0" }, "Your library is empty. Add files in the Library tab first."));
+  mine.forEach(it => {
+    const on = sharedHere(sp, it.libId || it.id);
+    box.append(h("button", { type: "button", class: "pick" + (on ? " on ok" : ""), "aria-pressed": on ? "true" : "false", onclick: () => shareToGroup(sp, it, !on) },
+      h("span", { class: "check-box" + (on ? " on" : "") }, on ? "✓" : ""), h("span", { class: "pick-text" }, h("span", null, it.title), h("span", { class: "muted small" }, (FILE_KINDS[it.kind] || FILE_KINDS.other).label))));
+  });
+  return box;
+}
+function groupFilesSec(sp, withUploads, actions, emptyText) {
+  const list = groupFiles(sp, withUploads);
+  return collapseSec(`gfs:${sp.id}`, false, "Shared files", null, list ? String(list.length) : "…", () => {
+    const box = h("div", { class: "stack", style: "gap:8px" });
+    box.append(actions);
+    if (S.uploading && S.uploading[sp.id]) box.append(h("div", { class: "banner" }, `Uploading ${S.uploading[sp.id]}…`));
+    if (S.libPickFor === sp.id) box.append(libPickerFor(sp));
+    if (list === null) box.append(h("div", { class: "muted small" }, "Loading…"));
+    else if (!list.length) box.append(h("div", { class: "muted small", style: "padding:0 4px 4px" }, emptyText));
+    else list.forEach(f => box.append(groupFileRow(sp, f)));
+    return box;
+  });
+}
 
 /* ================= PRAYER MEETING (approved layout) ================= */
 function meetingView(root, m) {
@@ -2341,6 +2461,10 @@ function meetingView(root, m) {
         () => h("div", { class: "stack", style: "gap:8px" }, its.map(it => prayerItemCard(m, it))), "crow-card"));
     });
   }
+  root.append(groupFilesSec(m, false,
+    h("div", { class: "row", style: "justify-content:flex-end;padding:0 4px" },
+      h("button", { class: "btn sm soft", type: "button", "aria-expanded": S.libPickFor === m.id ? "true" : "false", onclick: () => { S.libPickFor = S.libPickFor === m.id ? null : m.id; rerenderKeepScroll(); } }, S.libPickFor === m.id ? "Done" : "Share from Library")),
+    "No files yet. Files members share from their Library show up here for everyone."));
   root.append(h("div", { class: "cbar-sep" }));
   root.append(collapseBar(`pm-add:${m.id}`, "Add your prayer items", "+", true, () => {
     const fDate = h("input", { class: "field", type: "date", id: "pm-date", value: ymd(new Date()) });
@@ -2396,43 +2520,31 @@ function studySpaceView(root, sp) {
   root.append(h("div", null, h("span", { class: "chip gold" }, sp.type === "one" ? "One-on-one" : "Group"),
     h("h2", { class: "title", style: "font-size:clamp(22px,4.5vw,28px)" }, sp.name),
     h("p", { class: "muted small", style: "margin:4px 0 0" }, [sp.material, sp.started ? "Started " + fmtDate(sp.started, { month: "short", day: "numeric", year: "numeric" }) : "", `${sp.memberEmails.length} member${sp.memberEmails.length > 1 ? "s" : ""}`].filter(Boolean).join(" · "))));
-  // Sessions first, each collapsible (newest open)
-  const sBox = h("section", { class: "panel stack", style: "gap:8px;padding:14px 12px 12px" }, h("h3", { class: "sub", style: "padding:0 4px" }, `Sessions${sessions && sessions.length ? " · " + sessions.length : ""}`));
-  if (sessions === null) sBox.append(h("div", { class: "muted small" }, "Loading…"));
-  else if (!sessions.length) sBox.append(h("div", { class: "muted small", style: "padding:0 4px 4px" }, "No sessions yet. Open “Add a session” below."));
-  else [...sessions].sort((a, b) => (b.date || "").localeCompare(a.date || "") || b.created - a.created).forEach((x, idx) => sBox.append(collapseRow(`ss:${sp.id}:${x.id}`, idx === 0,
-    h("span", { class: "crow-text" }, h("b", null, x.topic || "Session"), h("span", { class: "muted small" }, `${fmtDate(x.date, { weekday: "short", month: "short", day: "numeric" })} · by ${x.authorEmail === meEmail() ? "you" : (x.authorName || x.authorEmail)}`)),
-    () => h("div", { class: "stack", style: "gap:8px" }, x.notes ? h("div", { class: "log-text log-item" }, x.notes) : h("div", { class: "muted small" }, "No notes."),
-      canEditItem(sp, x) ? h("div", null, deleteRow("Remove", "Remove this session?", () => delSub(sp.id, "sessions", x.id))) : null))));
-  root.append(sBox);
-  // Shared files, each collapsible
+  // Sessions (open by default), each session collapsible (newest open)
+  root.append(collapseSec(`sess:${sp.id}`, true, "Sessions", null, sessions ? String(sessions.length) : "…", () => {
+    const box = h("div", { class: "stack", style: "gap:8px" });
+    if (sessions === null) box.append(h("div", { class: "muted small" }, "Loading…"));
+    else if (!sessions.length) box.append(h("div", { class: "muted small", style: "padding:0 4px 4px" }, "No sessions yet. Open “Add a session” below."));
+    else [...sessions].sort((a, b) => (b.date || "").localeCompare(a.date || "") || b.created - a.created).forEach((x, idx) => box.append(collapseRow(`ss:${sp.id}:${x.id}`, idx === 0,
+      h("span", { class: "crow-text" }, h("b", null, x.topic || "Session"), h("span", { class: "muted small" }, `${fmtDate(x.date, { weekday: "short", month: "short", day: "numeric" })} · by ${x.authorEmail === meEmail() ? "you" : (x.authorName || x.authorEmail)}`)),
+      () => h("div", { class: "stack", style: "gap:8px" }, x.notes ? h("div", { class: "log-text log-item" }, x.notes) : h("div", { class: "muted small" }, "No notes."),
+        canEditItem(sp, x) ? h("div", null, deleteRow("Remove", "Remove this session?", () => delSub(sp.id, "sessions", x.id))) : null))));
+    return box;
+  }));
+  // Shared files (closed): uploads here + files shared from members' Libraries
   const fileInput = h("input", { type: "file", id: "ss-files", multiple: true, style: "display:none", accept: "image/*,video/*,audio/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.rtf,.odt", onchange: (e) => shareUpload(sp, [...e.target.files]) });
-  const fBox = h("section", { class: "panel stack", style: "gap:8px;padding:14px 12px 12px" },
-    h("div", { class: "spread", style: "padding:0 4px" }, h("h3", { class: "sub" }, `Shared files${files && files.length ? " · " + files.length : ""}`),
-      h("button", { class: "btn sm soft", type: "button", onclick: () => { if (!Sync.token || Date.now() > Sync.exp - 60000) { toast("Reconnect to Google first to upload"); signIn(); return; } fileInput.click(); } }, icon("clip"), "Share a file"), fileInput));
-  if (S.uploading && S.uploading[sp.id]) fBox.append(h("div", { class: "banner" }, `Uploading ${S.uploading[sp.id]}…`));
-  if (files === null) fBox.append(h("div", { class: "muted small" }, "Loading…"));
-  else if (!files.length) fBox.append(h("div", { class: "muted small", style: "padding:0 4px 4px" }, "No files yet. Study materials, documents, videos and photos open in Google Drive for everyone here."));
-  else [...files].sort((a, b) => b.created - a.created).forEach(f => {
-    const kind = kindOf(f.type, f.name);
-    fBox.append(collapseRow(`sf:${sp.id}:${f.id}`, false,
-      h("span", { class: "crow-file" }, fileBadge(kind, f.name), h("span", { class: "crow-text" }, h("b", { class: "fname" }, f.name), h("span", { class: "muted small" }, "by " + (f.authorEmail === meEmail() ? "you" : (f.authorName || f.authorEmail))))),
-      () => h("div", { class: "stack", style: "gap:8px" },
-        h("span", { class: "muted small" }, `${fmtBytes(f.size || 0)} · shared ${fmtTs(f.created)}`),
-        h("div", { class: "row", style: "gap:6px" },
-          h("a", { class: "btn sm", href: f.link, target: "_blank", rel: "noopener" }, "Open", icon("ext")),
-          f.driveId ? h("a", { class: "btn sm primary", href: driveDownload(f.driveId), target: "_blank", rel: "noopener" }, "↓ Download") : null,
-          canEditItem(sp, f) ? deleteRow("Remove", "Remove for everyone?", async () => {
-            if (f.authorUid === SH.user.uid && Sync.token) await gfetch(`files/${encodeURIComponent(f.driveId)}`, { method: "DELETE" }).catch(() => {});
-            delSub(sp.id, "files", f.id);
-          }) : null))));
-  });
-  root.append(fBox);
-  // Shared notes
-  const notes = h("textarea", { class: "field", id: "ss-notes", rows: "4", placeholder: "Shared notes everyone in this study can read and edit" }, sp.notes || "");
-  const nStatus = h("span", { class: "saved-note" });
-  let nt; notes.addEventListener("input", () => { nStatus.textContent = "Saving…"; clearTimeout(nt); nt = setTimeout(() => { spaceRef(sp.id).update({ notes: notes.value, updated: Date.now() }).catch(fbErr); nStatus.textContent = "Saved"; }, 800); });
-  root.append(h("div", { class: "panel stack", style: "gap:8px" }, h("div", { class: "spread" }, h("h3", { class: "sub" }, "Shared notes"), nStatus), notes));
+  root.append(groupFilesSec(sp, true,
+    h("div", { class: "spread", style: "padding:0 4px;gap:8px" }, h("p", { class: "muted small", style: "margin:0" }, "Uploaded here, plus files shared from members’ Libraries."),
+      h("button", { class: "btn sm soft", type: "button", style: "flex:none", onclick: () => { if (!Sync.token || Date.now() > Sync.exp - 60000) { toast("Reconnect to Google first to upload"); signIn(); return; } fileInput.click(); } }, icon("clip"), "Share a file"), fileInput),
+    "No files yet. Study materials, documents, videos and photos open in Google Drive for everyone here."));
+  // Shared notes (closed, first line as preview)
+  const firstLine = (sp.notes || "").split("\n").map(x => x.trim()).find(Boolean) || "Nothing written yet";
+  root.append(collapseSec(`snotes:${sp.id}`, false, "Shared notes", firstLine, null, () => {
+    const notes = h("textarea", { class: "field", id: "ss-notes", rows: "4", placeholder: "Shared notes everyone in this study can read and edit" }, sp.notes || "");
+    const nStatus = h("span", { class: "saved-note" });
+    let nt; notes.addEventListener("input", () => { nStatus.textContent = "Saving…"; clearTimeout(nt); nt = setTimeout(() => { spaceRef(sp.id).update({ notes: notes.value, updated: Date.now() }).catch(fbErr); nStatus.textContent = "Saved"; }, 800); });
+    return h("div", { class: "stack", style: "gap:6px" }, notes, nStatus);
+  }));
   // Collapsible bars below
   root.append(h("div", { class: "cbar-sep" }));
   root.append(collapseBar(`ss-add:${sp.id}`, "Add a session", "+", true, () => {
