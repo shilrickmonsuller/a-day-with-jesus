@@ -478,6 +478,20 @@ input, select, textarea { font-size: 16px; }
 .rv-bars { flex: 1; display: grid; gap: 4px; }
 .rv-bar { display: grid; grid-template-columns: 12px 1fr 20px; gap: 6px; align-items: center; font-size: 12.5px; }
 .rv-bar .progress { height: 7px; }
+.rate-pop { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 27; width: min(420px, calc(100% - 24px)); box-sizing: border-box; background: var(--paper); color: var(--ink); border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 14px 40px rgba(10, 15, 35, .25); padding: 18px 16px 12px; display: grid; gap: 8px; justify-items: center; text-align: center; animation: popin .25s ease-out; }
+@media (max-width: 699px) { .rate-pop { bottom: calc(var(--nav-h) + 12px + env(safe-area-inset-bottom, 0px)); } }
+.rate-pop-x { position: absolute; top: 8px; right: 8px; width: 34px; height: 34px; }
+@keyframes popin { from { opacity: 0; transform: translate(-50%, 12px); } to { opacity: 1; transform: translate(-50%, 0); } }
+@media (prefers-reduced-motion: reduce) { .rate-pop { animation: none; } }
+.rate-pop .rate-q { padding: 0 30px; text-wrap: balance; font-size: 18px; }
+.sync-btn[data-state="perm"] .sync-dot { background: #e08a1e; }
+.perm-row { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; }
+.perm-mark { flex: none; width: 24px; height: 24px; border-radius: 7px; display: grid; place-items: center; font-weight: 900; font-size: 12px; }
+.perm-mark.ok { background: var(--ok-soft); color: var(--ok); }
+.perm-mark.no { background: #fbe9e7; color: #a8372f; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .perm-mark.no { background: #4a2420; color: #ef8077; } }
+:root[data-theme="dark"] .perm-mark.no { background: #4a2420; color: #ef8077; }
+.perm-icon { flex: none; width: 40px; height: 40px; border-radius: 12px; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; font-weight: 900; font-size: 20px; }
 
 </style>
 <header class="topbar gutter">
@@ -696,7 +710,7 @@ function buildPlan() {
 const chapKey = (r) => r.b + "." + r.c;
 const CHAP_DAY = {};   // "b.c" -> plan day
 function chapRead(b, c) { const k = b + "." + c, d = CHAP_DAY[k]; return !!d && (S.progress[d] || []).includes(k); }
-function setChapRead(b, c, on) { const k = b + "." + c, d = CHAP_DAY[k]; if (!d) return; const st = new Set(S.progress[d] || []); on ? st.add(k) : st.delete(k); S.progress[d] = [...st]; saveKV("progress"); }
+function setChapRead(b, c, on) { const k = b + "." + c, d = CHAP_DAY[k]; if (!d) return; const st = new Set(S.progress[d] || []); on ? st.add(k) : st.delete(k); S.progress[d] = [...st]; saveKV("progress"); if (on) scheduleReviewAsk(1200); }
 const chapName = (r) => BOOKS[r.b] + " " + r.c;
 function summarize(list) {
   const out = []; let i = 0;
@@ -800,6 +814,8 @@ function render() {
   v.append(wrap);
   renderSelbar();
   if (S.tab !== "today") hideDevoBar();
+  document.querySelectorAll(".rate-pop").forEach(e => { if (!["today", "plan"].includes(S.tab)) e.remove(); });
+  if (S.tab === "today") scheduleReviewAsk(4000);
 }
 function rerenderKeepScroll() { const y = window.scrollY; render(); window.scrollTo(0, y); }
 
@@ -1980,7 +1996,7 @@ function syncStatusText() {
   if (!SYNC_ON) return "Not set up";
   if (Sync.pendingOwner) return "Choose how to use this device";
   if (!Sync.email) return "Not signed in";
-  return ({ syncing: "Syncing…", synced: "Synced " + (Sync.last ? new Date(Sync.last).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }) : ""), error: "Couldn’t sync. " + (Sync.error || "Try again."), expired: "Sign-in expired. Tap Reconnect.", offline: "Offline. Changes will sync when you’re back online.", off: "Signed in" })[Sync.state] || "Signed in";
+  return ({ syncing: "Syncing…", synced: "Synced " + (Sync.last ? new Date(Sync.last).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }) : ""), error: "Couldn’t sync. " + (Sync.error || "Try again."), expired: "Sign-in expired. Tap Reconnect.", perm: "Not syncing: Google Drive isn’t allowed yet.", offline: "Offline. Changes will sync when you’re back online.", off: "Signed in" })[Sync.state] || "Signed in";
 }
 
 /* ---- auth (redirect flow works inside installed home-screen apps) ---- */
@@ -1992,6 +2008,7 @@ function signIn(prompt) {
   const p = new URLSearchParams({ client_id: CFG.googleClientId, redirect_uri: redirectUri(), response_type: "token", scope: SCOPES, include_granted_scopes: "true", state });
   // "none" = silent refresh; "switch" = pick another account; default = reuse the signed-in account when known
   if (prompt === "none") { p.set("prompt", "none"); if (Sync.email) p.set("login_hint", Sync.email); }
+  else if (prompt === "consent") { p.set("prompt", "consent"); if (Sync.email) p.set("login_hint", Sync.email); }
   else if (prompt === "switch" || !Sync.email) p.set("prompt", "select_account");
   else p.set("login_hint", Sync.email);
   location.href = "https://accounts.google.com/o/oauth2/v2/auth?" + p.toString();
@@ -2004,10 +2021,11 @@ function consumeAuthRedirect() {
   history.replaceState(null, "", location.pathname + location.search + "#" + (tab || "today"));
   if (!state || p.get("state") !== state) return { error: "state" };
   if (p.get("error")) return { error: p.get("error") };
-  return { token: p.get("access_token"), exp: Date.now() + (parseInt(p.get("expires_in"), 10) || 3600) * 1000 };
+  return { token: p.get("access_token"), exp: Date.now() + (parseInt(p.get("expires_in"), 10) || 3600) * 1000, scope: p.get("scope") || "" };
 }
 async function finishSignIn(tok) {
   Sync.token = tok.token; Sync.exp = tok.exp;
+  if (tok.scope) { const sc = tok.scope.split(/\s+/); setDrivePerm({ appdata: sc.some(x => x.endsWith("/drive.appdata")), file: sc.some(x => x.endsWith("/drive.file")) }); }
   try {
     const r = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", { headers: { Authorization: "Bearer " + tok.token } });
     if (!r.ok) throw new Error(r.status);
@@ -2034,6 +2052,7 @@ async function clearDevice() {
   S.activeNote = S.activeSermon = S.activeStudy = null;
 }
 async function signOut(removeData) {
+  localStorage_set("drivePerm", "");
   clearTimeout(Sync.timer);
   if (removeData) { await clearDevice(); await DB.del("kv", "owner").catch(() => {}); Sync.owner = ""; }
   await fbSignOut();
@@ -2146,6 +2165,7 @@ function safeRerender() {
 }
 async function runSync() {
   if (!SYNC_ON || !Sync.token || Sync.running || Sync.pendingOwner) return;
+  if (!drivePerm().appdata) { setSyncState("perm"); return; }
   if (!navigator.onLine) { setSyncState("offline"); return; }
   if (Date.now() > Sync.exp - 60000) { Sync.token = null; setSyncState("expired"); return; }
   Sync.running = true; Sync.dirty = false; setSyncState("syncing");
@@ -2239,6 +2259,8 @@ function accountSection() {
   box.append(
     h("div", { class: "row" }, h("span", { class: "avatar" }, (Sync.name || Sync.email).slice(0, 1).toUpperCase()), h("div", null, h("b", null, Sync.name || Sync.email), h("div", { class: "muted small" }, Sync.email))),
     h("div", { class: "acct-status small" }, syncStatusText()),
+    (!drivePerm().appdata || !drivePerm().file) ? h("div", { class: "banner perm-banner" }, h("span", null, !drivePerm().appdata && !drivePerm().file ? "Google Drive isn’t allowed, so syncing and file sharing are off." : !drivePerm().appdata ? "Google Drive’s app folder isn’t allowed, so your notes and progress don’t sync." : "Google Drive files aren’t allowed, so you can’t upload or share files."),
+      h("button", { class: "btn sm primary gbtn", type: "button", onclick: () => signIn("consent") }, googleG(), "Sign in again and allow")) : null,
     h("div", { class: "row" },
       Sync.token ? h("button", { class: "btn sm", type: "button", onclick: () => { Sync.dirty = false; runSync(); } }, "Sync now")
         : h("button", { class: "btn sm primary", type: "button", onclick: () => signIn() }, "Reconnect"),
@@ -2704,7 +2726,7 @@ function studySpaceView(root, sp) {
   const fileInput = h("input", { type: "file", id: "ss-files", multiple: true, style: "display:none", accept: "image/*,video/*,audio/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.rtf,.odt", onchange: (e) => shareUpload(sp, [...e.target.files]) });
   root.append(groupFilesSec(sp, true,
     h("div", { class: "spread", style: "padding:0 4px;gap:8px" }, h("p", { class: "muted small", style: "margin:0" }, "Uploaded here, plus files shared from members’ Libraries."),
-      h("button", { class: "btn sm soft", type: "button", style: "flex:none", onclick: () => { if (!Sync.token || Date.now() > Sync.exp - 60000) { toast("Reconnect to Google first to upload"); signIn(); return; } fileInput.click(); } }, icon("clip"), "Share a file"), fileInput),
+      h("button", { class: "btn sm soft", type: "button", style: "flex:none", onclick: () => { if (!drivePerm().file) return askDrivePerm(); if (!Sync.token || Date.now() > Sync.exp - 60000) { toast("Reconnect to Google first to upload"); signIn(); return; } fileInput.click(); } }, icon("clip"), drivePerm().file ? "Share a file" : "Allow Google Drive to upload files"), fileInput),
     "No files yet. Study materials, documents, videos and photos open in Google Drive for everyone here."));
   // Shared notes (closed, first line as preview)
   const firstLine = (sp.notes || "").split("\n").map(x => x.trim()).find(Boolean) || "Nothing written yet";
@@ -2860,7 +2882,7 @@ function libAddForm() {
       } }, icon("plus"), "Add to library")));
   } else {
     const input = h("input", { type: "file", id: "lib-files", multiple: true, style: "display:none", onchange: (e) => libUpload([...e.target.files], title.value.trim(), note.value.trim()) });
-    box.append(h("div", { class: "dropzone" }, h("button", { class: "btn soft", type: "button", onclick: () => { if (!Sync.token || Date.now() > Sync.exp - 60000) { toast("Reconnect to Google first to upload"); signIn(); return; } input.click(); } }, icon("clip"), "Choose files"), input,
+    box.append(h("div", { class: "dropzone" }, h("button", { class: "btn soft", type: "button", onclick: () => { if (!drivePerm().file) return askDrivePerm(); if (!Sync.token || Date.now() > Sync.exp - 60000) { toast("Reconnect to Google first to upload"); signIn(); return; } input.click(); } }, icon("clip"), drivePerm().file ? "Choose files" : "Allow Google Drive to upload files"), input,
       h("div", { class: "muted small", style: "margin-top:6px" }, "Documents, photos, videos, MP3s and more, up to 200 MB each")),
       h("label", { class: "lbl" }, "Title", title), h("label", { class: "lbl" }, "Note", note),
       h("p", { class: "muted small", style: "margin:0" }, "New items are visible only to you. Change it under Sharing after adding."));
@@ -3253,9 +3275,32 @@ function viewReview(root) {
   root.append(h("p", { class: "muted small", style: "margin:0" }, "Counted from what you already do in the app. Only you can see it, and it syncs across your devices."));
 }
 
+
+/* ---- occasional review pop-up: every 5 days of use until the person sends a review ---- */
+const ASK_EVERY = 5 * 864e5;
+function markUseDay() { if (!localStorage_get("firstUse")) localStorage_set("firstUse", String(Date.now())); }
+let askTimer = 0;
+function scheduleReviewAsk(delay = 4000) { clearTimeout(askTimer); askTimer = setTimeout(maybeAskReview, delay); }
+async function maybeAskReview() {
+  if (localStorage_get("rated") === "1" || !FB_ON || !SYNC_ON) return;
+  const first = +localStorage_get("firstUse") || Date.now(), last = +localStorage_get("askedAt") || 0;
+  if (Date.now() - first < ASK_EVERY || Date.now() - last < ASK_EVERY) return;
+  if (!["today", "plan"].includes(S.tab) || $("#layer").childElementCount || document.querySelector(".rate-pop, .selbar")) return;
+  const a = document.activeElement; if (a && /^(TEXTAREA|INPUT|SELECT)$/.test(a.tagName)) { scheduleReviewAsk(15000); return; }
+  if (SH.user && fdb) { try { const d = await reviewRef(SH.user.uid).get(); if (d.exists) { localStorage_set("rated", "1"); return; } } catch {} }
+  localStorage_set("askedAt", String(Date.now()));
+  const close = () => pop.remove();
+  const pop = h("section", { class: "rate-pop", role: "dialog", "aria-label": "Rate the app" },
+    h("button", { class: "icon-btn rate-pop-x", type: "button", "aria-label": "Close", onclick: close }, icon("x")),
+    h("b", { class: "rate-q" }, "Is A Day With Jesus a blessing to you?"),
+    h("span", { class: "muted small" }, "Tap a star to tell the app owner. It takes 10 seconds."),
+    h("div", { class: "stars" }, ...[1, 2, 3, 4, 5].map(i => h("button", { type: "button", "aria-label": i + (i > 1 ? " stars" : " star"), onclick: () => { close(); openRateApp(i); } }, "★"))),
+    h("button", { class: "btn sm ghost", type: "button", onclick: close }, "Not now"));
+  document.body.append(pop);
+}
 /* ================= RATE & REVIEW THE APP ================= */
 const reviewRef = (id) => fdb.collection("reviews").doc(id);
-function openRateApp() {
+function openRateApp(preset) {
   const layer = $("#layer"); const close = () => { layer.textContent = ""; };
   const sheet = h("div", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": "Rate and review the app" },
     h("div", { class: "spread" }, h("h2", { class: "title", style: "font-size:22px;margin:0" }, "Rate & review"), h("button", { class: "icon-btn", type: "button", "aria-label": "Close", onclick: close }, icon("x"))));
@@ -3263,10 +3308,10 @@ function openRateApp() {
   layer.append(h("div", { class: "overlay", onclick: (e) => { if (e.target === e.currentTarget) close(); } }, sheet));
   const body = h("div", { class: "stack rate-body", style: "gap:12px" }); sheet.append(body);
   if (!FB_ON || !SYNC_ON) { body.append(h("p", { class: "muted" }, "Reviews aren’t set up in this copy of the app.")); return; }
-  if (!Sync.email) { body.append(h("p", null, "Sign in with Google so each person sends one review."), h("button", { class: "btn primary gbtn", type: "button", onclick: () => signIn() }, googleG(), "Sign in with Google")); return; }
+  if (!Sync.email) { body.append(h("p", null, "Sign in with Google so each person sends one review."), h("button", { class: "btn primary gbtn", type: "button", onclick: () => { localStorage_set("rateAfterSignin", String(preset || 0)); signIn(); } }, googleG(), "Sign in with Google")); return; }
   if (!SH.user || !fdb) { body.append(h("p", { class: "muted" }, "Connecting…")); (Sync.token ? fbSignIn(Sync.token) : fbInit()).then(() => { if (layer.contains(sheet)) openRateApp(); }).catch(() => {}); return; }
   const L = ["", "Not helpful", "Needs work", "It’s okay", "Helpful", "A blessing!"];
-  let stars = 0;
+  let stars = preset || 0;
   const starRow = h("div", { class: "stars", role: "radiogroup", "aria-label": "Rating" });
   const label = h("div", { class: "muted small" }, "Tap a star");
   const paint = () => { [...starRow.children].forEach((b, i) => { b.classList.toggle("on", i < stars); b.setAttribute("aria-checked", i + 1 === stars ? "true" : "false"); }); label.textContent = L[stars] || "Tap a star"; };
@@ -3281,12 +3326,13 @@ function openRateApp() {
       const data = { uid: SH.user.uid, stars, text: text.value.trim().slice(0, 2000), showName: showName.checked, name: showName.checked ? meName() : "", updated: Date.now() };
       try {
         await reviewRef(SH.user.uid).set({ ...data, created: S.myReviewCreated || Date.now() });
+        localStorage_set("rated", "1");
         body.textContent = ""; body.append(h("span", { class: "chip ok", style: "justify-self:center" }, "Thank you!"), h("p", { style: "margin:0;text-align:center" }, "Your review was sent to the app owner. You can change it anytime — your latest review replaces the old one."));
       } catch (e) { msg.textContent = "Couldn’t send it. Check your connection and try again."; }
     } }, "Send review")), msg,
     h("p", { class: "muted small", style: "margin:0" }, "Only the app owner can read reviews."));
   paint();
-  reviewRef(SH.user.uid).get().then(d => { if (d.exists) { const x = d.data(); stars = x.stars || 0; text.value = x.text || ""; showName.checked = x.showName !== false; S.myReviewCreated = x.created; paint(); } }).catch(() => {});
+  reviewRef(SH.user.uid).get().then(d => { if (d.exists) { const x = d.data(); stars = preset || x.stars || 0; text.value = x.text || ""; showName.checked = x.showName !== false; S.myReviewCreated = x.created; paint(); } }).catch(() => {});
 }
 function checkReviewAdmin() {
   if (!fdb || !SH.user || SH.reviewAdminChecked) return;
@@ -3321,6 +3367,34 @@ function viewAppReviews(root) {
   } }, "Download as spreadsheet (CSV)")));
 }
 
+
+/* ---- Google Drive permission check (the two tick boxes on Google's sign-in screen) ---- */
+function drivePerm() { try { return JSON.parse(localStorage_get("drivePerm") || "") || { appdata: true, file: true }; } catch { return { appdata: true, file: true }; } }
+function setDrivePerm(pm) {
+  const before = drivePerm(); localStorage_set("drivePerm", JSON.stringify(pm));
+  if ((!pm.appdata || !pm.file) && (before.appdata !== pm.appdata || before.file !== pm.file || !sessionStorage_get("permAsked"))) setTimeout(askDrivePerm, 800);
+  if (!pm.appdata) setSyncState("perm");
+}
+function sessionStorage_get(k) { try { return sessionStorage.getItem("adwj-" + k); } catch { return null; } }
+function sessionStorage_set(k, v) { try { sessionStorage.setItem("adwj-" + k, v); } catch {} }
+function askDrivePerm() {
+  sessionStorage_set("permAsked", "1");
+  const pm = drivePerm(); if (pm.appdata && pm.file) return;
+  const layer = $("#layer"); const close = () => { layer.textContent = ""; render(); };
+  const what = !pm.appdata && !pm.file ? "syncing and file sharing" : !pm.appdata ? "syncing your notes and progress" : "uploading and sharing files";
+  const row = (ok, title, why) => h("div", { class: "crow perm-row" }, h("span", { class: "perm-mark " + (ok ? "ok" : "no") }, ok ? "✓" : "✕"), h("span", null, h("b", null, title), h("div", { class: "muted small" }, why)));
+  layer.textContent = "";
+  layer.append(h("div", { class: "overlay", onclick: (e) => { if (e.target === e.currentTarget) close(); } },
+    h("div", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": "Please allow Google Drive" },
+      h("div", { class: "row", style: "gap:12px;flex-wrap:nowrap;align-items:flex-start" }, h("span", { class: "perm-icon" }, "!"),
+        h("div", null, h("h2", { class: "title", style: "font-size:21px;margin:0" }, "Please allow Google Drive"), h("div", { class: "muted small" }, `You’re signed in, but ${what} won’t work yet.`))),
+      row(pm.appdata, "Its own hidden app folder", "Saves your notes, journals, progress and highlights so they appear on your other devices."),
+      row(pm.file, "Files you use with this app", "Lets you upload to your Library and share study materials with your groups."),
+      h("p", { class: "small", style: "margin:0;color:var(--ok)" }, "🔒 The app can only touch its own files. It can never see your other Google Drive files, photos or emails."),
+      h("button", { class: "btn primary gbtn", type: "button", style: "justify-content:center", onclick: () => signIn("consent") }, googleG(), "Sign in again and tick both boxes"),
+      h("button", { class: "btn", type: "button", style: "justify-content:center", onclick: close }, "Continue without it"))));
+}
+
 /* ================= START ================= */
 async function start() {
   PLAN = buildPlan();
@@ -3341,11 +3415,13 @@ async function start() {
     S.library = await DB.all("library").catch(() => []);
     await migrateDayJournals();
   } catch {}
+  markUseDay();
   applyTheme();
   await initSync().catch(() => {});
   readHash();
   render();
   renderSyncButton();
+  { const ra = localStorage_get("rateAfterSignin"); if (ra && Sync.email) { localStorage_set("rateAfterSignin", ""); setTimeout(() => openRateApp(+ra || 0), 1500); } }
   if (!(await DB.persistent())) toast("This browser can’t save data, so changes last only until you close the page");
   fetch("memory.json").then(r => r.json()).then(d => { MEMORY = d; if (S.tab === "memory") rerenderKeepScroll(); }).catch(() => {});
   loadBible().then(() => { if (S.tab === "bible") render(); }).catch(() => {});
