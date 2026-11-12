@@ -1,0 +1,45 @@
+rules_version = '2';
+// A Day With Jesus: shared prayer meetings and Bible studies.
+// Only members (by Gmail) can read a group. Only the leader changes members or deletes the group.
+// Members can add items; each person can edit or delete their own items, and the leader can tidy any item.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null && request.auth.token.email_verified == true; }
+    function myEmail() { return request.auth.token.email.lower(); }
+
+    match /spaces/{spaceId} {
+      function isMember() { return signedIn() && myEmail() in resource.data.memberEmails; }
+      function isLeader() { return signedIn() && resource.data.ownerUid == request.auth.uid; }
+
+      allow read: if isMember();
+      allow create: if signedIn()
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.ownerEmail == myEmail()
+        && myEmail() in request.resource.data.memberEmails
+        && request.resource.data.memberEmails.size() <= 300
+        && request.resource.data.type in ['prayer', 'one', 'group'];
+      // Leader can change anything except who the leader is; members can only edit the shared notes.
+      allow update: if (isLeader()
+          && request.resource.data.ownerUid == resource.data.ownerUid
+          && request.resource.data.memberEmails.size() <= 300
+          && resource.data.ownerEmail in request.resource.data.memberEmails)
+        || (isMember() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['notes', 'updated']));
+      allow delete: if isLeader();
+
+      match /{sub}/{itemId} {
+        function space() { return get(/databases/$(database)/documents/spaces/$(spaceId)).data; }
+        function inSpace() { return signedIn() && myEmail() in space().memberEmails; }
+        function leadsSpace() { return signedIn() && space().ownerUid == request.auth.uid; }
+
+        allow read: if inSpace();
+        allow create: if inSpace()
+          && sub in ['items', 'sessions', 'files']
+          && request.resource.data.authorUid == request.auth.uid;
+        allow update: if inSpace()
+          && (resource.data.authorUid == request.auth.uid || leadsSpace())
+          && request.resource.data.authorUid == resource.data.authorUid;
+        allow delete: if inSpace() && (resource.data.authorUid == request.auth.uid || leadsSpace());
+      }
+    }
+  }
+}

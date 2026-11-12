@@ -16,6 +16,7 @@
 <link rel="icon" href="icons/favicon-32.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <style>body{margin:0}img{max-width:100%}</style>
+<script src="config.js"></script>
 </head>
 <body>
 <title>A Day With Jesus</title>
@@ -319,6 +320,23 @@ input, select, textarea { font-size: 16px; }
 .devo-date-label { white-space: nowrap; }
 @media (min-width: 760px) { .devo-grid { grid-template-columns: 200px minmax(0, 1fr); } .devo-date .icon-btn { width: 32px; height: 32px; } }
 @media (min-width: 700px) { .tabbar.shell { max-width: 1120px; } .tabbar button { padding: 9px 11px; gap: 6px; } }
+/* Sync status button */
+.sync-btn { position: relative; }
+.sync-dot { position: absolute; right: 6px; bottom: 6px; width: 9px; height: 9px; border-radius: 50%; background: var(--muted); box-shadow: 0 0 0 2px var(--paper); }
+.sync-btn[data-state="synced"] .sync-dot, .sync-btn[data-state="off"] .sync-dot { background: var(--ok); }
+.sync-btn[data-state="syncing"] .sync-dot { background: var(--accent); }
+.sync-btn[data-state="error"] .sync-dot, .sync-btn[data-state="expired"] .sync-dot { background: var(--danger); }
+.sync-btn[data-state="signedout"] .sync-dot { background: transparent; box-shadow: none; }
+@media (prefers-reduced-motion: no-preference) { .sync-btn[data-state="syncing"] .sync-dot { animation: pulse 1s ease-in-out infinite; } @keyframes pulse { 50% { opacity: .3; } } }
+.gbtn { gap: 8px; }
+.avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--indigo-soft); color: var(--indigo); display: grid; place-items: center; font-weight: 800; font-size: 17px; }
+.acct-status { color: var(--muted); }
+.ext-links { display: inline-flex; gap: 2px; flex-wrap: wrap; }
+.ver-seg button { min-width: 48px; }
+.space-card { text-align: left; width: 100%; cursor: pointer; font: inherit; color: inherit; }
+.space-card:hover { border-color: var(--accent); }
+.chip-x { border: 0; background: transparent; color: inherit; font-weight: 800; font-size: 15px; line-height: 1; padding: 0 0 0 6px; cursor: pointer; }
+.att a { text-decoration: none; color: inherit; }
 
 </style>
 <header class="topbar gutter">
@@ -333,9 +351,15 @@ input, select, textarea { font-size: 16px; }
       </svg>
       <h1>A Day With Jesus</h1>
     </div>
+    <div class="row" style="gap:8px;flex-wrap:nowrap">
+    <button class="icon-btn sync-btn" id="sync-btn" type="button" aria-label="Account and sync" hidden>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18a4.5 4.5 0 0 1-.6-8.96A6 6 0 0 1 18 8.5a4 4 0 0 1-.5 9.5z"/></svg>
+      <i class="sync-dot"></i>
+    </button>
     <button class="icon-btn" id="open-settings" type="button" aria-label="Settings">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
     </button>
+    </div>
   </div>
 </header>
 <div class="tabbar-wrap gutter">
@@ -409,7 +433,19 @@ function fmtDate(s, opts) { return parseYmd(s).toLocaleDateString(undefined, opt
 function fmtTs(ts) { return new Date(ts).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" }); }
 function uid(p) { return p + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
 function nivUrl(ref) { return "https://www.biblegateway.com/passage/?search=" + encodeURIComponent(ref) + "&version=NIV"; }
-function nivLink(ref, label = "NIV") { return h("a", { class: "btn sm ghost", href: nivUrl(ref), target: "_blank", rel: "noopener", title: "Read " + ref + " in the NIV on BibleGateway" }, label, icon("ext")); }
+const USFM = ["GEN","EXO","LEV","NUM","DEU","JOS","JDG","RUT","1SA","2SA","1KI","2KI","1CH","2CH","EZR","NEH","EST","JOB","PSA","PRO","ECC","SNG","ISA","JER","LAM","EZK","DAN","HOS","JOL","AMO","OBA","JON","MIC","NAM","HAB","ZEP","HAG","ZEC","MAL","MAT","MRK","LUK","JHN","ACT","ROM","1CO","2CO","GAL","EPH","PHP","COL","1TH","2TH","1TI","2TI","TIT","PHM","HEB","JAS","1PE","2PE","1JN","2JN","3JN","JUD","REV"];
+function rcpvUrl(ref) {
+  // RCPV = Maayong Balita Biblia (1999), Philippine Bible Society, on YouVersion
+  const p = parseRef(ref); if (!p) return "https://www.bible.com/versions/2188";
+  const vs = [...p.verses].sort((a, b) => a - b);
+  const span = vs.length ? "." + vs[0] + (vs.length > 1 ? "-" + vs[vs.length - 1] : "") : "";
+  return `https://www.bible.com/bible/2188/${USFM[p.b]}.${p.c}${span}.MBBCEB99`;
+}
+function nivLink(ref, label = "NIV") {
+  return h("span", { class: "ext-links" },
+    h("a", { class: "btn sm ghost", href: nivUrl(ref), target: "_blank", rel: "noopener", title: "Read " + ref + " in the NIV on BibleGateway" }, label, icon("ext")),
+    h("a", { class: "btn sm ghost", href: rcpvUrl(ref), target: "_blank", rel: "noopener", title: "Read " + ref + " in the RCPV (Cebuano) on YouVersion" }, "RCPV", icon("ext")));
+}
 function fmtBytes(n) { return n < 1024 ? n + " B" : n < 1048576 ? (n / 1024).toFixed(0) + " KB" : (n / 1048576).toFixed(1) + " MB"; }
 async function copyText(t) {
   try { await navigator.clipboard.writeText(t); toast("Copied"); }
@@ -442,11 +478,16 @@ const DB = (() => {
       t.onerror = () => rej(t.error); t.onabort = () => rej(t.error);
     });
   }
+  const rawPut = (s, v, k) => run(s, "readwrite", (o, m) => o ? (k === undefined ? o.put(v) : o.put(v, k)) : (m.set(k === undefined ? v.id : k, v), null));
+  const rawDel = (s, k) => run(s, "readwrite", (o, m) => o ? o.delete(k) : (m.delete(k), null));
+  const isTracked = (s) => s === "files" || SYNC_STORES.includes(s);
   return {
     persistent: async () => !!(await open()),
     get: (s, k) => run(s, "readonly", (o, m) => o ? o.get(k) : m.get(k)),
-    put: (s, v, k) => run(s, "readwrite", (o, m) => o ? (k === undefined ? o.put(v) : o.put(v, k)) : (m.set(k === undefined ? v.id : k, v), null)),
-    del: (s, k) => run(s, "readwrite", (o, m) => o ? o.delete(k) : (m.delete(k), null)),
+    put: (s, v, k) => { const tr = isTracked(s); if (tr && v && typeof v === "object") v._t = Date.now(); return rawPut(s, v, k).then(r => { if (tr) localChanged(); return r; }); },
+    del: (s, k) => rawDel(s, k).then(r => { if (isTracked(s)) { stampTomb(s, k); localChanged(); } return r; }),
+    rawPut: (s, v, k) => rawPut(s, v, k),
+    rawDel: (s, k) => rawDel(s, k),
     all: (s) => run(s, "readonly", (o, m) => o ? o.getAll() : [...m.values()]),
     clear: (s) => run(s, "readwrite", (o, m) => o ? o.clear() : (m.clear(), null)),
   };
@@ -469,11 +510,15 @@ const S = {
   sermons: [], sermonFilter: "all", sermonQ: "", activeSermon: null, sermonEditing: false,
   devo: { date: null, ed: null }, memColl: "lamp2",
   studies: [], studyQ: "", activeStudy: null, studyEditing: false,
-  prayers: [], prayerMode: "others", prayerFilter: "praying", prayerPerson: "", prayerForm: null, answering: null,
+  prayers: [], prayerMode: "meetings", prayerFilter: "praying", prayerPerson: "", prayerForm: null, answering: null,
+  activeMeeting: null, meetingPerson: "", spaceForm: null, editingItem: null, studyMode: "one", activeStudyId: null, studyLocal: false, uploading: {},
 };
-let BIBLE = null, bibleLoading = null, MEMORY = null, PLAN = null;
+let BIBLE = null, MEMORY = null, PLAN = null;
+const VERSIONS = { KJV: { file: "kjv.json", name: "King James Version" }, BSB: { file: "bsb.json", name: "Berean Standard Bible" }, ASV: { file: "asv.json", name: "American Standard Version (1901)" } };
+const BIBLE_CACHE = {}, bibleLoads = {};
+const curVer = () => (VERSIONS[S.settings.bibleVersion] ? S.settings.bibleVersion : "KJV");
 const KV_KEYS = { progress: "progress3y" };
-const saveKV = (k) => DB.put("kv", S[k], KV_KEYS[k] || k).catch(() => {});
+const saveKV = (k) => { if (k === "progress") stampProgress(); else if (k === "settings" || k === "mem") stampKV(k); const p = DB.put("kv", S[k], KV_KEYS[k] || k).catch(() => {}); if (k === "progress" || k === "settings" || k === "mem") localChanged(); return p; };
 
 /* ---------- plan ---------- */
 function buildPlan() {
@@ -554,11 +599,15 @@ function lordify(t) { return esc(t).replace(/\bLORD\b/g, '<span class="sc">Lord<
 
 /* ---------- Bible loading ---------- */
 function loadBible() {
-  if (BIBLE) return Promise.resolve(BIBLE);
-  if (!bibleLoading) bibleLoading = fetch("kjv.json").then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
-    .then(d => { BIBLE = d; return d; })
-    .catch(e => { bibleLoading = null; throw e; });
-  return bibleLoading;
+  const v = curVer();
+  if (BIBLE_CACHE[v]) { BIBLE = BIBLE_CACHE[v]; return Promise.resolve(BIBLE); }
+  if (!bibleLoads[v]) bibleLoads[v] = fetch(VERSIONS[v].file).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(d => { BIBLE_CACHE[v] = d; return d; }).catch(e => { delete bibleLoads[v]; throw e; });
+  return bibleLoads[v].then(d => { if (curVer() === v) BIBLE = d; return d; });
+}
+function setVersion(v) { if (!VERSIONS[v]) return; S.settings.bibleVersion = v; saveKV("settings"); BIBLE = BIBLE_CACHE[v] || null; S.bible.results = null; rerenderKeepScroll(); }
+function versionSeg() {
+  return h("div", { class: "seg ver-seg", role: "group", "aria-label": "Bible version" }, Object.keys(VERSIONS).map(v => h("button", { type: "button", title: VERSIONS[v].name, "aria-pressed": curVer() === v ? "true" : "false", onclick: () => setVersion(v) }, v)));
 }
 function openChapter(b, c, opts = {}) {
   S.bible.b = b; S.bible.c = c; S.bible.mode = "read"; S.bible.sel.clear();
@@ -637,6 +686,15 @@ function viewToday(root) {
         installEvt ? h("button", { class: "btn sm primary", type: "button", onclick: doInstall }, "Install") : null,
         h("button", { class: "btn sm ghost", type: "button", onclick: () => { localStorage_set("installHidden", "1"); render(); } }, "Hide"))));
   }
+  if (SYNC_ON && !Sync.email && !localStorage_get("syncHidden")) {
+    root.append(h("div", { class: "banner" },
+      h("span", null, "Sign in with Google to save your notes, prayers and files to your Google Drive and use them on any device."),
+      h("div", { class: "row" },
+        h("button", { class: "btn sm primary gbtn", type: "button", onclick: () => signIn() }, googleG(), "Sign in"),
+        h("button", { class: "btn sm ghost", type: "button", onclick: () => { localStorage_set("syncHidden", "1"); render(); } }, "Not now"))));
+  }
+  if (Sync.pendingOwner) root.append(h("div", { class: "banner" }, h("span", null, "Finish signing in: choose what to do with the data already on this device."), h("button", { class: "btn sm primary", type: "button", onclick: openSettings }, "Choose")));
+  if (SYNC_ON && Sync.email && Sync.state === "expired") root.append(h("div", { class: "banner" }, h("span", null, "Your Google sign-in expired, so syncing is paused."), h("button", { class: "btn sm primary", type: "button", onclick: () => signIn() }, "Reconnect")));
   if (!DEVOS) {
     const box = h("div", { class: "loading" }, h("b", null, "Opening today’s devotional…"));
     root.append(box);
@@ -816,12 +874,13 @@ function viewBible(root) {
   const verses = BIBLE.text[B.b][B.c - 1];
   const savedSet = savedVersesIn(B.b, B.c);
   root.append(h("div", { class: "bible-bar" },
-    h("button", { class: "btn", type: "button", style: "justify-content:flex-start", onclick: () => { B.mode = "books"; B.pickBook = B.b; render(); } }, `${BOOKS[B.b]} ${B.c}`, h("span", { class: "muted small" }, "· KJV")),
+    h("button", { class: "btn", type: "button", style: "justify-content:flex-start", onclick: () => { B.mode = "books"; B.pickBook = B.b; render(); } }, `${BOOKS[B.b]} ${B.c}`),
     h("button", { class: "icon-btn", type: "button", "aria-label": "Previous chapter", onclick: () => stepChapter(-1) }, icon("left")),
     h("button", { class: "icon-btn", type: "button", "aria-label": "Next chapter", onclick: () => stepChapter(1) }, icon("right"))));
   root.append(h("div", { class: "spread" },
     h("h2", { class: "chapter-title" }, BOOKS[B.b] === "Psalms" ? `Psalm ${B.c}` : `${BOOKS[B.b]} ${B.c}`),
-    nivLink(`${BOOKS[B.b]} ${B.c}`, "Read in NIV")));
+    versionSeg()));
+  root.append(h("div", { class: "row", style: "margin-top:-6px" }, h("span", { class: "muted small" }, VERSIONS[curVer()].name + " · also read in"), nivLink(`${BOOKS[B.b]} ${B.c}`)));
   root.append(h("p", { class: "muted small", style: "margin:-8px 0 0" }, "Tap verses to save, copy, or write about them."));
   const vEl = h("div", { class: "verses" });
   verses.forEach((t, i) => {
@@ -829,7 +888,7 @@ function viewBible(root) {
     const cls = [B.sel.has(n) ? "sel" : "", savedSet.has(n) ? "saved" : "", B.hl && B.hl.has(n) ? "hl" : ""].join(" ").trim();
     vEl.append(h("p", { class: cls || null, id: "v" + n, role: "button", tabindex: "0", "aria-pressed": B.sel.has(n) ? "true" : "false",
       onclick: () => toggleVerse(n), onkeydown: (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleVerse(n); } },
-      html: `<sup>${n}</sup>${lordify(t)}` }));
+      html: t ? `<sup>${n}</sup>${lordify(t)}` : `<sup>${n}</sup><span class="muted small">This verse is not in the earliest manuscripts, so ${curVer()} leaves it out. Switch to KJV to read it.</span>` }));
   });
   root.append(vEl);
   root.append(h("div", { class: "spread" },
@@ -862,11 +921,11 @@ function bibleBooks(root) {
 }
 function bibleSearch(root) {
   const B = S.bible;
-  const input = h("input", { class: "field", id: "bible-q", type: "search", placeholder: "Search the KJV, e.g. “shepherd” or “love one another”", value: B.q, enterkeyhint: "search" });
+  const input = h("input", { class: "field", id: "bible-q", type: "search", placeholder: `Search the ${curVer()}, e.g. “shepherd” or “love one another”`, value: B.q, enterkeyhint: "search" });
   const form = h("form", { class: "row", style: "flex-wrap:nowrap", onsubmit: (e) => { e.preventDefault(); B.q = input.value.trim(); B.results = runSearch(B.q); render(); } },
     input, h("button", { class: "btn primary", type: "submit" }, icon("search"), "Search"));
   root.append(form);
-  if (!B.results) { root.append(h("p", { class: "muted small" }, "Searches every verse of the King James Version. You can also type a reference like John 3:16.")); setTimeout(() => input.focus(), 50); return; }
+  if (!B.results) { root.append(h("p", { class: "muted small" }, `Searches every verse of the ${VERSIONS[curVer()].name}. You can also type a reference like John 3:16.`)); setTimeout(() => input.focus(), 50); return; }
   if (B.results.ref) {
     const p = B.results.ref;
     root.append(h("button", { class: "result", type: "button", onclick: () => openChapter(p.b, p.c, { hl: p.verses.size ? p.verses : null }) }, h("b", null, "Go to"), h("span", null, `${BOOKS[p.b]} ${p.c}${p.verses.size ? ":" + [...p.verses].join(",") : ""}`)));
@@ -898,11 +957,11 @@ function renderSelbar() {
   if (S.tab !== "bible" || !S.bible.sel.size || S.bible.mode !== "read") return;
   const bar = h("div", { class: "selbar", role: "toolbar", "aria-label": "Selected verses" },
     h("span", { class: "count" }, `${S.bible.sel.size} selected`),
-    h("button", { class: "btn sm", type: "button", onclick: async () => { const s = selectionText(); await addSaved({ ref: s.ref, text: s.text, translation: "KJV" }); S.bible.sel.clear(); render(); toast("Saved " + s.ref); } }, icon("saved"), "Save"),
-    h("button", { class: "btn sm", type: "button", onclick: () => { const s = selectionText(); copyText(`${s.text}\n— ${s.ref} (KJV)`); } }, icon("copy"), "Copy"),
+    h("button", { class: "btn sm", type: "button", onclick: async () => { const s = selectionText(); await addSaved({ ref: s.ref, text: s.text, translation: curVer() }); S.bible.sel.clear(); render(); toast("Saved " + s.ref); } }, icon("saved"), "Save"),
+    h("button", { class: "btn sm", type: "button", onclick: () => { const s = selectionText(); copyText(`${s.text}\n— ${s.ref} (${curVer()})`); } }, icon("copy"), "Copy"),
     h("button", { class: "btn sm", type: "button", onclick: () => addToJournal() }, "Journal"),
-    h("button", { class: "btn sm", type: "button", onclick: () => { const s = selectionText(); newNote({ title: s.ref, ref: s.ref, body: `“${s.text}” — ${s.ref} (KJV)\n\n` }); S.bible.sel.clear(); go("notes"); } }, icon("notes"), "Note"),
-    h("button", { class: "btn sm", type: "button", onclick: () => { const s = selectionText(); newSermon({ scripture: s.ref, content: `“${s.text}” — ${s.ref} (KJV)\n\n` }); S.bible.sel.clear(); go("sermons"); } }, icon("sermons"), "Sermon"),
+    h("button", { class: "btn sm", type: "button", onclick: () => { const s = selectionText(); newNote({ title: s.ref, ref: s.ref, body: `“${s.text}” — ${s.ref} (${curVer()})\n\n` }); S.bible.sel.clear(); go("notes"); } }, icon("notes"), "Note"),
+    h("button", { class: "btn sm", type: "button", onclick: () => { const s = selectionText(); newSermon({ scripture: s.ref, content: `“${s.text}” — ${s.ref} (${curVer()})\n\n` }); S.bible.sel.clear(); go("sermons"); } }, icon("sermons"), "Sermon"),
     h("button", { class: "btn sm", type: "button", "aria-label": "Clear selection", onclick: () => { S.bible.sel.clear(); render(); } }, icon("x")));
   document.body.append(bar);
 }
@@ -912,7 +971,7 @@ async function addToJournal() {
   const prev = S.notes.find(n => n.id === id);
   const note = { ...(prev || { id, kind: "journal", created: Date.now(), attachments: [], body: "", soap: { s: "", o: "", a: "", p: "" } }),
     title: `Day ${day} · ${fmtDate(date, { month: "short", day: "numeric" })}`, ref: summarize(PLAN[day - 1]), date, day, updated: Date.now() };
-  note.soap = { ...note.soap, s: (note.soap.s ? note.soap.s + "\n" : "") + `${s.text} (${s.ref})` };
+  note.soap = { ...note.soap, s: (note.soap.s ? note.soap.s + "\n" : "") + `${s.text} (${s.ref} ${curVer()})` };
   await DB.put("notes", note); const i = S.notes.findIndex(n => n.id === id); i >= 0 ? S.notes[i] = note : S.notes.push(note);
   S.bible.sel.clear(); render(); toast(`Added to Day ${day} journal`);
 }
@@ -928,7 +987,7 @@ function kjvText(ref) {
 }
 function memFlat(id = "lamp2") {
   const c = getColl(id); if (!c) return [];
-  return c.sections.flatMap(s => s.verses.map(v => ({ ...v, sec: s.id, secName: s.name, key: memKey(c, s, v), coll: c.id, trans: c.translation.split(" ")[0], text: v.text || kjvText(v.ref) })));
+  return c.sections.flatMap(s => s.verses.map(v => ({ ...v, sec: s.id, secName: s.name, key: memKey(c, s, v), coll: c.id, trans: c.id === "lamp2" ? "NIV" : curVer(), text: v.text || kjvText(v.ref) })));
 }
 function weekVerses(day) {
   const flat = memFlat("lamp2"); if (!flat.length) return [];
@@ -979,7 +1038,7 @@ function bridgeIllustration() {
 function viewMemory(root) {
   if (!MEMORY) { root.append(h("div", { class: "loading" }, "Loading your memory verses…")); return; }
   const c = getColl(S.memColl) || collections()[0];
-  if (c.translation.startsWith("KJV") && !BIBLE) {
+  if (c.id !== "lamp2" && !BIBLE) {
     root.append(h("div", { class: "loading" }, "Loading verses…"));
     loadBible().then(() => { if (S.tab === "memory") render(); }).catch(() => {});
     return;
@@ -989,7 +1048,8 @@ function viewMemory(root) {
   root.append(h("div", { class: "seg seg-wide", role: "group", "aria-label": "Collection" },
     ...collections().map(x => h("button", { type: "button", "aria-pressed": x.id === c.id ? "true" : "false", onclick: () => { S.memColl = x.id; S.lampSec = "all"; S.lampStatus = "all"; render(); } }, x.id === "tms" ? "TMS" : x.name.replace(" Verses", "")))));
   root.append(h("div", { class: "panel stack", style: "gap:10px" },
-    h("div", null, h("b", { style: "font-family:var(--read);font-size:19px" }, c.name), h("span", { class: "chip", style: "margin-left:8px" }, c.translation)),
+    h("div", null, h("b", { style: "font-family:var(--read);font-size:19px" }, c.name), h("span", { class: "chip", style: "margin-left:8px" }, c.id === "lamp2" ? c.translation : curVer())),
+    c.id !== "lamp2" ? h("div", { class: "row" }, h("span", { class: "muted small" }, "Bible version:"), versionSeg()) : null,
     h("p", { class: "muted small", style: "margin:0" }, `${flat.length} verses. ${c.source || ""}`),
     h("div", { class: "spread" }, h("span", null, h("b", null, mc), ` of ${flat.length} memorized`),
       h("button", { class: "btn sm primary", type: "button", onclick: () => { const set = memFiltered(c); if (!set.length) return toast("No verses match these filters"); openPractice(set.map(memCard), c.id === "tms" ? "TMS practice" : c.name + " practice"); } }, icon("play"), "Practice these")),
@@ -1013,7 +1073,7 @@ function viewMemory(root) {
     listEl.append(h("article", { class: "mem" + (week.has(v.key) ? " week" : ""), "data-ref": v.ref },
       h("div", { class: "top" }, h("div", null, h("div", { class: "ref" }, v.ref), h("div", { class: "topic" }, `${c.sections.length > 1 ? v.sec + v.n + " · " : v.n + ". "}${v.topic}`)),
         h("div", { class: "row" }, week.has(v.key) ? h("span", { class: "chip gold" }, "This week") : null, m ? h("span", { class: "chip ok" }, "Memorized") : null)),
-      h("p", { class: "txt", html: v.trans === "KJV" ? lordify(v.text) : esc(v.text) }),
+      h("p", { class: "txt", html: v.trans !== "NIV" ? lordify(v.text) : esc(v.text) }),
       h("div", { class: "acts" },
         h("button", { class: "btn sm", type: "button", onclick: () => openPractice([memCard(v)], v.ref) }, icon("play"), "Practice"),
         h("button", { class: "btn sm" + (m ? " on" : ""), type: "button", "aria-pressed": m ? "true" : "false", onclick: () => { setMem(v.key, !m); rerenderKeepScroll(); } }, icon("check"), m ? "Memorized" : "Mark memorized"),
@@ -1069,7 +1129,7 @@ async function markKnown(c) {
 /* ================= SAVED ================= */
 function savedVersesIn(b, c) {
   const set = new Set();
-  S.saved.forEach(s => { if (s.translation !== "KJV") return; const p = parseRef(s.ref); if (p && p.b === b && p.c === c) p.verses.forEach(v => set.add(v)); });
+  S.saved.forEach(s => { if (s.translation !== curVer()) return; const p = parseRef(s.ref); if (p && p.b === b && p.c === c) p.verses.forEach(v => set.add(v)); });
   return set;
 }
 async function addSaved(item) {
@@ -1100,7 +1160,7 @@ function viewSaved(root) {
     listEl.append(h("article", { class: "mem" },
       h("div", { class: "top" }, h("div", null, h("div", { class: "ref" }, s.ref), s.note ? h("div", { class: "topic" }, s.note) : null),
         h("div", { class: "row" }, s.translation ? h("span", { class: "chip" }, s.translation) : null, s.memorized ? h("span", { class: "chip ok" }, "Memorized") : null)),
-      h("p", { class: "txt", html: s.translation === "KJV" ? lordify(s.text) : esc(s.text) }),
+      h("p", { class: "txt", html: VERSIONS[s.translation] ? lordify(s.text) : esc(s.text) }),
       h("div", { class: "muted small" }, "Saved " + fmtTs(s.created)),
       h("div", { class: "acts" },
         h("button", { class: "btn sm", type: "button", onclick: () => openPractice([{ key: s.id, kind: "saved", ref: s.ref, text: s.text, topic: s.note, trans: s.translation }], s.ref) }, icon("play"), "Practice"),
@@ -1131,7 +1191,7 @@ function savedForm() {
     h("h3", { class: "sub" }, f.id ? "Edit verse" : "Add a verse"),
     h("div", { style: "display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:10px" },
       h("label", { class: "lbl" }, "Reference", h("input", { class: "field", id: "sf-ref", placeholder: "e.g. Romans 12:2", value: f.ref })),
-      h("label", { class: "lbl" }, "Translation", h("select", { class: "field", id: "sf-trans" }, ["NIV", "KJV", "ESV", "NLT", "NKJV", "MBBTAG", "Other"].map(t => h("option", { value: t, selected: f.translation === t ? true : null }, t))))),
+      h("label", { class: "lbl" }, "Translation", h("select", { class: "field", id: "sf-trans" }, ["NIV", "RCPV", "KJV", "BSB", "ASV", "ESV", "NLT", "Other"].map(t => h("option", { value: t, selected: f.translation === t ? true : null }, t))))),
     h("label", { class: "lbl" }, "Verse text", h("textarea", { class: "field", id: "sf-text", rows: "4", placeholder: "Type or paste the verse" }, f.text)),
     h("label", { class: "lbl" }, "Note (optional)", h("input", { class: "field", id: "sf-note", placeholder: "Why this verse matters to you", value: f.note })),
     err,
@@ -1259,7 +1319,7 @@ function sermonEditor(s) {
   const p = parseRef(s.scripture);
   ed.append(h("label", { class: "lbl" }, "Main scripture", h("input", { class: "field", id: "sm-scripture", placeholder: "e.g. John 15:1-8", value: s.scripture, onchange: () => rerenderKeepScroll(), oninput: (e) => { s.scripture = e.target.value; save(); } })));
   if (s.scripture) ed.append(h("div", { class: "row", style: "margin-top:-4px" },
-    p ? h("button", { class: "btn sm soft", type: "button", onclick: () => openChapter(p.b, p.c, { hl: p.verses }) }, "Read chapter (KJV)") : null, nivLink(s.scripture, "Read in NIV")));
+    p ? h("button", { class: "btn sm soft", type: "button", onclick: () => openChapter(p.b, p.c, { hl: p.verses }) }, "Read chapter") : null, nivLink(s.scripture, "Read in NIV")));
   ed.append(h("label", { class: "lbl" }, "Big idea", h("input", { class: "field", id: "sm-bigidea", placeholder: "The one sentence you want people to remember", value: s.bigIdea, oninput: (e) => { s.bigIdea = e.target.value; save(); } })));
   ed.append(h("label", { class: "lbl" }, "Content — outline or manuscript", h("textarea", { class: "field body", id: "sm-content", style: "min-height:320px",
     placeholder: "Introduction\n\nI. First point\n   – Scripture\n   – Illustration\n   – Application\n\nII. Second point\n\nConclusion and call to respond",
@@ -1376,9 +1436,9 @@ function newStudy() {
   S.studies.push(s); S.activeStudy = s.id; S.studyEditing = true; return s;
 }
 async function persistStudy(s) { const { draft, ...rest } = s; await DB.put("studies", rest); delete s.draft; }
-function viewStudy(root) {
+function viewLocalStudies(root) {
   root.append(h("div", { class: "spread" },
-    h("div", null, h("div", { class: "eyebrow" }, "Discipleship"), h("h2", { class: "title" }, "Bible Studies")),
+    h("div", null, h("div", { class: "eyebrow" }, "Saved on this device only"), h("h2", { class: "title", style: "font-size:22px" }, "Earlier studies")),
     h("button", { class: "btn primary", type: "button", onclick: () => { newStudy(); render(); setTimeout(() => { const t = $("#bs-name"); if (t) t.focus(); }, 30); } }, icon("plus"), "New Bible study")));
   const q = S.studyQ.toLowerCase();
   const list = S.studies.filter(s => !q || [s.name, s.material, s.notes, s.contact, ...(s.sessions || []).map(x => x.topic + " " + x.notes)].join(" ").toLowerCase().includes(q))
@@ -1448,7 +1508,7 @@ function studyEditor(s) {
 
 /* ================= PRAYER ================= */
 async function savePrayer(p) { p.updated = Date.now(); await DB.put("prayers", p); const i = S.prayers.findIndex(x => x.id === p.id); i >= 0 ? S.prayers[i] = p : S.prayers.push(p); }
-function viewPrayer(root) {
+function viewPrayerLegacyUnused(root) {
   root.append(h("div", null, h("div", { class: "eyebrow" }, "Pray without ceasing"), h("h2", { class: "title" }, "Prayer")));
   root.append(h("div", { class: "seg seg-wide", role: "group", "aria-label": "Prayer list" },
     h("button", { type: "button", "aria-pressed": S.prayerMode === "others" ? "true" : "false", onclick: () => { S.prayerMode = "others"; S.prayerForm = null; render(); } }, "Prayer requests"),
@@ -1559,6 +1619,7 @@ function openSettings() {
   const restoreMsg = h("div", { class: "small", "aria-live": "polite" });
   const sheet = h("div", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": "Settings" },
     h("div", { class: "spread" }, h("h2", { class: "title", style: "font-size:24px;margin:0" }, "Settings"), h("button", { class: "icon-btn", type: "button", "aria-label": "Close settings", onclick: close }, icon("x"))),
+    accountSection(),
 
     h("div", { class: "stack", style: "gap:8px" }, h("h3", { class: "sub" }, "Bible reading plan (3 years)"),
       h("label", { class: "lbl" }, "Start date", h("input", { class: "field", type: "date", id: "set-start", value: S.settings.start, onchange: async (e) => { if (!e.target.value) return; S.settings.start = e.target.value; S.viewDay = null; await saveKV("settings"); toast(`You’re on Day ${currentDay()}`); } })),
@@ -1579,14 +1640,14 @@ function openSettings() {
       h("button", { class: "btn sm", type: "button", style: "justify-self:start", onclick: async () => { try { const ok = await navigator.storage.persist(); toast(ok ? "Your data is protected from automatic cleanup" : "Your browser didn’t allow it. Install the app and try again."); } catch { toast("This browser doesn’t support it"); } } }, "Protect my data from cleanup")),
 
     h("div", { class: "stack", style: "gap:8px" }, h("h3", { class: "sub" }, "Backup"),
-      h("p", { class: "muted small", style: "margin:0" }, "Your notes, sermons, prayers, Bible studies, files and progress live only on this device. Download a backup now and then, and use it to move to a new phone."),
+      h("p", { class: "muted small", style: "margin:0" }, (SYNC_ON && Sync.email) ? "Your data syncs to your Google Drive. A backup file is an extra copy you can keep anywhere." : "Without signing in, your notes, sermons, prayers, Bible studies, files and progress live only on this device. Download a backup now and then."),
       h("div", { class: "row" },
         h("button", { class: "btn", type: "button", onclick: exportBackup }, "Download backup"),
         h("label", { class: "btn" }, "Restore from backup", h("input", { type: "file", accept: "application/json,.json", style: "display:none", onchange: (e) => importBackup(e.target.files[0], restoreMsg) }))),
       restoreMsg),
 
     h("div", { class: "stack", style: "gap:6px" }, h("h3", { class: "sub" }, "About"),
-      h("p", { class: "muted small", style: "margin:0" }, "Daily devotional: C. H. Spurgeon, Morning and Evening (1866, public domain). Bible text: King James Version (public domain), stored on your device. NIV buttons open BibleGateway and need internet. Memory verses: your Lamp 2 plan (NIV 1984), Witnessing verses and the Navigators’ Topical Memory System (KJV text)."),
+      h("p", { class: "muted small", style: "margin:0" }, "Daily devotional: C. H. Spurgeon, Morning and Evening (1866, public domain). Bibles stored on your device: King James Version, Berean Standard Bible and American Standard Version (all public domain). NIV buttons open BibleGateway; RCPV buttons open the Maayong Balita Biblia (Revised Cebuano Popular Version) on YouVersion; both need internet. Memory verses: your Lamp 2 plan (NIV 1984), Witnessing verses and the Navigators’ Topical Memory System (in your chosen Bible version)."),
       h("p", { class: "muted small", style: "margin:0" }, NIV_NOTICE))
   );
   layer.textContent = "";
@@ -1630,6 +1691,670 @@ async function importBackup(file, msg) {
   } catch { msg.textContent = "That file isn’t an A Day With Jesus backup."; }
 }
 
+const SYNC_STORES = ["notes", "saved", "sermons", "studies", "prayers"];
+/* ================= CLOUD SYNC: Google sign-in + each user's Google Drive (hidden app folder) ================= */
+const CFG = window.ADWJ_CONFIG || {};
+const SYNC_ON = !!(CFG.googleClientId && /\.apps\.googleusercontent\.com$/.test(CFG.googleClientId));
+const SCOPES = "openid email profile https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/drive.file";
+const DATA_FILE = "adwj-data.json";
+const Sync = { token: null, exp: 0, email: "", name: "", state: "off", last: 0, error: "", dirty: false, timer: null, running: false, pendingOwner: null, owner: "" };
+let TOMBS = {}, KVT = {}, PROGT = {}, lastProgress = {};
+
+function stampTomb(store, id) { TOMBS[store + ":" + id] = Date.now(); DB.put("kv", TOMBS, "tombs").catch(() => {}); }
+function stampProgress() {
+  const now = Date.now();
+  const days = new Set([...Object.keys(S.progress), ...Object.keys(lastProgress)]);
+  days.forEach(d => { if (JSON.stringify(S.progress[d] || []) !== JSON.stringify(lastProgress[d] || [])) PROGT[d] = now; });
+  lastProgress = JSON.parse(JSON.stringify(S.progress));
+  DB.put("kv", PROGT, "progressT").catch(() => {});
+}
+function stampKV(k) { KVT[k] = Date.now(); DB.put("kv", KVT, "kvT").catch(() => {}); }
+function localChanged() { if (!SYNC_ON || !Sync.token) return; Sync.dirty = true; scheduleSync(4000); }
+function scheduleSync(ms = 1500) { clearTimeout(Sync.timer); Sync.timer = setTimeout(runSync, ms); }
+function setSyncState(st) { Sync.state = st; renderSyncButton(); if (S.tab === "today" || document.querySelector(".acct")) { const el = document.querySelector(".acct-status"); if (el) el.textContent = syncStatusText(); } }
+function syncStatusText() {
+  if (!SYNC_ON) return "Not set up";
+  if (Sync.pendingOwner) return "Choose how to use this device";
+  if (!Sync.email) return "Not signed in";
+  return ({ syncing: "Syncing…", synced: "Synced " + (Sync.last ? new Date(Sync.last).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }) : ""), error: "Couldn’t sync. " + (Sync.error || "Try again."), expired: "Sign-in expired. Tap Reconnect.", offline: "Offline. Changes will sync when you’re back online.", off: "Signed in" })[Sync.state] || "Signed in";
+}
+
+/* ---- auth (redirect flow works inside installed home-screen apps) ---- */
+const redirectUri = () => location.origin + location.pathname.replace(/index\.html$/, "");
+function signIn(prompt) {
+  if (!SYNC_ON) return;
+  const state = uid("st");
+  localStorage_set("authState", state + "|" + S.tab);
+  const p = new URLSearchParams({ client_id: CFG.googleClientId, redirect_uri: redirectUri(), response_type: "token", scope: SCOPES, include_granted_scopes: "true", state });
+  // "none" = silent refresh; "switch" = pick another account; default = reuse the signed-in account when known
+  if (prompt === "none") { p.set("prompt", "none"); if (Sync.email) p.set("login_hint", Sync.email); }
+  else if (prompt === "switch" || !Sync.email) p.set("prompt", "select_account");
+  else p.set("login_hint", Sync.email);
+  location.href = "https://accounts.google.com/o/oauth2/v2/auth?" + p.toString();
+}
+function consumeAuthRedirect() {
+  const raw = location.hash.slice(1);
+  if (!/(^|&)(access_token|error)=/.test(raw)) return null;
+  const p = new URLSearchParams(raw);
+  const [state, tab] = (localStorage_get("authState") || "").split("|");
+  history.replaceState(null, "", location.pathname + location.search + "#" + (tab || "today"));
+  if (!state || p.get("state") !== state) return { error: "state" };
+  if (p.get("error")) return { error: p.get("error") };
+  return { token: p.get("access_token"), exp: Date.now() + (parseInt(p.get("expires_in"), 10) || 3600) * 1000 };
+}
+async function finishSignIn(tok) {
+  Sync.token = tok.token; Sync.exp = tok.exp;
+  try {
+    const r = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", { headers: { Authorization: "Bearer " + tok.token } });
+    if (!r.ok) throw new Error(r.status);
+    const u = await r.json(); Sync.email = u.email || ""; Sync.name = u.name || "";
+  } catch { Sync.token = null; setSyncState("error"); Sync.error = "Couldn’t read your Google account."; return; }
+  if (Sync.owner && Sync.owner !== Sync.email && await hasLocalData()) {
+    Sync.pendingOwner = { email: Sync.email, name: Sync.name, token: Sync.token, exp: Sync.exp };
+    Sync.token = null; setSyncState("off"); render(); return;
+  }
+  await acceptAccount();
+}
+async function acceptAccount() {
+  Sync.owner = Sync.email; Sync.pendingOwner = null;
+  await DB.put("kv", { token: Sync.token, exp: Sync.exp, email: Sync.email, name: Sync.name }, "auth").catch(() => {});
+  await DB.put("kv", Sync.owner, "owner").catch(() => {});
+  setSyncState("off"); render(); runSync(); fbSignIn(Sync.token);
+}
+async function hasLocalData() { for (const s of SYNC_STORES) if ((await DB.all(s)).length) return true; return false; }
+async function clearDevice() {
+  for (const s of [...SYNC_STORES, "files"]) await DB.clear(s);
+  for (const k of ["progress3y", "mem", "tombs", "progressT", "kvT"]) await DB.del("kv", k).catch(() => {});
+  S.notes = []; S.saved = []; S.sermons = []; S.studies = []; S.prayers = []; S.progress = {}; S.mem = {};
+  TOMBS = {}; KVT = {}; PROGT = {}; lastProgress = {};
+  S.activeNote = S.activeSermon = S.activeStudy = null;
+}
+async function signOut(removeData) {
+  clearTimeout(Sync.timer);
+  if (removeData) { await clearDevice(); await DB.del("kv", "owner").catch(() => {}); Sync.owner = ""; }
+  await fbSignOut();
+  Sync.token = null; Sync.email = ""; Sync.name = ""; Sync.last = 0; Sync.pendingOwner = null;
+  await DB.del("kv", "auth").catch(() => {});
+  setSyncState("off"); render(); toast(removeData ? "Signed out and removed this device’s copy" : "Signed out. Your data stays on this device.");
+}
+
+/* ---- Drive API ---- */
+async function gfetch(url, opts = {}) {
+  const r = await fetch(url.startsWith("http") ? url : "https://www.googleapis.com/drive/v3/" + url, { ...opts, headers: { Authorization: "Bearer " + Sync.token, ...(opts.headers || {}) } });
+  if (r.status === 401) { Sync.token = null; const e = new Error("auth"); e.code = "auth"; throw e; }
+  if (r.status === 403 || r.status === 507) { const t = await r.text().catch(() => ""); const e = new Error(/storageQuota|quotaExceeded/i.test(t) ? "Your Google Drive is full." : "Google Drive refused the request (" + r.status + ")."); e.code = "http"; throw e; }
+  if (!r.ok) { const e = new Error("Google Drive error " + r.status); e.code = "http"; throw e; }
+  return r;
+}
+async function listRemote() {
+  let files = [], token = "";
+  do {
+    const r = await gfetch(`files?spaces=appDataFolder&pageSize=1000&fields=${encodeURIComponent("nextPageToken,files(id,name,appProperties,size)")}${token ? "&pageToken=" + encodeURIComponent(token) : ""}`);
+    const j = await r.json(); files = files.concat(j.files || []); token = j.nextPageToken || "";
+  } while (token);
+  return files;
+}
+async function uploadMultipart(meta, blob, existingId) {
+  const b = "adwj" + Math.random().toString(36).slice(2);
+  const body = new Blob([`--${b}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n`, JSON.stringify(meta), `\r\n--${b}\r\nContent-Type: ${blob.type || "application/octet-stream"}\r\n\r\n`, blob, `\r\n--${b}--`]);
+  const url = "https://www.googleapis.com/upload/drive/v3/files" + (existingId ? "/" + existingId : "") + "?uploadType=multipart&fields=id";
+  return (await gfetch(url, { method: existingId ? "PATCH" : "POST", headers: { "Content-Type": `multipart/related; boundary=${b}` }, body })).json();
+}
+async function uploadFile(meta, blob) {
+  if (blob.size <= 5 * 1048576) return uploadMultipart(meta, blob);
+  const init = await gfetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable&fields=id", { method: "POST", headers: { "Content-Type": "application/json; charset=UTF-8", "X-Upload-Content-Type": blob.type || "application/octet-stream" }, body: JSON.stringify(meta) });
+  const loc = init.headers.get("Location");
+  if (!loc) return uploadMultipart(meta, blob);
+  const r = await fetch(loc, { method: "PUT", headers: { "Content-Type": blob.type || "application/octet-stream" }, body: blob });
+  if (!r.ok) throw new Error("Upload failed (" + r.status + ")");
+  return r.json();
+}
+
+/* ---- merge ---- */
+async function buildLocalDoc() {
+  const stores = {};
+  for (const s of SYNC_STORES) { stores[s] = {}; (await DB.all(s)).forEach(r => { stores[s][r.id] = r; }); }
+  const progress = {};
+  Object.keys(S.progress).forEach(d => { progress[d] = { k: S.progress[d], t: PROGT[d] || 0 }; });
+  return { v: 1, kv: { settings: { val: S.settings, t: KVT.settings || 0 }, mem: S.mem, progress }, stores, tombs: { ...TOMBS } };
+}
+function mergeDocs(local, remote) {
+  remote = remote || {}; const rkv = remote.kv || {};
+  const out = { v: 1, kv: {}, stores: {}, tombs: {} };
+  for (const src of [local.tombs, remote.tombs]) for (const [k, t] of Object.entries(src || {})) out.tombs[k] = Math.max(out.tombs[k] || 0, t);
+  for (const s of SYNC_STORES) {
+    const a = (local.stores || {})[s] || {}, b = (remote.stores || {})[s] || {}, m = {};
+    for (const id of new Set([...Object.keys(a), ...Object.keys(b)])) {
+      const x = a[id], y = b[id];
+      const r = !x ? y : !y ? x : ((y._t || 0) > (x._t || 0) ? y : x);
+      if ((out.tombs[s + ":" + id] || 0) >= (r._t || 0)) continue;
+      m[id] = r;
+    }
+    out.stores[s] = m;
+  }
+  const sa = local.kv.settings, sb = rkv.settings;
+  out.kv.settings = !sb ? sa : !sa ? sb : ((sb.t || 0) > (sa.t || 0) ? sb : sa);
+  out.kv.mem = { ...(rkv.mem || {}) };
+  for (const [k, v] of Object.entries(local.kv.mem || {})) if (!out.kv.mem[k] || (v.t || 0) > (out.kv.mem[k].t || 0)) out.kv.mem[k] = v;
+  out.kv.progress = { ...(rkv.progress || {}) };
+  for (const [d, v] of Object.entries(local.kv.progress || {})) if (!out.kv.progress[d] || (v.t || 0) > (out.kv.progress[d].t || 0)) out.kv.progress[d] = v;
+  return out;
+}
+async function applyMerged(doc) {
+  let changed = false;
+  TOMBS = { ...doc.tombs }; await DB.put("kv", TOMBS, "tombs");
+  for (const s of SYNC_STORES) {
+    const cur = new Map((await DB.all(s)).map(r => [r.id, r]));
+    for (const [id, r] of Object.entries(doc.stores[s])) { const l = cur.get(id); if (!l || (r._t || 0) > (l._t || 0)) { await DB.rawPut(s, r); changed = true; } }
+    for (const [id, l] of cur) if (!doc.stores[s][id] && (TOMBS[s + ":" + id] || 0) >= (l._t || 0)) { await DB.rawDel(s, id); changed = true; }
+  }
+  for (const k of Object.keys(TOMBS)) if (k.startsWith("files:")) await DB.rawDel("files", k.slice(6)).catch(() => {});
+  const st = doc.kv.settings;
+  if (st && (st.t || 0) > (KVT.settings || 0)) { S.settings = { ...S.settings, ...st.val }; KVT.settings = st.t; await DB.put("kv", S.settings, "settings"); await DB.put("kv", KVT, "kvT"); applyTheme(); changed = true; }
+  if (JSON.stringify(doc.kv.mem) !== JSON.stringify(S.mem)) { S.mem = doc.kv.mem; await DB.put("kv", S.mem, "mem"); changed = true; }
+  const prog = {}; const pt = {};
+  Object.entries(doc.kv.progress).forEach(([d, v]) => { prog[d] = v.k; pt[d] = v.t; });
+  if (JSON.stringify(prog) !== JSON.stringify(S.progress)) changed = true;
+  S.progress = prog; PROGT = pt; lastProgress = JSON.parse(JSON.stringify(prog));
+  await DB.put("kv", S.progress, "progress3y"); await DB.put("kv", PROGT, "progressT");
+  if (changed) {
+    const drafts = { notes: S.notes.filter(n => n.draft), sermons: S.sermons.filter(n => n.draft), studies: S.studies.filter(n => n.draft) };
+    S.notes = [...await DB.all("notes"), ...drafts.notes]; S.saved = await DB.all("saved");
+    S.sermons = [...await DB.all("sermons"), ...drafts.sermons]; S.studies = [...await DB.all("studies"), ...drafts.studies]; S.prayers = await DB.all("prayers");
+  }
+  return changed;
+}
+function findAttMeta(doc, id) {
+  for (const s of SYNC_STORES) for (const r of Object.values(doc.stores[s])) { const a = (r.attachments || []).find(x => x.id === id); if (a) return a; }
+  return null;
+}
+function safeRerender() {
+  const a = document.activeElement;
+  if (a && (a.tagName === "TEXTAREA" || (a.tagName === "INPUT" && a.type !== "checkbox" && a.type !== "file"))) { a.addEventListener("blur", () => setTimeout(safeRerender, 50), { once: true }); return; }
+  if (document.querySelector(".overlay")) return;
+  rerenderKeepScroll();
+}
+async function runSync() {
+  if (!SYNC_ON || !Sync.token || Sync.running || Sync.pendingOwner) return;
+  if (!navigator.onLine) { setSyncState("offline"); return; }
+  if (Date.now() > Sync.exp - 60000) { Sync.token = null; setSyncState("expired"); return; }
+  Sync.running = true; Sync.dirty = false; setSyncState("syncing");
+  try {
+    const files = await listRemote();
+    const dataFile = files.find(f => f.name === DATA_FILE);
+    const remote = dataFile ? await (await gfetch(`files/${dataFile.id}?alt=media`)).json() : null;
+    const merged = mergeDocs(await buildLocalDoc(), remote);
+    const remoteFiles = new Map(files.filter(f => f.appProperties && f.appProperties.fid).map(f => [f.appProperties.fid, f]));
+    const needed = new Set();
+    for (const s of SYNC_STORES) for (const r of Object.values(merged.stores[s])) (r.attachments || []).forEach(a => needed.add(a.id));
+    const localFiles = new Map((await DB.all("files")).map(f => [f.id, f]));
+    for (const id of needed) if (localFiles.has(id) && !remoteFiles.has(id)) {
+      const f = localFiles.get(id);
+      await uploadFile({ name: "file-" + id, parents: ["appDataFolder"], appProperties: { fid: id } }, f.blob);
+    }
+    const json = new Blob([JSON.stringify(merged)], { type: "application/json" });
+    if (dataFile) await uploadMultipart({}, json, dataFile.id); else await uploadMultipart({ name: DATA_FILE, parents: ["appDataFolder"] }, json);
+    const changed = await applyMerged(merged);
+    let gotFiles = false;
+    for (const id of needed) if (!localFiles.has(id) && remoteFiles.has(id) && !TOMBS["files:" + id]) {
+      const blob = await (await gfetch(`files/${remoteFiles.get(id).id}?alt=media`)).blob();
+      const meta = findAttMeta(merged, id) || {};
+      await DB.rawPut("files", { id, blob: meta.type ? new Blob([blob], { type: meta.type }) : blob, name: meta.name || "file", type: meta.type || blob.type, size: blob.size });
+      gotFiles = true;
+    }
+    for (const k of Object.keys(merged.tombs)) if (k.startsWith("files:") && remoteFiles.has(k.slice(6))) await gfetch(`files/${remoteFiles.get(k.slice(6)).id}`, { method: "DELETE" }).catch(() => {});
+    Sync.last = Date.now(); Sync.error = "";
+    await DB.put("kv", { last: Sync.last }, "syncMeta").catch(() => {});
+    setSyncState("synced");
+    if (changed || gotFiles) safeRerender();
+  } catch (e) {
+    if (e.code === "auth") setSyncState("expired");
+    else { Sync.error = e.message || "Check your connection."; setSyncState("error"); }
+  } finally {
+    Sync.running = false;
+    if (Sync.dirty && Sync.token) scheduleSync(3000);
+  }
+}
+async function initSync() {
+  const [tombs, kvt, pt, auth, owner, meta] = await Promise.all(["tombs", "kvT", "progressT", "auth", "owner", "syncMeta"].map(k => DB.get("kv", k).catch(() => null)));
+  TOMBS = tombs || {}; KVT = kvt || {}; PROGT = pt || {}; lastProgress = JSON.parse(JSON.stringify(S.progress));
+  Sync.owner = owner || ""; Sync.last = (meta && meta.last) || 0;
+  if (!SYNC_ON) return;
+  const ret = consumeAuthRedirect();
+  if (auth) { Sync.email = auth.email; Sync.name = auth.name; Sync.token = auth.token; Sync.exp = auth.exp; }
+  if (ret && ret.token) { localStorage_set("silentTry", ""); await finishSignIn(ret); return; }
+  if (ret && ret.error) {
+    if (ret.error === "interaction_required" || ret.error === "login_required" || ret.error === "consent_required") { Sync.token = null; setSyncState("expired"); }
+    else if (ret.error !== "access_denied") toast("Google sign-in didn’t finish. Please try again.");
+    return;
+  }
+  if (Sync.email) {
+    if (FB_ON) fbInit().catch(() => {});
+    if (Sync.token && Date.now() < Sync.exp - 60000) { setSyncState("off"); runSync(); fbSignIn(Sync.token); }
+    else if (navigator.onLine && Date.now() - (+localStorage_get("silentTry") || 0) > 10 * 60000) { localStorage_set("silentTry", String(Date.now())); signIn("none"); }
+    else { Sync.token = null; setSyncState(navigator.onLine ? "expired" : "offline"); }
+  }
+}
+window.addEventListener("online", () => { if (Sync.token) runSync(); else if (Sync.email) setSyncState("expired"); });
+window.addEventListener("offline", () => { if (Sync.email) setSyncState("offline"); });
+document.addEventListener("visibilitychange", () => { if (!document.hidden && Sync.token) scheduleSync(800); });
+setInterval(() => { if (!document.hidden && Sync.token && !Sync.running) runSync(); }, 90000);
+window.addEventListener("focus", () => { if (Sync.token && Date.now() - Sync.last > 20000) scheduleSync(500); });
+
+/* ---- UI ---- */
+function renderSyncButton() {
+  const b = document.getElementById("sync-btn"); if (!b) return;
+  b.hidden = !SYNC_ON;
+  const st = !Sync.email ? "signedout" : Sync.pendingOwner ? "error" : Sync.state;
+  b.dataset.state = st;
+  b.setAttribute("aria-label", "Account and sync: " + syncStatusText());
+  b.title = syncStatusText();
+}
+function accountSection() {
+  const box = h("div", { class: "stack acct", style: "gap:10px" }, h("h3", { class: "sub" }, "Account & sync"));
+  if (!SYNC_ON) { box.append(h("p", { class: "muted small", style: "margin:0" }, "Google sign-in isn’t set up for this copy of the app yet. The app owner adds a Google client ID in config.js (see SETUP-GOOGLE-SIGN-IN.md).")); return box; }
+  if (Sync.pendingOwner) {
+    box.append(h("div", { class: "banner" }, h("span", null, `This device already has data from ${Sync.owner}. How should ${Sync.pendingOwner.email} use it?`)),
+      h("div", { class: "row" },
+        h("button", { class: "btn primary", type: "button", onclick: async () => { Object.assign(Sync, { email: Sync.pendingOwner.email, name: Sync.pendingOwner.name, token: Sync.pendingOwner.token, exp: Sync.pendingOwner.exp }); await clearDevice(); await acceptAccount(); toast("Device cleared. Loading your data…"); } }, "Clear this device, then load my data"),
+        h("button", { class: "btn", type: "button", onclick: async () => { Object.assign(Sync, { email: Sync.pendingOwner.email, name: Sync.pendingOwner.name, token: Sync.pendingOwner.token, exp: Sync.pendingOwner.exp }); await acceptAccount(); } }, "Add this device’s data to my account"),
+        h("button", { class: "btn ghost", type: "button", onclick: () => { Sync.pendingOwner = null; Sync.email = ""; render(); } }, "Cancel")));
+    return box;
+  }
+  if (!Sync.email) {
+    box.append(h("p", { class: "muted small", style: "margin:0" }, "Sign in with Google to keep your notes, prayers, sermons, studies, files and progress in your own Google Drive, and use them on any phone, tablet or computer."),
+      h("button", { class: "btn primary gbtn", type: "button", onclick: () => signIn() }, googleG(), "Sign in with Google"));
+    return box;
+  }
+  box.append(
+    h("div", { class: "row" }, h("span", { class: "avatar" }, (Sync.name || Sync.email).slice(0, 1).toUpperCase()), h("div", null, h("b", null, Sync.name || Sync.email), h("div", { class: "muted small" }, Sync.email))),
+    h("div", { class: "acct-status small" }, syncStatusText()),
+    h("div", { class: "row" },
+      Sync.token ? h("button", { class: "btn sm", type: "button", onclick: () => { Sync.dirty = false; runSync(); } }, "Sync now")
+        : h("button", { class: "btn sm primary", type: "button", onclick: () => signIn() }, "Reconnect"),
+      h("button", { class: "btn sm ghost", type: "button", onclick: () => signOut(false) }, "Sign out"),
+      h("button", { class: "btn sm ghost danger", type: "button", onclick: (e) => {
+        const slot = e.target.parentNode; e.target.replaceWith(h("span", { class: "confirm" }, "Remove everything from this device? It stays in your Google Drive.",
+          h("button", { class: "btn sm danger", type: "button", onclick: () => signOut(true) }, "Sign out & remove"),
+          h("button", { class: "btn sm ghost", type: "button", onclick: () => openSettings() }, "Keep")));
+      } }, "Sign out & remove from this device")),
+    h("p", { class: "muted small", style: "margin:0" }, "Your data is saved in a private app folder in your Google Drive. Only this app can see it; it doesn’t appear in your Drive file list."));
+  return box;
+}
+function googleG() { return h("span", { "aria-hidden": "true", style: "display:inline-grid;background:#fff;border-radius:50%;padding:2px", html: '<svg width="16" height="16" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.6 5.4 2.7 13.3l7.9 6.1C12.5 13.6 17.8 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.7 6c4.5-4.2 6.9-10.3 6.9-17.7z"/><path fill="#FBBC05" d="M10.6 28.6c-.5-1.4-.8-3-.8-4.6s.3-3.2.8-4.6l-7.9-6.1C1 16.6 0 20.2 0 24s1 7.4 2.7 10.7l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.7-6c-2.2 1.5-5 2.3-8.2 2.3-6.2 0-11.5-4.1-13.4-9.9l-7.9 6.1C6.6 42.6 14.6 48 24 48z"/></svg>' }); }
+
+/* ================= SHARED GROUPS: Firebase Firestore (prayer meetings, Bible studies) ================= */
+const FB_CFG = CFG.firebase || {};
+const FB_ON = SYNC_ON && !!(FB_CFG.apiKey && FB_CFG.projectId && !/PASTE/.test(FB_CFG.apiKey));
+let fbAuth = null, fdb = null, fbLoading = null;
+const SH = { user: null, spaces: null, unsubSpaces: null, sub: {}, data: {}, error: "", folder: null };
+const meEmail = () => ((SH.user && SH.user.email) || "").toLowerCase();
+const meName = () => Sync.name || (SH.user && SH.user.displayName) || meEmail();
+const shRefresh = () => { if (S.tab === "prayer" || S.tab === "study") safeRerender(); };
+function loadScriptOnce(src) {
+  if (document.querySelector(`script[data-src="${src}"]`)) return Promise.resolve();
+  return new Promise((res, rej) => { const el = document.createElement("script"); el.src = src; el.dataset.src = src; el.onload = res; el.onerror = () => rej(new Error("load " + src)); document.head.append(el); });
+}
+function fbInit() {
+  if (!FB_ON) return Promise.resolve(null);
+  if (fbLoading) return fbLoading;
+  fbLoading = (async () => {
+    await loadScriptOnce("vendor/firebase-app-compat.js");
+    await loadScriptOnce("vendor/firebase-auth-compat.js");
+    await loadScriptOnce("vendor/firebase-firestore-compat.js");
+    firebase.initializeApp(FB_CFG);
+    fbAuth = firebase.auth(); fdb = firebase.firestore();
+    try { await fdb.enablePersistence({ synchronizeTabs: true }); } catch {}
+    fbAuth.onAuthStateChanged(u => {
+      if (u && Sync.email && (u.email || "").toLowerCase() !== Sync.email.toLowerCase()) { fbAuth.signOut(); return; }
+      SH.user = u; listenSpaces(); shRefresh();
+    });
+  })().catch(e => { fbLoading = null; SH.error = "Shared groups couldn’t load. Check your connection."; shRefresh(); throw e; });
+  return fbLoading;
+}
+async function fbSignIn(token) {
+  if (!FB_ON || !token) return;
+  try {
+    await fbInit();
+    const cu = fbAuth.currentUser;
+    if (cu && (cu.email || "").toLowerCase() === Sync.email.toLowerCase()) return;
+    await fbAuth.signInWithCredential(firebase.auth.GoogleAuthProvider.credential(null, token));
+    SH.error = "";
+  } catch (e) { SH.error = "Couldn’t connect to shared groups (" + (e.code || e.message) + ")."; shRefresh(); }
+}
+async function fbSignOut() { try { if (fbAuth) await fbAuth.signOut(); } catch {} unlistenAll(); SH.user = null; SH.spaces = null; }
+function unlistenAll() { if (SH.unsubSpaces) SH.unsubSpaces(); SH.unsubSpaces = null; Object.values(SH.sub).forEach(f => f()); SH.sub = {}; SH.data = {}; }
+function listenSpaces() {
+  unlistenAll(); SH.spaces = null;
+  if (!SH.user || !fdb) return;
+  SH.unsubSpaces = fdb.collection("spaces").where("memberEmails", "array-contains", meEmail()).onSnapshot(
+    snap => { SH.spaces = snap.docs.map(d => ({ id: d.id, ...d.data() })); SH.error = ""; shRefresh(); },
+    err => { SH.spaces = []; SH.error = "Couldn’t load your groups (" + (err.code || "error") + ")."; shRefresh(); });
+}
+function subData(spaceId, sub) {
+  const key = spaceId + "/" + sub;
+  if (!SH.sub[key] && fdb) {
+    SH.data[key] = null;
+    SH.sub[key] = fdb.collection("spaces").doc(spaceId).collection(sub).onSnapshot(
+      snap => { SH.data[key] = snap.docs.map(d => ({ id: d.id, ...d.data() })); shRefresh(); },
+      () => { SH.data[key] = []; shRefresh(); });
+  }
+  return SH.data[key];
+}
+const spaceRef = (id) => fdb.collection("spaces").doc(id);
+const fbErr = (e) => toast(/permission/i.test((e && (e.code || e.message)) || "") ? "You don’t have permission to change that." : "Couldn’t save. It will retry when you’re online.");
+function parseEmails(text) { return [...new Set((text || "").split(/[\s,;]+/).map(x => x.trim().toLowerCase()).filter(x => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(x)))]; }
+function createSpace(type, data) {
+  const id = uid("sp");
+  const members = [meEmail(), ...data.members.filter(e => e !== meEmail())];
+  spaceRef(id).set({ type, name: data.name, desc: data.desc || "", material: data.material || "", started: data.started || "", ownerUid: SH.user.uid, ownerEmail: meEmail(), ownerName: meName(), memberEmails: members, notes: "", created: Date.now(), updated: Date.now() }).catch(fbErr);
+  return id;
+}
+function addSub(spaceId, sub, data) {
+  const id = uid("x");
+  spaceRef(spaceId).collection(sub).doc(id).set({ ...data, authorUid: SH.user.uid, authorEmail: meEmail(), authorName: meName(), created: Date.now(), updated: Date.now() }).catch(fbErr);
+  return id;
+}
+const updSub = (spaceId, sub, id, data) => spaceRef(spaceId).collection(sub).doc(id).update({ ...data, updated: Date.now() }).catch(fbErr);
+const delSub = (spaceId, sub, id) => spaceRef(spaceId).collection(sub).doc(id).delete().catch(fbErr);
+const isOwnerOf = (sp) => SH.user && sp.ownerUid === SH.user.uid;
+const canEditItem = (sp, it) => SH.user && (it.authorUid === SH.user.uid || isOwnerOf(sp));
+
+/* gate shown when shared features can’t run yet */
+function sharedGate(root, what) {
+  if (!FB_ON) {
+    root.append(h("div", { class: "empty" }, h("b", null, `${what} need Google sign-in`),
+      h("span", null, SYNC_ON ? "The app owner still needs to add the Firebase settings in config.js (see SETUP-GOOGLE-SIGN-IN.md)." : "The app owner needs to set up Google sign-in first (see SETUP-GOOGLE-SIGN-IN.md).")));
+    return true;
+  }
+  if (!Sync.email) {
+    root.append(h("div", { class: "empty" }, h("b", null, `Sign in to join ${what.toLowerCase()}`),
+      h("span", null, "Everyone signs in with their own Gmail. The leader adds members by their Gmail address."),
+      h("button", { class: "btn primary gbtn", type: "button", onclick: () => signIn() }, googleG(), "Sign in with Google")));
+    return true;
+  }
+  if (!SH.user) {
+    root.append(h("div", { class: "empty" }, h("b", null, SH.error ? "Not connected" : "Connecting…"),
+      h("span", null, SH.error || "Connecting to your groups."),
+      SH.error ? h("button", { class: "btn", type: "button", onclick: () => { SH.error = ""; Sync.token ? fbSignIn(Sync.token) : signIn(); render(); } }, Sync.token ? "Try again" : "Reconnect") : null));
+    if (!fbLoading) fbInit().catch(() => {});
+    return true;
+  }
+  if (SH.spaces === null) { root.append(h("div", { class: "loading" }, "Loading your groups…")); return true; }
+  return false;
+}
+
+/* members editor (owner adds/removes by Gmail) */
+function membersPanel(sp, max) {
+  const owner = isOwnerOf(sp);
+  const box = h("div", { class: "stack", style: "gap:8px" },
+    h("div", { class: "spread" }, h("h3", { class: "sub" }, `Members · ${sp.memberEmails.length}`), owner ? null : h("span", { class: "muted small" }, "Leader: " + (sp.ownerName || sp.ownerEmail))));
+  box.append(h("div", { class: "row people-chips" }, sp.memberEmails.map(e => h("span", { class: "chip" + (e === sp.ownerEmail ? " gold" : "") }, e === meEmail() ? "You" : e, e === sp.ownerEmail ? " · leader" : "",
+    owner && e !== sp.ownerEmail ? h("button", { class: "chip-x", type: "button", "aria-label": "Remove " + e, onclick: () => { spaceRef(sp.id).update({ memberEmails: sp.memberEmails.filter(x => x !== e), updated: Date.now() }).catch(fbErr); } }, "×") : null))));
+  if (owner && (!max || sp.memberEmails.length < max)) {
+    const inp = h("input", { class: "field", id: "add-members-" + sp.id, type: "email", inputmode: "email", autocomplete: "off", placeholder: max ? "Their Gmail address" : "Gmail addresses, separated by commas" });
+    const add = () => {
+      const list = parseEmails(inp.value).filter(e => !sp.memberEmails.includes(e));
+      if (!list.length) return toast("Type a valid Gmail address");
+      const next = [...sp.memberEmails, ...list].slice(0, max || 300);
+      spaceRef(sp.id).update({ memberEmails: next, updated: Date.now() }).catch(fbErr);
+      inp.value = ""; toast(`Added ${list.length}. They’ll see it after signing in with that Gmail.`);
+    };
+    inp.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); add(); } });
+    box.append(h("div", { class: "row", style: "flex-wrap:nowrap" }, inp, h("button", { class: "btn soft", type: "button", onclick: add }, icon("plus"), "Add")));
+    box.append(h("p", { class: "muted small", style: "margin:0" }, "Members sign in with that Gmail to see this group and add to it."));
+  }
+  return box;
+}
+
+/* ================= PRAYER ================= */
+function viewPrayer(root) {
+  root.append(h("div", null, h("div", { class: "eyebrow" }, "Pray without ceasing"), h("h2", { class: "title" }, "Prayer")));
+  root.append(h("div", { class: "seg seg-wide", role: "group", "aria-label": "Prayer section" },
+    h("button", { type: "button", "aria-pressed": S.prayerMode !== "personal" ? "true" : "false", onclick: () => { S.prayerMode = "meetings"; S.prayerForm = null; render(); } }, "Prayer meetings"),
+    h("button", { type: "button", "aria-pressed": S.prayerMode === "personal" ? "true" : "false", onclick: () => { S.prayerMode = "personal"; S.prayerForm = null; render(); } }, "My personal prayer")));
+  if (S.prayerMode === "personal") return viewPersonalPrayer(root);
+  if (sharedGate(root, "Prayer meetings")) { legacyRequests(root); return; }
+  const meetings = SH.spaces.filter(s => s.type === "prayer").sort((a, b) => b.updated - a.updated);
+  const active = meetings.find(m => m.id === S.activeMeeting);
+  if (active) return meetingView(root, active);
+  root.append(h("div", { class: "spread" },
+    h("p", { class: "muted small", style: "margin:0" }, "A shared prayer list for your church or cell group. Each member adds prayer items from their own account."),
+    h("button", { class: "btn primary", type: "button", onclick: () => { S.spaceForm = { type: "prayer" }; render(); } }, icon("plus"), "New prayer meeting")));
+  if (S.spaceForm && S.spaceForm.type === "prayer") root.append(spaceForm("prayer"));
+  if (!meetings.length) root.append(h("div", { class: "empty" }, h("b", null, "No prayer meetings yet"), h("span", null, "Create one and add members by their Gmail. If someone added you, it appears here after you sign in with that Gmail.")));
+  else root.append(h("div", { class: "mem-list" }, meetings.map(m => h("button", { type: "button", class: "mem space-card", onclick: () => { S.activeMeeting = m.id; render(); window.scrollTo(0, 0); } },
+    h("div", { class: "top" }, h("div", { class: "ref" }, m.name), h("span", { class: "chip" }, `${m.memberEmails.length} member${m.memberEmails.length > 1 ? "s" : ""}`)),
+    m.desc ? h("div", { class: "topic" }, m.desc) : null,
+    h("div", { class: "muted small" }, isOwnerOf(m) ? "You lead this meeting" : "Led by " + (m.ownerName || m.ownerEmail))))));
+  legacyRequests(root);
+}
+function spaceForm(type) {
+  const f = S.spaceForm;
+  const labels = { prayer: ["New prayer meeting", "Name", "e.g. Wednesday Prayer Meeting", "Schedule or description (optional)", "e.g. Every Wednesday, 7 PM at the church", "Members’ Gmail addresses (optional)"],
+    one: ["New one-on-one Bible study", "Who you’re studying with", "Their name", "", "", "Their Gmail (optional, to share with them)"],
+    group: ["New group Bible study", "Group name", "e.g. Youth Bible Study", "", "", "Members’ Gmail addresses (optional)"] }[type];
+  const err = h("div", { class: "small", style: "color:var(--danger)", "aria-live": "polite" });
+  const form = h("form", { class: "panel stack", style: "gap:12px", onsubmit: (e) => {
+    e.preventDefault();
+    const name = $("#sp-name").value.trim();
+    if (!name) { err.textContent = "Add a name first."; return; }
+    const members = parseEmails($("#sp-members").value).slice(0, type === "one" ? 1 : 299);
+    const id = createSpace(type, { name, desc: $("#sp-desc") ? $("#sp-desc").value.trim() : "", material: $("#sp-material") ? $("#sp-material").value.trim() : "", started: $("#sp-started") ? $("#sp-started").value : "", members });
+    S.spaceForm = null;
+    if (type === "prayer") S.activeMeeting = id; else S.activeStudyId = id;
+    render(); toast("Created");
+  } },
+    h("h3", { class: "sub" }, labels[0]),
+    h("label", { class: "lbl" }, labels[1], h("input", { class: "field", id: "sp-name", placeholder: labels[2] })),
+    type === "prayer" ? h("label", { class: "lbl" }, labels[3], h("input", { class: "field", id: "sp-desc", placeholder: labels[4] })) : null,
+    type !== "prayer" ? h("div", { class: "two" },
+      h("label", { class: "lbl" }, "Study material", h("input", { class: "field", id: "sp-material", placeholder: "e.g. Lamp 1, Gospel of John" })),
+      h("label", { class: "lbl" }, "Started", h("input", { class: "field", type: "date", id: "sp-started", value: ymd(new Date()) }))) : null,
+    h("label", { class: "lbl" }, labels[5], type === "one"
+      ? h("input", { class: "field", id: "sp-members", type: "email", inputmode: "email", placeholder: "name@gmail.com" })
+      : h("textarea", { class: "field", id: "sp-members", rows: "3", placeholder: "ana@gmail.com, juan@gmail.com" })),
+    err,
+    h("div", { class: "row" }, h("button", { class: "btn primary", type: "submit" }, "Create"), h("button", { class: "btn ghost", type: "button", onclick: () => { S.spaceForm = null; render(); } }, "Cancel")));
+  setTimeout(() => { const el = $("#sp-name"); if (el) el.focus(); }, 30);
+  return form;
+}
+function meetingView(root, m) {
+  const items = subData(m.id, "items");
+  root.append(h("div", { class: "spread" },
+    h("button", { class: "btn sm ghost", type: "button", onclick: () => { S.activeMeeting = null; S.meetingPerson = ""; render(); } }, icon("left"), "All prayer meetings"),
+    isOwnerOf(m) ? deleteRow("Delete meeting", "Delete this meeting for everyone?", () => { spaceRef(m.id).delete().catch(fbErr); S.activeMeeting = null; render(); }) : null));
+  root.append(h("div", null, h("h2", { class: "title", style: "font-size:clamp(22px,4.5vw,28px)" }, m.name), m.desc ? h("p", { class: "muted", style: "margin:4px 0 0" }, m.desc) : null));
+  root.append(h("div", { class: "panel" }, membersPanel(m)));
+  // add item
+  const fDate = h("input", { class: "field", type: "date", id: "pm-date", value: ymd(new Date()) });
+  const fFor = h("input", { class: "field", id: "pm-for", placeholder: "Leave blank if it’s for you" });
+  const fText = h("textarea", { class: "field", id: "pm-text", rows: "3", placeholder: "One item per line, e.g.\nHealing for my mother\nGuidance for my job interview" });
+  root.append(h("form", { class: "panel stack", style: "gap:10px", onsubmit: (e) => {
+    e.preventDefault();
+    const text = fText.value.trim(); if (!text) return toast("Write a prayer item first");
+    addSub(m.id, "items", { date: fDate.value || ymd(new Date()), forWhom: fFor.value.trim(), text, status: "praying", answeredDate: "", answerNote: "" });
+    fText.value = ""; fFor.value = ""; toast("Prayer item added");
+  } },
+    h("h3", { class: "sub" }, "Add your prayer items"),
+    h("div", { class: "two" }, h("label", { class: "lbl" }, "Date", fDate), h("label", { class: "lbl" }, "Praying for (optional)", fFor)),
+    h("label", { class: "lbl" }, "Prayer items", fText),
+    h("div", null, h("button", { class: "btn primary", type: "submit" }, icon("plus"), "Add"))));
+  if (items === null) { root.append(h("div", { class: "loading" }, "Loading prayer items…")); return; }
+  const people = [...new Set(items.map(i => i.authorName || i.authorEmail))];
+  if (people.length > 1) root.append(h("div", { class: "row people-chips" },
+    h("button", { class: "chip" + (S.meetingPerson ? "" : " sel"), type: "button", onclick: () => { S.meetingPerson = ""; render(); } }, "Everyone"),
+    people.map(p => h("button", { class: "chip" + (S.meetingPerson === p ? " sel" : ""), type: "button", onclick: () => { S.meetingPerson = S.meetingPerson === p ? "" : p; render(); } }, p))));
+  root.append(h("div", { class: "seg", role: "group", "aria-label": "Status" },
+    ...[["praying", "Praying"], ["answered", "Answered"], ["all", "All"]].map(([k, l]) => h("button", { type: "button", "aria-pressed": S.prayerFilter === k ? "true" : "false", onclick: () => { S.prayerFilter = k; render(); } }, l))));
+  const list = items.filter(i => (!S.meetingPerson || (i.authorName || i.authorEmail) === S.meetingPerson) && (S.prayerFilter === "all" || (S.prayerFilter === "answered" ? i.status === "answered" : i.status !== "answered")))
+    .sort((a, b) => (b.date || "").localeCompare(a.date || "") || b.created - a.created);
+  if (!list.length) { root.append(h("div", { class: "empty" }, h("b", null, S.prayerFilter === "answered" ? "No answered prayers yet" : "No prayer items yet"), h("span", null, "Items added by any member show up here for everyone in the meeting."))); return; }
+  let lastDate = "";
+  const listEl = h("div", { class: "mem-list" });
+  list.forEach(it => {
+    if (it.date !== lastDate) { listEl.append(h("div", { class: "plan-month" }, fmtDate(it.date, { weekday: "long", month: "long", day: "numeric", year: "numeric" }))); lastDate = it.date; }
+    const mine = canEditItem(m, it), answering = S.answering === it.id, editing = S.editingItem === it.id;
+    const card = h("article", { class: "mem prayer-card" + (it.status === "answered" ? " answered" : "") },
+      h("div", { class: "top" },
+        h("div", null, h("div", { class: "ref" }, it.authorEmail === meEmail() ? "You" : (it.authorName || it.authorEmail)), it.forWhom ? h("div", { class: "topic" }, "For " + it.forWhom) : null),
+        it.status === "answered" ? h("span", { class: "chip ok" }, "Answered") : h("span", { class: "chip gold" }, "Praying")));
+    if (editing) {
+      const t = h("textarea", { class: "field", id: "pm-edit", rows: "3" }, it.text);
+      card.append(t, h("div", { class: "row" }, h("button", { class: "btn sm primary", type: "button", onclick: () => { updSub(m.id, "items", it.id, { text: t.value.trim() }); S.editingItem = null; rerenderKeepScroll(); } }, "Save"), h("button", { class: "btn sm ghost", type: "button", onclick: () => { S.editingItem = null; rerenderKeepScroll(); } }, "Cancel")));
+    } else card.append(h("p", { class: "txt", style: "white-space:pre-wrap" }, it.text));
+    if (it.status === "answered") card.append(h("div", { class: "answer" }, h("b", null, "Answered" + (it.answeredDate ? " " + fmtDate(it.answeredDate, { month: "short", day: "numeric", year: "numeric" }) : "")), it.answerNote ? h("div", { style: "white-space:pre-wrap" }, it.answerNote) : null));
+    if (answering) {
+      const aDate = h("input", { class: "field", type: "date", id: "pm-adate", value: ymd(new Date()) });
+      const aNote = h("textarea", { class: "field", id: "pm-anote", rows: "3", placeholder: "How did God answer?" });
+      card.append(h("div", { class: "panel inset stack", style: "gap:10px" }, h("label", { class: "lbl" }, "Answered on", aDate), h("label", { class: "lbl" }, "What happened", aNote),
+        h("div", { class: "row" }, h("button", { class: "btn sm primary", type: "button", onclick: () => { updSub(m.id, "items", it.id, { status: "answered", answeredDate: aDate.value, answerNote: aNote.value.trim() }); S.answering = null; rerenderKeepScroll(); toast("Praise God!"); } }, "Save answer"),
+          h("button", { class: "btn sm ghost", type: "button", onclick: () => { S.answering = null; rerenderKeepScroll(); } }, "Cancel"))));
+    }
+    if (mine && !answering && !editing) card.append(h("div", { class: "acts" },
+      it.status === "answered" ? h("button", { class: "btn sm", type: "button", onclick: () => updSub(m.id, "items", it.id, { status: "praying" }) }, "Still praying")
+        : h("button", { class: "btn sm on", type: "button", onclick: () => { S.answering = it.id; rerenderKeepScroll(); } }, icon("check"), "Mark answered"),
+      h("button", { class: "btn sm ghost", type: "button", onclick: () => { S.editingItem = it.id; rerenderKeepScroll(); } }, "Edit"),
+      deleteRow("Delete", "Delete this item?", () => delSub(m.id, "items", it.id))));
+    listEl.append(card);
+  });
+  root.append(listEl);
+}
+function legacyRequests(root) {
+  const old = S.prayers.filter(p => p.kind === "request");
+  if (!old.length) return;
+  root.append(h("details", { class: "plan-month-box" }, h("summary", null, h("span", null, "Earlier prayer list on this device"), h("span", { class: "muted small" }, old.length + " items")),
+    h("div", { class: "mem-list", style: "padding-bottom:10px" }, old.sort((a, b) => b.date.localeCompare(a.date)).map(p => h("article", { class: "mem" },
+      h("div", { class: "top" }, h("div", null, h("div", { class: "ref" }, p.person || "Prayer"), h("div", { class: "topic" }, fmtDate(p.date, { month: "short", day: "numeric", year: "numeric" }))), p.status === "answered" ? h("span", { class: "chip ok" }, "Answered") : null),
+      h("p", { class: "txt", style: "white-space:pre-wrap" }, p.items),
+      h("div", { class: "acts" }, deleteRow("Delete", "Delete this item?", async () => { await DB.del("prayers", p.id); S.prayers = S.prayers.filter(x => x.id !== p.id); rerenderKeepScroll(); })))))));
+}
+
+/* ================= BIBLE STUDY ================= */
+function viewStudy(root) {
+  root.append(h("div", null, h("div", { class: "eyebrow" }, "Discipleship"), h("h2", { class: "title" }, "Bible Study")));
+  root.append(h("div", { class: "seg seg-wide", role: "group", "aria-label": "Study type" },
+    h("button", { type: "button", "aria-pressed": S.studyMode !== "group" ? "true" : "false", onclick: () => { S.studyMode = "one"; S.activeStudyId = null; S.spaceForm = null; render(); } }, "One-on-one"),
+    h("button", { type: "button", "aria-pressed": S.studyMode === "group" ? "true" : "false", onclick: () => { S.studyMode = "group"; S.activeStudyId = null; S.spaceForm = null; render(); } }, "Group Bible Study")));
+  if (S.studyLocal) { root.append(h("button", { class: "btn sm ghost", type: "button", onclick: () => { S.studyLocal = false; render(); } }, icon("left"), "Back to shared studies")); return viewLocalStudies(root); }
+  const type = S.studyMode === "group" ? "group" : "one";
+  if (sharedGate(root, "Shared Bible studies")) { localStudiesLink(root); return; }
+  const list = SH.spaces.filter(s => s.type === type).sort((a, b) => b.updated - a.updated);
+  const active = list.find(s => s.id === S.activeStudyId);
+  if (active) return studySpaceView(root, active);
+  root.append(h("div", { class: "spread" },
+    h("p", { class: "muted small", style: "margin:0" }, type === "one" ? "Meet with one person. Invite them by Gmail so you can both see the sessions and share materials." : "Study with a group. Every member can log sessions and share study materials, documents, videos and photos."),
+    h("button", { class: "btn primary", type: "button", onclick: () => { S.spaceForm = { type }; render(); } }, icon("plus"), type === "one" ? "New one-on-one" : "New group")));
+  if (S.spaceForm && S.spaceForm.type === type) root.append(spaceForm(type));
+  if (!list.length) root.append(h("div", { class: "empty" }, h("b", null, type === "one" ? "No one-on-one studies yet" : "No group studies yet"), h("span", null, "Studies you create, or that someone adds you to, appear here.")));
+  else root.append(h("div", { class: "mem-list" }, list.map(s => h("button", { type: "button", class: "mem space-card", onclick: () => { S.activeStudyId = s.id; render(); window.scrollTo(0, 0); } },
+    h("div", { class: "top" }, h("div", { class: "ref" }, s.name), h("span", { class: "chip" }, `${s.memberEmails.length} member${s.memberEmails.length > 1 ? "s" : ""}`)),
+    s.material ? h("div", { class: "topic" }, s.material) : null,
+    h("div", { class: "muted small" }, (isOwnerOf(s) ? "You lead this study" : "Led by " + (s.ownerName || s.ownerEmail)) + (s.started ? " · started " + fmtDate(s.started, { month: "short", day: "numeric", year: "numeric" }) : ""))))));
+  localStudiesLink(root);
+}
+function localStudiesLink(root) {
+  if (!S.studies.length) return;
+  root.append(h("button", { class: "btn sm ghost", type: "button", style: "justify-self:start", onclick: () => { S.studyLocal = true; render(); } }, `Earlier studies saved on this device (${S.studies.length})`));
+}
+function studySpaceView(root, sp) {
+  const owner = isOwnerOf(sp);
+  const sessions = subData(sp.id, "sessions");
+  const files = subData(sp.id, "files");
+  root.append(h("div", { class: "spread" },
+    h("button", { class: "btn sm ghost", type: "button", onclick: () => { S.activeStudyId = null; render(); } }, icon("left"), sp.type === "one" ? "All one-on-ones" : "All groups"),
+    owner ? deleteRow("Delete study", "Delete this study for everyone?", () => { spaceRef(sp.id).delete().catch(fbErr); S.activeStudyId = null; render(); }) : null));
+  root.append(h("div", null, h("span", { class: "chip gold" }, sp.type === "one" ? "One-on-one" : "Group"),
+    h("h2", { class: "title", style: "font-size:clamp(22px,4.5vw,28px)" }, sp.name),
+    h("p", { class: "muted small", style: "margin:4px 0 0" }, [sp.material, sp.started ? "Started " + fmtDate(sp.started, { month: "short", day: "numeric", year: "numeric" }) : ""].filter(Boolean).join(" · "))));
+  if (owner) {
+    const mat = h("input", { class: "field", id: "ss-material", value: sp.material || "", placeholder: "Study material or series" });
+    let t; mat.addEventListener("input", () => { clearTimeout(t); t = setTimeout(() => spaceRef(sp.id).update({ material: mat.value.trim(), updated: Date.now() }).catch(fbErr), 700); });
+    root.append(h("label", { class: "lbl" }, "Study material", mat));
+  }
+  root.append(h("div", { class: "panel" }, membersPanel(sp, sp.type === "one" ? 2 : 0)));
+  // shared notes
+  const notes = h("textarea", { class: "field", id: "ss-notes", rows: "5", placeholder: "Shared notes everyone in this study can read and edit" }, sp.notes || "");
+  const nStatus = h("span", { class: "saved-note" });
+  let nt; notes.addEventListener("input", () => { nStatus.textContent = "Saving…"; clearTimeout(nt); nt = setTimeout(() => { spaceRef(sp.id).update({ notes: notes.value, updated: Date.now() }).catch(fbErr); nStatus.textContent = "Saved"; }, 800); });
+  root.append(h("div", { class: "panel stack", style: "gap:8px" }, h("div", { class: "spread" }, h("h3", { class: "sub" }, "Shared notes"), nStatus), notes));
+  // sessions
+  const sDate = h("input", { class: "field", type: "date", id: "ss-date", value: ymd(new Date()) });
+  const sTopic = h("input", { class: "field", id: "ss-topic", placeholder: "Lesson or passage, e.g. John 3" });
+  const sNotes = h("textarea", { class: "field", id: "ss-snotes", rows: "3", placeholder: "What you covered, responses, prayer needs" });
+  const sessBox = h("div", { class: "panel stack", style: "gap:10px" }, h("h3", { class: "sub" }, `Sessions${sessions && sessions.length ? " · " + sessions.length : ""}`),
+    h("div", { class: "panel inset stack", style: "gap:10px" },
+      h("div", { class: "two" }, h("label", { class: "lbl" }, "Date", sDate), h("label", { class: "lbl" }, "Lesson or passage", sTopic)),
+      h("label", { class: "lbl" }, "Notes", sNotes),
+      h("div", null, h("button", { class: "btn soft", type: "button", onclick: () => {
+        if (!sTopic.value.trim() && !sNotes.value.trim()) return toast("Add the lesson or some notes first");
+        addSub(sp.id, "sessions", { date: sDate.value || ymd(new Date()), topic: sTopic.value.trim(), notes: sNotes.value.trim() });
+        sTopic.value = ""; sNotes.value = ""; toast("Session added");
+      } }, icon("plus"), "Add session"))));
+  if (sessions === null) sessBox.append(h("div", { class: "muted small" }, "Loading…"));
+  else [...sessions].sort((a, b) => (b.date || "").localeCompare(a.date || "") || b.created - a.created).forEach(x => sessBox.append(h("div", { class: "log-item" },
+    h("div", { class: "spread" }, h("b", null, x.topic || "Session"), h("span", { class: "muted small" }, fmtDate(x.date, { weekday: "short", month: "short", day: "numeric", year: "numeric" }))),
+    x.notes ? h("div", { class: "log-text" }, x.notes) : null,
+    h("div", { class: "row" }, h("span", { class: "muted small" }, "by " + (x.authorEmail === meEmail() ? "you" : (x.authorName || x.authorEmail))), canEditItem(sp, x) ? deleteRow("Remove", "Remove this session?", () => delSub(sp.id, "sessions", x.id)) : null))));
+  root.append(sessBox);
+  // shared files
+  const fileInput = h("input", { type: "file", id: "ss-files", multiple: true, style: "display:none", accept: "image/*,video/*,audio/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.rtf,.odt", onchange: (e) => shareUpload(sp, [...e.target.files]) });
+  const filesBox = h("div", { class: "panel stack", style: "gap:10px" },
+    h("div", { class: "spread" }, h("h3", { class: "sub" }, `Shared files${files && files.length ? " · " + files.length : ""}`),
+      h("button", { class: "btn sm soft", type: "button", onclick: () => { if (!Sync.token || Date.now() > Sync.exp - 60000) { toast("Reconnect to Google first to upload"); signIn(); return; } fileInput.click(); } }, icon("clip"), "Share a file"), fileInput),
+    h("p", { class: "muted small", style: "margin:0" }, "Study materials, documents, videos and photos. Files are stored in the uploader’s Google Drive and open in Google Drive for anyone in this study."));
+  if (S.uploading && S.uploading[sp.id]) filesBox.append(h("div", { class: "banner" }, `Uploading ${S.uploading[sp.id]}…`));
+  if (files === null) filesBox.append(h("div", { class: "muted small" }, "Loading…"));
+  else if (!files.length) filesBox.append(h("div", { class: "muted small" }, "No files shared yet."));
+  else {
+    const grid = h("div", { class: "attach-grid" });
+    [...files].sort((a, b) => b.created - a.created).forEach(f => {
+      const t = f.type || "";
+      const thumb = (t.startsWith("image/") || t.startsWith("video/")) ? h("img", { src: `https://drive.google.com/thumbnail?id=${encodeURIComponent(f.driveId)}&sz=w600`, alt: f.name, loading: "lazy", onerror: (e) => { e.target.replaceWith(h("div", { class: "doc" }, t.startsWith("video/") ? "VIDEO" : "PHOTO")); } })
+        : h("div", { class: "doc" }, (f.name.split(".").pop() || "FILE").toUpperCase().slice(0, 5));
+      grid.append(h("div", { class: "att" },
+        h("a", { href: f.link, target: "_blank", rel: "noopener" }, thumb),
+        h("div", { class: "meta" }, h("span", { class: "nm", title: f.name }, f.name),
+          h("span", { class: "muted" }, `${fmtBytes(f.size || 0)} · ${f.authorEmail === meEmail() ? "you" : (f.authorName || f.authorEmail)}`),
+          h("div", { class: "row", style: "gap:4px" }, h("a", { class: "btn sm ghost", href: f.link, target: "_blank", rel: "noopener" }, "Open", icon("ext")),
+            canEditItem(sp, f) ? deleteRow("Remove", "Remove for everyone?", async () => {
+              if (f.authorUid === SH.user.uid && Sync.token) await gfetch(`files/${encodeURIComponent(f.driveId)}`, { method: "DELETE" }).catch(() => {});
+              delSub(sp.id, "files", f.id);
+            }) : null))));
+    });
+    filesBox.append(grid);
+  }
+  root.append(filesBox);
+}
+async function ensureSharedFolder() {
+  if (SH.folder) return SH.folder;
+  const q = encodeURIComponent("appProperties has { key='adwjShared' and value='1' } and mimeType='application/vnd.google-apps.folder' and trashed=false");
+  const found = await (await gfetch(`files?q=${q}&spaces=drive&fields=files(id)`)).json();
+  if (found.files && found.files[0]) return (SH.folder = found.files[0].id);
+  const made = await (await gfetch("files?fields=id", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: "A Day With Jesus – shared files", mimeType: "application/vnd.google-apps.folder", appProperties: { adwjShared: "1" } }) })).json();
+  return (SH.folder = made.id);
+}
+async function shareUpload(sp, files) {
+  if (!files.length) return;
+  S.uploading = S.uploading || {};
+  let done = 0;
+  try {
+    const folder = await ensureSharedFolder();
+    for (const f of files) {
+      S.uploading[sp.id] = `${f.name} (${done + 1} of ${files.length})`; rerenderKeepScroll();
+      const up = await uploadFile({ name: f.name, parents: [folder], appProperties: { adwjSpace: sp.id } }, f);
+      await gfetch(`files/${up.id}/permissions?sendNotificationEmail=false`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ role: "reader", type: "anyone" }) });
+      const meta = await (await gfetch(`files/${up.id}?fields=id,webViewLink,mimeType`)).json();
+      addSub(sp.id, "files", { name: f.name, type: f.type || meta.mimeType || "", size: f.size, driveId: up.id, link: meta.webViewLink || `https://drive.google.com/file/d/${up.id}/view` });
+      done++;
+    }
+    toast(`${done} file${done > 1 ? "s" : ""} shared`);
+  } catch (e) {
+    toast(e.code === "auth" ? "Your Google sign-in expired. Reconnect, then try again." : (e.message || "Upload failed"));
+    if (e.code === "auth") setSyncState("expired");
+  } finally { delete S.uploading[sp.id]; rerenderKeepScroll(); }
+}
+
 /* ================= START ================= */
 async function start() {
   PLAN = buildPlan();
@@ -1646,8 +2371,10 @@ async function start() {
     S.prayers = await DB.all("prayers").catch(() => []);
   } catch {}
   applyTheme();
+  await initSync().catch(() => {});
   readHash();
   render();
+  renderSyncButton();
   if (!(await DB.persistent())) toast("This browser can’t save data, so changes last only until you close the page");
   fetch("memory.json").then(r => r.json()).then(d => { MEMORY = d; if (S.tab === "memory") rerenderKeepScroll(); }).catch(() => {});
   loadBible().then(() => { if (S.tab === "bible") render(); }).catch(() => {});
@@ -1655,6 +2382,7 @@ async function start() {
 window.addEventListener("hashchange", () => { readHash(); if (S.tab !== "bible") S.bible.sel.clear(); render(); window.scrollTo(0, 0); });
 window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); installEvt = e; if (S.tab === "today") rerenderKeepScroll(); });
 $("#open-settings").addEventListener("click", openSettings);
+$("#sync-btn").addEventListener("click", openSettings);
 // Re-check the day when the app comes back to the foreground (e.g. the next morning)
 let lastDay = ymd(new Date());
 document.addEventListener("visibilitychange", () => { if (!document.hidden && ymd(new Date()) !== lastDay) { lastDay = ymd(new Date()); S.viewDay = null; render(); } });
