@@ -1010,7 +1010,7 @@ function soapEditor(b, c, pfx = "soap") {
   const soap = existing ? { s: "", o: "", a: "", p: "", ...existing.soap } : { s: "", o: "", a: "", p: "" };
   const status = h("div", { class: "saved-note", "aria-live": "polite" }, existing ? "Saved " + fmtTs(existing.updated) : "");
   let timer;
-  const build = () => { const prev = S.notes.find(n => n.id === id); return { ...(prev || { id, kind: "journal", created: Date.now(), attachments: [], body: "" }), title: `${name} · S.O.A.P.`, ref: name, b, c, soap: { ...soap }, updated: Date.now() }; };
+  const build = () => { const prev = S.notes.find(n => n.id === id); return { ...(prev || { id, kind: "journal", created: Date.now(), attachments: [], body: "" }), title: prev && prev.title && prev.title !== `${name} · S.O.A.P.` ? prev.title : name, ref: name, b, c, soap: { ...soap }, updated: Date.now() }; };
   const remember = (note) => { const i = S.notes.findIndex(n => n.id === id); i >= 0 ? S.notes[i] = note : S.notes.push(note); return note; };
   const save = () => { const note = remember(build()); clearTimeout(timer); timer = setTimeout(async () => { try { await DB.put("notes", note); status.textContent = "Saved"; } catch { status.textContent = "Couldn’t save. Your device storage may be full."; } }, 600); };
   return h("div", { class: "stack soap", style: "gap:8px" },
@@ -1039,7 +1039,7 @@ function chapterRow(b, c, opts = {}) {
         chevronSvg(open))),
     open ? h("div", { class: "crow-body stack", style: "gap:8px" },
       h("div", { class: "row", style: "gap:6px" }, h("button", { class: "btn sm soft", type: "button", onclick: () => openChapter(b, c, { back: CHAP_DAY[b + "." + c] || null }) }, "Read chapter"), nivLink(name, "NIV")),
-      h("div", { class: "muted small", style: "font-weight:700;letter-spacing:.06em;text-transform:uppercase" }, "S.O.A.P. journal · " + name),
+      h("div", { class: "muted small", style: "font-weight:700;letter-spacing:.06em;text-transform:uppercase" }, "S.O.A.P. journal"),
       soapEditor(b, c)) : null);
 }
 function readByBook(root, todayList, cur) {
@@ -1064,12 +1064,18 @@ function readByBook(root, todayList, cur) {
   });
 }
 async function migrateDayJournals() {
+  // drop the old " · S.O.A.P." default from journal titles
+  for (const n of S.notes) {
+    if (n.kind === "journal" && typeof n.title === "string" && /^.+ · S\.O\.A\.P\.$/.test(n.title) && n.title === `${n.ref} · S.O.A.P.`) {
+      n.title = n.ref; try { await DB.put("notes", n); } catch {}
+    }
+  }
   // v9: journals moved from one-per-day to one-per-chapter
   for (const n of [...S.notes]) {
     if (n.kind !== "journal" || !/^journal-\d{4}-\d{2}-\d{2}$/.test(n.id) || !n.day || !PLAN[n.day - 1]) continue;
     const r = PLAN[n.day - 1][0], id = chapJournalId(r.b, r.c);
     if (S.notes.some(x => x.id === id)) continue;
-    const note = { ...n, id, b: r.b, c: r.c, title: `${chapName(r)} · S.O.A.P.`, ref: chapName(r) };
+    const note = { ...n, id, b: r.b, c: r.c, title: chapName(r), ref: chapName(r) };
     delete note.date; delete note.day; delete note._t;
     try { await DB.put("notes", note); await DB.del("notes", n.id); S.notes = S.notes.filter(x => x.id !== n.id); S.notes.push(note); } catch {}
   }
@@ -1202,7 +1208,7 @@ function renderSelbar() {
 async function addToJournal() {
   const sel = selectionText(), B = S.bible, id = chapJournalId(B.b, B.c), name = `${BOOKS[B.b]} ${B.c}`;
   const prev = S.notes.find(n => n.id === id);
-  const note = { ...(prev || { id, kind: "journal", created: Date.now(), attachments: [], body: "", soap: { s: "", o: "", a: "", p: "" } }), title: `${name} · S.O.A.P.`, ref: name, b: B.b, c: B.c, updated: Date.now() };
+  const note = { ...(prev || { id, kind: "journal", created: Date.now(), attachments: [], body: "", soap: { s: "", o: "", a: "", p: "" } }), title: prev && prev.title && prev.title !== `${name} · S.O.A.P.` ? prev.title : name, ref: name, b: B.b, c: B.c, updated: Date.now() };
   note.soap = { s: "", o: "", a: "", p: "", ...note.soap };
   note.soap.s = (note.soap.s ? note.soap.s + "\n" : "") + `${sel.text} (${sel.ref} ${curVer()})`;
   await DB.put("notes", note); const i = S.notes.findIndex(n => n.id === id); i >= 0 ? S.notes[i] = note : S.notes.push(note);
@@ -1529,7 +1535,7 @@ function noteEditor(n) {
     h("button", { class: "btn sm ghost", type: "button", onclick: () => { S.editing = false; if (n.draft && !n.title && !n.body) { S.notes = S.notes.filter(x => x !== n); S.activeNote = null; } render(); } }, icon("left"), "All notes"),
     status));
   ed.append(h("label", { class: "lbl" }, "Title", h("input", { class: "field", id: "note-title", style: "font-family:var(--read);font-size:19px;font-weight:600", placeholder: "What is God showing you?", value: n.title, oninput: (e) => { n.title = e.target.value; save(); } })));
-  ed.append(h("label", { class: "lbl" }, "Scripture", h("input", { class: "field", id: "note-ref", placeholder: "e.g. Psalm 23", value: n.ref || "", oninput: (e) => { n.ref = e.target.value; save(); } })));
+  if (n.kind !== "journal") ed.append(h("label", { class: "lbl" }, "Scripture", h("input", { class: "field", id: "note-ref", placeholder: "e.g. Psalm 23", value: n.ref || "", oninput: (e) => { n.ref = e.target.value; save(); } })));
   if (n.kind === "journal") {
     n.soap = n.soap || { s: "", o: "", a: "", p: "" };
     [["s", "Scripture"], ["o", "Observation"], ["a", "Application"], ["p", "Prayer"]].forEach(([k, l]) => ed.append(h("label", { class: "lbl" }, l, h("textarea", { class: "field", id: "note-soap-" + k, rows: "3", oninput: (e) => { n.soap[k] = e.target.value; save(); } }, n.soap[k] || ""))));
