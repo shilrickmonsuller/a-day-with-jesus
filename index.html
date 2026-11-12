@@ -457,6 +457,28 @@ input, select, textarea { font-size: 16px; }
 .dmark { background: var(--hlc); color: inherit; border-radius: 3px; padding: 1px 0; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
 .devo-body { -webkit-user-select: text; user-select: text; }
 
+/* ---- review ---- */
+.rstats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+@media (min-width: 700px) { .rstats { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.rstat { background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 12px; display: grid; gap: 2px; }
+.rstat b { font-family: var(--read); font-size: 26px; line-height: 1.1; }
+.rv-hl { margin: 0; padding: 6px 8px; border-radius: 6px; background: var(--hlc); font-family: var(--read); }
+.week-card { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; align-items: center; text-align: left; background: var(--accent-soft); border: 1px solid var(--line); border-radius: 14px; padding: 12px 16px; color: var(--ink); cursor: pointer; font-size: 14px; }
+.week-card .eyebrow { grid-column: 1 / -1; margin: 0; }
+.week-card svg { width: 18px; height: 18px; }
+.rate-btn { width: 100%; justify-content: center; }
+.stars { display: flex; gap: 6px; justify-content: center; }
+.stars button { border: 0; background: transparent; font-size: 36px; line-height: 1; color: var(--line); cursor: pointer; padding: 0 2px; }
+.stars button.on { color: var(--accent); }
+.rate-q { font-family: var(--read); font-size: 19px; text-align: center; }
+.rv-sum { display: flex; gap: 18px; align-items: center; }
+.rv-avg { display: grid; justify-items: center; }
+.rv-avg b { font-family: var(--read); font-size: 40px; line-height: 1; }
+.rv-stars { color: var(--accent); letter-spacing: 2px; }
+.rv-bars { flex: 1; display: grid; gap: 4px; }
+.rv-bar { display: grid; grid-template-columns: 12px 1fr 20px; gap: 6px; align-items: center; font-size: 12.5px; }
+.rv-bar .progress { height: 7px; }
+
 </style>
 <header class="topbar gutter">
   <div class="shell">
@@ -525,6 +547,8 @@ const ICONS = {
   bible: '<path d="M4 4.5A1.5 1.5 0 0 1 5.5 3H20v16H5.5A1.5 1.5 0 0 0 4 20.5z"/><path d="M4 20.5A1.5 1.5 0 0 0 5.5 22H20v-3"/><path d="M12 7v7M9.5 9.5h5"/>',
   lamp: '<path d="M8 14c-2.5 0-5-1-5-3h18c0 2-2.5 3-5 3"/><path d="M8 14l1 4h6l1-4"/><path d="M12 11c-1.5-1.5-1.5-4 0-7 1.5 3 1.5 5.5 0 7z"/><path d="M8 21h8"/>',
   saved: '<path d="M6 3h12v18l-6-4-6 4z"/>',
+  review: '<path d="M3 20h18"/><path d="M6 16v-4M10 16V8M14 16v-6M18 16V5"/>',
+  star: '<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>',
   notes: '<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/>',
   check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
   left: '<path d="M15 18l-6-6 6-6"/>', right: '<path d="M9 18l6-6-6-6"/>',
@@ -744,10 +768,10 @@ function openChapter(b, c, opts = {}) {
 }
 
 /* ---------- routing ---------- */
-const TABS = [["today", "Today"], ["plan", "Plan"], ["bible", "Bible"], ["memory", "Memory"], ["prayer", "Prayer"], ["study", "Bible Study"], ["notes", "Notes"], ["sermons", "Sermons"], ["library", "Library"], ["saved", "Saved"]];
+const TABS = [["today", "Today"], ["plan", "Plan"], ["bible", "Bible"], ["memory", "Memory"], ["prayer", "Prayer"], ["study", "Bible Study"], ["notes", "Notes"], ["sermons", "Sermons"], ["library", "Library"], ["saved", "Saved"], ["review", "Review"]];
 const PRIMARY = ["today", "plan", "bible", "memory"];
 function go(tab) { if (location.hash !== "#" + tab) location.hash = "#" + tab; else render(); }
-function readHash() { let t = location.hash.slice(1); if (/^join-[A-Za-z0-9]{6,20}$/.test(t)) { S.joinCode = t.slice(5).toUpperCase(); S.tab = "join"; return; } if (t === "lamp") t = "memory"; S.tab = TABS.some(x => x[0] === t) ? t : "today"; }
+function readHash() { let t = location.hash.slice(1); if (t === "reviews") { S.tab = "reviews"; return; } if (/^join-[A-Za-z0-9]{6,20}$/.test(t)) { S.joinCode = t.slice(5).toUpperCase(); S.tab = "join"; return; } if (t === "lamp") t = "memory"; S.tab = TABS.some(x => x[0] === t) ? t : "today"; }
 function renderTabs() {
   const nav = $("#tabbar"); nav.textContent = "";
   TABS.forEach(([id, label]) => nav.append(h("button", { type: "button", class: PRIMARY.includes(id) ? "primary-tab" : "secondary-tab", "aria-current": S.tab === id ? "page" : null, onclick: () => go(id) }, icon(id), h("span", null, label))));
@@ -759,6 +783,7 @@ function openMore() {
   const sheet = h("div", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": "More sections" },
     h("div", { class: "spread" }, h("h2", { class: "title", style: "font-size:22px;margin:0" }, "More"), h("button", { class: "icon-btn", type: "button", "aria-label": "Close", onclick: close }, icon("x"))),
     shareAppCard(),
+    h("button", { type: "button", class: "btn rate-btn", onclick: () => { close(); openRateApp(); } }, icon("star"), "Rate & review the app"),
     h("div", { class: "more-grid" },
       ...TABS.filter(t => !PRIMARY.includes(t[0])).map(([id, label]) => h("button", { type: "button", class: "more-item" + (S.tab === id ? " cur" : ""), onclick: () => { close(); go(id); } }, icon(id), h("span", null, label))),
       h("button", { type: "button", class: "more-item", onclick: () => { close(); openSettings(); } }, h("span", { "aria-hidden": "true", style: "display:inline-grid", html: $("#open-settings svg").outerHTML }), h("span", null, "Settings"))));
@@ -771,7 +796,7 @@ function render() {
   renderTabs();
   const v = $("#view"); v.textContent = "";
   const wrap = h("section", { class: "view stack" });
-  ({ today: viewToday, plan: viewPlan, bible: viewBible, memory: viewMemory, saved: viewSaved, notes: viewNotes, sermons: viewSermons, study: viewStudy, prayer: viewPrayer, library: viewLibrary, join: viewJoin })[S.tab](wrap);
+  ({ today: viewToday, plan: viewPlan, bible: viewBible, memory: viewMemory, saved: viewSaved, notes: viewNotes, sermons: viewSermons, study: viewStudy, prayer: viewPrayer, library: viewLibrary, join: viewJoin, review: viewReview, reviews: viewAppReviews })[S.tab](wrap);
   v.append(wrap);
   renderSelbar();
   if (S.tab !== "today") hideDevoBar();
@@ -848,6 +873,12 @@ function viewToday(root) {
     h("div", { class: "devo-aside-label" }, "Edition"),
     ...[["m", "Morning"], ["e", "Evening"]].map(([k, l]) => h("button", { type: "button", "aria-pressed": ed === k ? "true" : "false", onclick: () => setEd(k) }, l)));
 
+  if (new Date().getDay() === 0 && !S.devo.date) {
+    const w = reviewStats("week");
+    root.append(h("button", { type: "button", class: "week-card", onclick: () => { S.reviewRange = "week"; go("review"); } },
+      h("span", { class: "eyebrow" }, "Your week with Jesus"),
+      h("span", null, `${w.chapters} chapters · ${w.journals} journals · ${w.highlights} highlights · ${w.answered} answered prayers`), icon("right")));
+  }
   const paras = text.split(/\n+/).map(s => s.trim()).filter(Boolean);
   const body = h("div", { class: "devo-main" },
     h("p", { class: "devo-key" }, h("span", null, verse.replace(/[.,;:]?$/, "") + " "), "— ",
@@ -1848,6 +1879,9 @@ function openSettings() {
   const sheet = h("div", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": "Settings" },
     h("div", { class: "spread" }, h("h2", { class: "title", style: "font-size:24px;margin:0" }, "Settings"), h("button", { class: "icon-btn", type: "button", "aria-label": "Close settings", onclick: close }, icon("x"))),
     accountSection(),
+    h("div", { class: "row", style: "gap:8px" },
+      h("button", { class: "btn", type: "button", onclick: () => { layer.textContent = ""; openRateApp(); } }, icon("star"), "Rate & review the app"),
+      SH.reviewAdmin ? h("button", { class: "btn soft", type: "button", onclick: () => { layer.textContent = ""; location.hash = "#reviews"; } }, "App reviews (only you)") : null),
 
     h("div", { class: "stack", style: "gap:8px" }, h("h3", { class: "sub" }, "Bible reading plan (3 years)"),
       h("label", { class: "lbl" }, "Start date", h("input", { class: "field", type: "date", id: "set-start", value: S.settings.start, onchange: async (e) => { if (!e.target.value) return; S.settings.start = e.target.value; S.viewDay = null; await saveKV("settings"); toast(`You’re on Day ${currentDay()}`); } })),
@@ -2226,7 +2260,7 @@ let fbAuth = null, fdb = null, fbLoading = null;
 const SH = { user: null, spaces: null, unsubSpaces: null, sub: {}, data: {}, error: "", folder: null };
 const meEmail = () => ((SH.user && SH.user.email) || "").toLowerCase();
 const meName = () => Sync.name || (SH.user && SH.user.displayName) || meEmail();
-const shRefresh = () => { if (S.tab === "prayer" || S.tab === "study" || S.tab === "library" || S.tab === "join") safeRerender(); };
+const shRefresh = () => { if (["prayer", "study", "library", "join", "review", "reviews"].includes(S.tab)) safeRerender(); };
 function loadScriptOnce(src) {
   if (document.querySelector(`script[data-src="${src}"]`)) return Promise.resolve();
   return new Promise((res, rej) => { const el = document.createElement("script"); el.src = src; el.dataset.src = src; el.onload = res; el.onerror = () => rej(new Error("load " + src)); document.head.append(el); });
@@ -2243,7 +2277,7 @@ function fbInit() {
     try { await fdb.enablePersistence({ synchronizeTabs: true }); } catch {}
     fbAuth.onAuthStateChanged(u => {
       if (u && Sync.email && (u.email || "").toLowerCase() !== Sync.email.toLowerCase()) { fbAuth.signOut(); return; }
-      SH.user = u; listenSpaces(); shRefresh();
+      SH.user = u; listenSpaces(); shRefresh(); if (u) setTimeout(checkReviewAdmin, 1500);
     });
   })().catch(e => { fbLoading = null; SH.error = "Shared groups couldn’t load. Check your connection."; shRefresh(); throw e; });
   return fbLoading;
@@ -3126,6 +3160,166 @@ document.addEventListener("selectionchange", () => {
     else if (Date.now() - devoBarHold > 600) { devoSel = null; hideDevoBar(); }
   }, 250);
 });
+
+
+/* ================= MY REVIEW ================= */
+function reviewRange(kind) {
+  const now = new Date(), end = Date.now();
+  if (kind === "week") { const s = new Date(now); s.setHours(0, 0, 0, 0); s.setDate(s.getDate() - 6); return { from: +s, to: end, label: `${fmtDate(ymd(s), { month: "short", day: "numeric" })} – ${fmtDate(ymd(now), { month: "short", day: "numeric" })}`, key: "week-" + ymd(s) }; }
+  if (kind === "month") { const s = new Date(now.getFullYear(), now.getMonth(), 1); return { from: +s, to: end, label: now.toLocaleDateString(undefined, { month: "long", year: "numeric" }), key: "month-" + ymd(s).slice(0, 7) }; }
+  if (kind === "year") { const s = new Date(now.getFullYear(), 0, 1); return { from: +s, to: end, label: String(now.getFullYear()), key: "year-" + now.getFullYear() }; }
+  return { from: 0, to: end, label: "Since " + fmtDate(S.settings.start, { month: "long", day: "numeric", year: "numeric" }), key: "all" };
+}
+function myAnsweredPrayers() {
+  const out = [];
+  S.prayers.filter(p => p.status === "answered").forEach(p => out.push({ text: (p.items || p.text || "").split("\n")[0], date: p.answeredDate || ymd(new Date(p.updated || p.created)), where: "My personal prayer" }));
+  (SH.spaces || []).filter(sp => sp.type === "prayer").forEach(sp => (subData(sp.id, "items") || []).forEach(it => {
+    if (it.status === "answered" && it.authorUid === (SH.user && SH.user.uid)) out.push({ text: it.text.split("\n")[0], date: it.answeredDate || ymd(new Date(it.updated)), where: sp.name });
+  }));
+  return out;
+}
+function bestStreak(fromDay, toDay) { let best = 0, run = 0; for (let d = fromDay; d <= toDay; d++) { if (dayDone(d)) { run++; best = Math.max(best, run); } else run = 0; } return best; }
+function reviewStats(kind) {
+  const R = reviewRange(kind), inR = (t) => t >= R.from && t <= R.to;
+  const chapters = [];
+  Object.entries(S.progress).forEach(([d, keys]) => { const t = PROGT[d] || +parseYmd(dateForDay(+d)); if (inR(t)) keys.forEach(k => { const [b, c] = k.split(".").map(Number); chapters.push({ b, c }); }); });
+  chapters.sort((a, b) => a.b - b.b || a.c - b.c);
+  const journals = S.notes.filter(n => n.kind === "journal" && !n.draft && inR(n.updated || n.created));
+  const hl = Object.entries(S.hlt).filter(([, x]) => x.c && inR(x.t)), dh = Object.entries(S.dhl).filter(([, x]) => x.c && inR(x.t));
+  const mem = Object.entries(S.mem).filter(([, x]) => x.m && inR(x.t)).map(([k]) => k);
+  const answered = myAnsweredPrayers().filter(a => inR(+parseYmd(a.date)));
+  const notes = S.notes.filter(n => n.kind !== "journal" && !n.draft && !String(n.id).startsWith("review-") && inR(n.created));
+  const sermons = S.sermons.filter(x => !x.draft && inR(x.created));
+  const cur = currentDay();
+  const streakN = kind === "week" || kind === "month" ? streak() : bestStreak(1, cur);
+  return { R, chapterList: chapters, chapters: chapters.length, journals: journals.length, hl, dh, highlights: hl.length + dh.length, mem,
+    answered: answered.length, notes, sermons, streakN, streakLabel: kind === "week" || kind === "month" ? "day streak" : "best streak" };
+}
+function viewReview(root) {
+  const kind = S.reviewRange || "week";
+  if (FB_ON && SH.user && SH.spaces) SH.spaces.filter(sp => sp.type === "prayer").forEach(sp => subData(sp.id, "items"));
+  const R = reviewRange(kind), inR = (t) => t >= R.from && t <= R.to;
+  const st = reviewStats(kind), chapters = st.chapterList;
+  root.append(h("div", null, h("div", { class: "eyebrow" }, "Look back with thanks"), h("h2", { class: "title" }, "My review")));
+  root.append(h("div", { class: "seg seg-wide", role: "group", "aria-label": "Period" }, ...[["week", "This week"], ["month", "Month"], ["year", "Year"], ["all", "All time"]].map(([k, l]) =>
+    h("button", { type: "button", "aria-pressed": kind === k ? "true" : "false", onclick: () => { S.reviewRange = k; render(); } }, l))));
+  root.append(h("div", { class: "muted small" }, R.label));
+  const stat = (n, l) => h("div", { class: "rstat" }, h("b", null, String(n)), h("span", { class: "muted small" }, l));
+  root.append(h("div", { class: "rstats" },
+    stat(chapters.length, chapters.length === 1 ? "chapter read" : "chapters read"), stat(st.streakN, st.streakLabel), stat(st.journals, st.journals === 1 ? "S.O.A.P. journal" : "S.O.A.P. journals"), stat(st.highlights, st.highlights === 1 ? "highlight" : "highlights"),
+    stat(st.mem.length, st.mem.length === 1 ? "verse memorized" : "verses memorized"), stat(st.answered, st.answered === 1 ? "prayer answered" : "prayers answered"), stat(st.notes.length, st.notes.length === 1 ? "note written" : "notes written"), stat(st.sermons.length, st.sermons.length === 1 ? "sermon idea" : "sermon ideas")));
+  // reading
+  const runs = []; chapters.forEach(r => { const last = runs[runs.length - 1]; if (last && last.b === r.b && last.to === r.c - 1) last.to = r.c; else runs.push({ b: r.b, from: r.c, to: r.c }); });
+  root.append(collapseSec("rv-read", true, "Reading", chapters.length ? `${chapters.length} chapter${chapters.length > 1 ? "s" : ""}` : "Nothing marked read yet", null, () => h("div", { class: "stack", style: "gap:6px" },
+    chapters.length ? h("p", { style: "margin:0" }, runs.map(x => `${BOOKS[x.b] === "Psalms" ? "Psalm" : BOOKS[x.b]} ${x.from}${x.to > x.from ? "–" + x.to : ""}`).join(" · ")) : h("span", { class: "muted small" }, "Tick chapters in the Plan tab as you read them."))));
+  // answered prayers
+  root.append(collapseSec("rv-pray", st.answered > 0, "Answered prayers", `${st.answered}`, null, () => h("div", { class: "stack", style: "gap:6px" },
+    st.answered ? st.answered && myAnsweredPrayers().filter(a => inR(+parseYmd(a.date))).sort((a, b) => b.date.localeCompare(a.date)).map(a => h("div", { class: "crow", style: "padding:10px 12px" }, h("b", null, a.text), h("div", { class: "muted small" }, `Answered ${fmtDate(a.date, { month: "short", day: "numeric", year: "numeric" })} · ${a.where}`)))
+      : h("span", { class: "muted small" }, "Mark prayers as answered in Prayer meetings to see God’s faithfulness here."))));
+  // highlights
+  root.append(collapseSec("rv-hl", false, "Highlights", `${st.highlights}`, null, () => {
+    const box = h("div", { class: "stack", style: "gap:6px" });
+    if (!st.highlights) { box.append(h("span", { class: "muted small" }, "Highlight verses in the Bible or words in Today.")); return box; }
+    if (st.hl.length && !BIBLE) { box.append(h("span", { class: "muted small" }, "Loading…")); loadBible().then(() => { if (S.tab === "review") rerenderKeepScroll(); }).catch(() => {}); }
+    st.hl.slice(0, 40).forEach(([k, x]) => { const [b, c, v] = k.split(".").map(Number); const t = BIBLE ? ((BIBLE.text[b][c - 1] || [])[v - 1] || "") : "";
+      box.append(h("p", { class: "rv-hl c-" + x.c }, t ? `“${t}” — ` : "", h("b", null, `${BOOKS[b]} ${c}:${v}`))); });
+    st.dh.slice(0, 40).forEach(([, x]) => { const [md, ed] = x.k.split("|"); const e = DEVOS && DEVOS[md]; if (!e) return;
+      const para = e[ed][2].split(/\n+/).map(t => t.trim()).filter(Boolean)[x.p] || "";
+      box.append(h("p", { class: "rv-hl c-" + x.c }, `“${para.slice(x.s, x.e)}” — `, h("b", null, `Today, ${fmtDate(new Date().getFullYear() + "-" + md, { month: "short", day: "numeric" })} ${ed === "m" ? "Morning" : "Evening"}`))); });
+    if (st.dh.length && !DEVOS) loadDevos().then(() => { if (S.tab === "review") rerenderKeepScroll(); }).catch(() => {});
+    box.append(h("button", { class: "btn sm ghost", type: "button", style: "justify-self:start", onclick: () => { S.savedFilter = "hl"; go("saved"); } }, "All highlights"));
+    return box;
+  }));
+  // memorized
+  root.append(collapseSec("rv-mem", false, "Verses memorized", `${st.mem.length}`, null, () => {
+    if (!MEMORY) return h("span", { class: "muted small" }, "Open the Memory tab once to load your verses.");
+    const all = collections().flatMap(c => memFlat(c.id)); const byKey = new Map(all.map(v => [v.key, v]));
+    const names = st.mem.map(k => byKey.get(k)).filter(Boolean);
+    return names.length ? h("p", { style: "margin:0" }, names.map(v => `${v.coll === "lamp2" ? v.sec + v.n : v.coll === "tms" ? "TMS " + v.sec + v.n : "Witnessing " + v.n} ${v.ref}`).join(" · ")) : h("span", { class: "muted small" }, "Mark verses as memorized in the Memory tab.");
+  }));
+  // reflection
+  const id = "review-" + R.key, existing = S.notes.find(n => n.id === id);
+  const status = h("span", { class: "saved-note" }, existing ? "Saved " + fmtTs(existing.updated) : "");
+  let timer;
+  const ta = h("textarea", { class: "field", id: "rv-reflect", rows: "4", placeholder: "A few lines about this time. Saved with your notes.", oninput: () => {
+    status.textContent = "Saving…"; clearTimeout(timer);
+    timer = setTimeout(async () => {
+      const prev = S.notes.find(n => n.id === id);
+      const note = { ...(prev || { id, kind: "note", created: Date.now(), attachments: [] }), title: `Review · ${R.label}`, ref: "", body: ta.value, updated: Date.now() };
+      await DB.put("notes", note); const i = S.notes.findIndex(n => n.id === id); i >= 0 ? S.notes[i] = note : S.notes.push(note); status.textContent = "Saved";
+    }, 700);
+  } }, existing ? existing.body : "");
+  root.append(h("section", { class: "panel stack", style: "gap:8px" }, h("h3", { class: "sub" }, "What has God been teaching me?"), ta, status));
+  root.append(h("p", { class: "muted small", style: "margin:0" }, "Counted from what you already do in the app. Only you can see it, and it syncs across your devices."));
+}
+
+/* ================= RATE & REVIEW THE APP ================= */
+const reviewRef = (id) => fdb.collection("reviews").doc(id);
+function openRateApp() {
+  const layer = $("#layer"); const close = () => { layer.textContent = ""; };
+  const sheet = h("div", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": "Rate and review the app" },
+    h("div", { class: "spread" }, h("h2", { class: "title", style: "font-size:22px;margin:0" }, "Rate & review"), h("button", { class: "icon-btn", type: "button", "aria-label": "Close", onclick: close }, icon("x"))));
+  layer.textContent = "";
+  layer.append(h("div", { class: "overlay", onclick: (e) => { if (e.target === e.currentTarget) close(); } }, sheet));
+  const body = h("div", { class: "stack rate-body", style: "gap:12px" }); sheet.append(body);
+  if (!FB_ON || !SYNC_ON) { body.append(h("p", { class: "muted" }, "Reviews aren’t set up in this copy of the app.")); return; }
+  if (!Sync.email) { body.append(h("p", null, "Sign in with Google so each person sends one review."), h("button", { class: "btn primary gbtn", type: "button", onclick: () => signIn() }, googleG(), "Sign in with Google")); return; }
+  if (!SH.user || !fdb) { body.append(h("p", { class: "muted" }, "Connecting…")); (Sync.token ? fbSignIn(Sync.token) : fbInit()).then(() => { if (layer.contains(sheet)) openRateApp(); }).catch(() => {}); return; }
+  const L = ["", "Not helpful", "Needs work", "It’s okay", "Helpful", "A blessing!"];
+  let stars = 0;
+  const starRow = h("div", { class: "stars", role: "radiogroup", "aria-label": "Rating" });
+  const label = h("div", { class: "muted small" }, "Tap a star");
+  const paint = () => { [...starRow.children].forEach((b, i) => { b.classList.toggle("on", i < stars); b.setAttribute("aria-checked", i + 1 === stars ? "true" : "false"); }); label.textContent = L[stars] || "Tap a star"; };
+  for (let i = 1; i <= 5; i++) starRow.append(h("button", { type: "button", role: "radio", "aria-label": i + (i > 1 ? " stars" : " star"), onclick: () => { stars = i; paint(); } }, "★"));
+  const text = h("textarea", { class: "field", id: "rate-text", rows: "4", maxlength: "2000", placeholder: "What do you like? What should be better? Any feature you wish it had?" });
+  const showName = h("input", { type: "checkbox", id: "rate-name", checked: true });
+  const msg = h("div", { class: "small", "aria-live": "polite" });
+  body.append(h("b", { class: "rate-q" }, "How is A Day With Jesus helping you?"), starRow, label, text,
+    h("label", { class: "row", style: "gap:8px;font-size:14px" }, showName, "Show my name to the app owner"),
+    h("div", null, h("button", { class: "btn primary", type: "button", onclick: async () => {
+      if (!stars) { msg.textContent = "Choose 1 to 5 stars first."; return; }
+      const data = { uid: SH.user.uid, stars, text: text.value.trim().slice(0, 2000), showName: showName.checked, name: showName.checked ? meName() : "", updated: Date.now() };
+      try {
+        await reviewRef(SH.user.uid).set({ ...data, created: S.myReviewCreated || Date.now() });
+        body.textContent = ""; body.append(h("span", { class: "chip ok", style: "justify-self:center" }, "Thank you!"), h("p", { style: "margin:0;text-align:center" }, "Your review was sent to the app owner. You can change it anytime — your latest review replaces the old one."));
+      } catch (e) { msg.textContent = "Couldn’t send it. Check your connection and try again."; }
+    } }, "Send review")), msg,
+    h("p", { class: "muted small", style: "margin:0" }, "Only the app owner can read reviews."));
+  paint();
+  reviewRef(SH.user.uid).get().then(d => { if (d.exists) { const x = d.data(); stars = x.stars || 0; text.value = x.text || ""; showName.checked = x.showName !== false; S.myReviewCreated = x.created; paint(); } }).catch(() => {});
+}
+function checkReviewAdmin() {
+  if (!fdb || !SH.user || SH.reviewAdminChecked) return;
+  SH.reviewAdminChecked = true;
+  const un = fdb.collection("reviews").onSnapshot(snap => { SH.reviewAdmin = true; SH.reviews = snap.docs.map(d => ({ id: d.id, ...d.data() })); if (S.tab === "reviews") safeRerender(); },
+    () => { SH.reviewAdmin = false; try { un && un(); } catch {} });
+}
+function viewAppReviews(root) {
+  root.append(h("div", null, h("div", { class: "eyebrow" }, "Only you can see this"), h("h2", { class: "title" }, "App reviews")));
+  if (!SH.user) { root.append(h("div", { class: "loading" }, "Connecting…")); if (Sync.token) fbSignIn(Sync.token); return; }
+  checkReviewAdmin();
+  if (!SH.reviewAdmin) { root.append(h("div", { class: "empty" }, h("b", null, SH.reviewAdminChecked ? "This page is for the app owner" : "Loading…"), h("span", null, "Reviews can only be read by the account named in the Firebase rules."))); return; }
+  const all = (SH.reviews || []).slice().sort((a, b) => (b.updated || 0) - (a.updated || 0));
+  const n = all.length, avg = n ? all.reduce((a, r) => a + (r.stars || 0), 0) / n : 0;
+  const counts = [5, 4, 3, 2, 1].map(k => all.filter(r => r.stars === k).length);
+  root.append(h("section", { class: "panel rv-sum" },
+    h("div", { class: "rv-avg" }, h("b", null, n ? avg.toFixed(1) : "–"), h("div", { class: "rv-stars" }, "★★★★★".slice(0, Math.round(avg)) + "☆☆☆☆☆".slice(0, 5 - Math.round(avg))), h("span", { class: "muted small" }, `${n} review${n === 1 ? "" : "s"}`)),
+    h("div", { class: "rv-bars" }, ...counts.map((c, i) => h("div", { class: "rv-bar" }, h("span", null, String(5 - i)), h("span", { class: "progress" }, h("i", { style: `width:${n ? c / n * 100 : 0}%` })), h("span", { class: "muted" }, String(c)))))));
+  const f = S.reviewFilter || "all";
+  root.append(h("div", { class: "seg seg-wide", role: "group", "aria-label": "Filter reviews" }, ...[["all", "All"], ["text", "With comments"], ["low", "3★ and below"]].map(([k, l]) =>
+    h("button", { type: "button", "aria-pressed": f === k ? "true" : "false", onclick: () => { S.reviewFilter = k; render(); } }, l))));
+  const list = all.filter(r => f === "all" || (f === "text" ? (r.text || "").trim() : r.stars <= 3));
+  if (!list.length) root.append(h("div", { class: "empty" }, h("b", null, n ? "Nothing matches" : "No reviews yet"), h("span", null, "Members can send one from More → Rate & review the app.")));
+  list.forEach(r => root.append(h("article", { class: "panel stack", style: "gap:6px" },
+    h("div", { class: "spread" }, h("b", null, r.showName && r.name ? r.name : "Anonymous"), h("span", { class: "muted small" }, fmtTs(r.updated || r.created))),
+    h("div", { class: "rv-stars" }, "★".repeat(r.stars || 0) + "☆".repeat(5 - (r.stars || 0))),
+    h("p", { style: "margin:0;white-space:pre-wrap" }, (r.text || "").trim() || h("span", { class: "muted" }, "(no comment)")))));
+  if (n) root.append(h("div", null, h("button", { class: "btn sm", type: "button", onclick: () => {
+    const q = (v) => `"${String(v == null ? "" : v).replace(/"/g, '""')}"`;
+    const csv = ["Name,Stars,Comment,Date", ...all.map(r => [r.showName && r.name ? r.name : "Anonymous", r.stars, r.text || "", new Date(r.updated || r.created).toISOString().slice(0, 10)].map(q).join(","))].join("\n");
+    const a = h("a", { href: URL.createObjectURL(new Blob(["﻿" + csv], { type: "text/csv" })), download: "app-reviews.csv" }); document.body.append(a); a.click(); a.remove();
+  } }, "Download as spreadsheet (CSV)")));
+}
 
 /* ================= START ================= */
 async function start() {
