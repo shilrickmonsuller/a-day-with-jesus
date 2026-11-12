@@ -1648,7 +1648,8 @@ function openSettings() {
 
     h("div", { class: "stack", style: "gap:6px" }, h("h3", { class: "sub" }, "About"),
       h("p", { class: "muted small", style: "margin:0" }, "Daily devotional: C. H. Spurgeon, Morning and Evening (1866, public domain). Bibles stored on your device: King James Version, Berean Standard Bible and American Standard Version (all public domain). NIV buttons open BibleGateway; RCPV buttons open the Maayong Balita Biblia (Revised Cebuano Popular Version) on YouVersion; both need internet. Memory verses: your Lamp 2 plan (NIV 1984), Witnessing verses and the Navigators’ Topical Memory System (in your chosen Bible version)."),
-      h("p", { class: "muted small", style: "margin:0" }, NIV_NOTICE))
+      h("p", { class: "muted small", style: "margin:0" }, NIV_NOTICE),
+      h("p", { class: "small", style: "margin:0" }, h("a", { href: "privacy.html", target: "_blank", rel: "noopener" }, "Privacy policy")))
   );
   layer.textContent = "";
   layer.append(h("div", { class: "overlay", onclick: (e) => { if (e.target === e.currentTarget) close(); } }, sheet));
