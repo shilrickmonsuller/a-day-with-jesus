@@ -516,6 +516,24 @@ textarea.field { resize: none; overflow-y: hidden; min-height: calc(3 * 1.65em +
 .plan-item-acts { display: flex; gap: 6px; }
 .journal-chip { justify-self: start; cursor: pointer; border: 0; background: var(--indigo-soft); color: var(--indigo); margin-top: 2px; }
 @media (max-width: 420px) { .plan-item { grid-template-columns: auto minmax(0, 1fr); } .plan-item-acts { grid-column: 2; } }
+.pace-pct { font-size: 13px; color: var(--accent); }
+.ptiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 4px; }
+@media (min-width: 700px) { .ptiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.ptile { background: var(--paper); border-radius: 12px; padding: 11px 12px; display: grid; gap: 2px; min-width: 0; }
+.ptile b { font-family: var(--read); font-size: 25px; line-height: 1.1; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ptile b small { font-size: 14px; color: var(--muted); font-weight: 600; }
+.ptile span { font-size: 11.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.ptile { align-content: start; }
+
+/* ---- install guide ---- */
+.install-guide { background: var(--paper); border: 1px solid var(--line); border-radius: 16px; padding: 16px; display: grid; gap: 10px; }
+.install-guide.center { justify-items: center; text-align: center; }
+.ig-title { font-family: var(--read); font-size: 20px; }
+.ig-step { display: grid; grid-template-columns: 30px 1fr; gap: 10px; align-items: center; background: var(--bg); border-radius: 12px; padding: 10px 12px; line-height: 1.5; }
+.ig-num { width: 28px; height: 28px; border-radius: 50%; background: var(--ink); color: var(--paper); display: grid; place-items: center; font-weight: 800; font-size: 13px; }
+.ig-ico { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 8px; background: var(--indigo-soft); color: var(--indigo); vertical-align: middle; }
+.ig-ico svg { width: 17px; height: 17px; }
+.ig-dots { letter-spacing: 1px; }
 
 </style>
 <header class="topbar gutter">
@@ -821,6 +839,7 @@ function openMore() {
   const sheet = h("div", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": "More sections" },
     h("div", { class: "spread" }, h("h2", { class: "title", style: "font-size:22px;margin:0" }, "More"), h("button", { class: "icon-btn", type: "button", "aria-label": "Close", onclick: close }, icon("x"))),
     shareAppCard(),
+    !isStandalone() ? h("button", { type: "button", class: "btn primary rate-btn", onclick: () => { close(); openInstallGuide(); } }, "Install the app on this phone") : null,
     h("div", { class: "row", style: "gap:8px;flex-wrap:nowrap" },
       h("button", { type: "button", class: "btn rate-btn", onclick: () => { close(); openRateApp(); } }, icon("star"), "Rate & review"),
       h("button", { type: "button", class: "btn rate-btn", onclick: () => { close(); location.hash = "#member-reviews"; } }, "Member reviews")),
@@ -875,13 +894,7 @@ function heroArt() {
   </svg>` });
 }
 function viewToday(root) {
-  if (!isStandalone() && !localStorage_get("installHidden") && (installEvt || isIOS)) {
-    root.append(h("div", { class: "banner" },
-      h("span", null, installEvt ? "Install A Day With Jesus on this device to use it offline." : "To install on iPhone: tap Share, then Add to Home Screen."),
-      h("div", { class: "row" },
-        installEvt ? h("button", { class: "btn sm primary", type: "button", onclick: doInstall }, "Install") : null,
-        h("button", { class: "btn sm ghost", type: "button", onclick: () => { localStorage_set("installHidden", "1"); render(); } }, "Hide"))));
-  }
+  if (!isStandalone() && !localStorage_get("installHidden") && installPlatform() !== "desktop") root.append(installGuide(true));
   if (SYNC_ON && !Sync.email && !localStorage_get("syncHidden")) {
     root.append(h("div", { class: "banner" },
       h("span", null, "Sign in with Google to save your notes, prayers and files to your Google Drive and use them on any device."),
@@ -959,7 +972,7 @@ function loadStories() {
   }).catch(e => { storiesLoading = null; throw e; });
   return storiesLoading;
 }
-const planUnit = () => (S.settings.planUnit === "chapter" ? "chapter" : "story");
+const planUnit = () => "story";
 function storyRef(x) { const bk = BOOKS[x.b] === "Psalms" ? "Psalm" : BOOKS[x.b]; return `${bk} ${x.c}:${x.v}` + (x.ec !== x.c ? `–${x.ec}:${x.ev}` : x.ev !== x.v ? `–${x.ev}` : ""); }
 const storiesInChapter = (b, c) => (STORY_BY_BOOK ? STORY_BY_BOOK[b].filter(x => x.c <= c && x.ec >= c) : []);
 function storyChaptersRead(x) { for (let c = x.c; c <= x.ec; c++) if (!chapRead(x.b, c)) return false; return true; }
@@ -1001,6 +1014,12 @@ function fmtSpan(days) {
   const ys = y ? `${y} year${y > 1 ? "s" : ""}` : "", ms = m ? `${m} month${m > 1 ? "s" : ""}` : "";
   return [ys, ms].filter(Boolean).join(" ") || "1 month";
 }
+function fmtSpanShort(days) {
+  if (days < 14) return `${Math.max(1, Math.round(days))}d`;
+  if (days < 60) return `${Math.round(days / 7)}w`;
+  const y = Math.floor(days / 365), m = Math.round((days - y * 365) / 30.4);
+  return [y ? `${y}y` : "", m ? `${m}m` : ""].filter(Boolean).join(" ") || "1m";
+}
 function paceInfo(unit) {
   unit = unit || planUnit();
   const total = unit === "chapter" ? 1189 : (STORIES ? STORIES.length : 3015);
@@ -1017,7 +1036,7 @@ function paceInfo(unit) {
   if (!rate) return { ...res, headline: `Tick a ${name} to see your finish date again.`, detail: `No reading in the last 30 days.` };
   const daysLeft = (total - done) / rate, finish = new Date(now + daysLeft * 864e5);
   const per = rate >= 1 ? `about ${rate.toFixed(1).replace(/\.0$/, "")} ${rate >= 1.05 ? names : name} a day` : `about ${Math.round(rate * 7)} ${Math.round(rate * 7) === 1 ? name : names} a week`;
-  return { ...res, rate, daysLeft, span: fmtSpan(daysLeft), headline: `At your pace, you’ll finish the Bible in about ${fmtSpan(daysLeft)}.`,
+  return { ...res, rate, daysLeft, finish, span: fmtSpan(daysLeft), headline: `At your pace, you’ll finish the Bible in about ${fmtSpan(daysLeft)}.`,
     detail: `You read ${per} · around ${finish.toLocaleDateString(undefined, { month: "long", year: "numeric" })}` };
 }
 function nextStory() {
@@ -1058,33 +1077,29 @@ function viewPlan(root) {
     loadStories().then(() => { if (S.tab === "plan") render(); }).catch(() => { box.textContent = "The story list couldn’t load. Connect to the internet once, then try again."; });
     return;
   }
-  const unit = planUnit();
-  root.append(h("div", { class: "seg", role: "group", "aria-label": "Tick by", style: "max-width:260px" }, ...[["story", "Stories"], ["chapter", "Chapters"]].map(([k, l]) =>
-    h("button", { type: "button", "aria-pressed": unit === k ? "true" : "false", onclick: () => { S.settings.planUnit = k; saveKV("settings"); render(); } }, l))));
+  const unit = "story";
   const p = paceInfo(unit);
-  root.append(h("section", { class: "pace-card" }, h("div", { class: "eyebrow" }, "Your pace"), h("b", { class: "pace-head" }, p.headline), h("span", { class: "muted small" }, p.detail),
-    h("div", { class: "progress pace-bar" }, h("i", { style: `width:${p.pct.toFixed(1)}%` })),
-    h("span", { class: "muted small" }, `${p.done.toLocaleString()} of ${unit === "story" ? "about " : ""}${p.total.toLocaleString()} ${p.names} read (${Math.floor(p.pct)}%)`)));
-  // continue reading
-  if (unit === "story") {
-    const x = nextStory();
-    if (x) root.append(h("section", { class: "panel stack", style: "gap:8px" }, h("div", { class: "eyebrow", style: "margin:0" }, "Continue reading"),
-      h("div", null, h("b", { class: "next-title" }, x.t), h("div", { class: "muted small" }, storyRef(x))),
-      h("div", { class: "row", style: "gap:6px" },
-        h("button", { class: "btn sm soft", type: "button", onclick: () => readStory(x) }, "Read it"),
-        h("button", { class: "btn sm primary", type: "button", onclick: () => { setStoryRead(x, true); rerenderKeepScroll(); afterTickToast(x.t); } }, icon("check"), "Mark as read"),
-        h("button", { class: "btn sm", type: "button", onclick: () => writeJournal("story", x) }, "✎ Write in Journal"))));
-  } else {
-    const r = nextChapter();
-    if (r) root.append(h("section", { class: "panel stack", style: "gap:8px" }, h("div", { class: "eyebrow", style: "margin:0" }, "Continue reading"),
-      h("b", { class: "next-title" }, `${BOOKS[r.b]} ${r.c}`),
-      h("div", { class: "row", style: "gap:6px" },
-        h("button", { class: "btn sm soft", type: "button", onclick: () => openChapter(r.b, r.c, { back: true }) }, "Read it"),
-        h("button", { class: "btn sm primary", type: "button", onclick: () => { setChapterReadAll(r.b, r.c, true); rerenderKeepScroll(); afterTickToast(`${BOOKS[r.b]} ${r.c}`); } }, icon("check"), "Mark as read"),
-        h("button", { class: "btn sm", type: "button", onclick: () => writeJournal("chapter", r) }, "✎ Write in Journal"))));
-  }
   const month = ymd(new Date()).slice(0, 7), daysThisMonth = [...readDays()].filter(d => d.startsWith(month)).length;
-  root.append(h("div", { class: "stats" }, h("span", null, h("b", null, readStreak()), " day streak"), h("span", null, h("b", null, daysThisMonth), " days read this month")));
+  const tile = (big, label, small) => h("div", { class: "ptile" }, h("b", null, big, small ? h("small", null, small) : null), h("span", null, label));
+  const rateTxt = p.rate ? (p.rate >= 10 ? Math.round(p.rate) : p.rate.toFixed(1).replace(/\.0$/, "")) : "—";
+  root.append(h("section", { class: "pace-card" },
+    h("div", { class: "spread" }, h("span", { class: "eyebrow", style: "margin:0" }, "Your pace"), h("b", { class: "pace-pct" }, `${Math.floor(p.pct)}%`)),
+    h("div", { class: "progress pace-bar" }, h("i", { style: `width:${Math.max(p.pct, p.done ? 0.8 : 0).toFixed(1)}%` })),
+    h("div", { class: "ptiles" },
+      tile(p.done.toLocaleString(), "stories read", ` / ${p.total.toLocaleString()}`),
+      tile(rateTxt, "stories a day"),
+      tile(p.finished ? "Done" : p.daysLeft ? fmtSpanShort(p.daysLeft) : "—", "to finish"),
+      tile(p.finished ? "🎉" : p.finish ? p.finish.toLocaleDateString(undefined, { month: "short", year: "numeric" }) : "—", "finish date"),
+      tile(String(readStreak()), "day streak"),
+      tile(String(daysThisMonth), "days this month")),
+    !p.daysLeft && !p.finished ? h("span", { class: "muted small" }, p.done ? "Finish date shows after your first week of reading." : "Tick stories as you read — no schedule, go at your own pace.") : null));
+  const x = nextStory();
+  if (x) root.append(h("section", { class: "panel stack", style: "gap:8px" }, h("div", { class: "eyebrow", style: "margin:0" }, "Continue reading"),
+    h("div", null, h("b", { class: "next-title" }, x.t), h("div", { class: "muted small" }, storyRef(x))),
+    h("div", { class: "row", style: "gap:6px" },
+      h("button", { class: "btn sm soft", type: "button", onclick: () => readStory(x) }, "Read it"),
+      h("button", { class: "btn sm primary", type: "button", onclick: () => { setStoryRead(x, true); rerenderKeepScroll(); afterTickToast(x.t); } }, icon("check"), "Mark as read"),
+      h("button", { class: "btn sm", type: "button", onclick: () => writeJournal("story", x) }, "✎ Write in Journal"))));
   readByBook(root, unit);
 }
 /* open a book (and story or chapter) in Read by book and scroll to it */
@@ -3112,10 +3127,70 @@ function linkTools(url, title, text, showLink = true) {
       h("button", { class: "btn sm soft", type: "button", onclick: () => shareLink(url, title, text) }, "Share…"), qrBtn),
     qrSlot);
 }
+/* ---- install guide: shows only the steps for where the app was opened ---- */
+const UA = navigator.userAgent || "";
+const isAndroid = /android/i.test(UA);
+const inAppBrowser = /FBAN|FBAV|FB_IAB|FBIOS|Messenger|Instagram|Line\/|MicroMessenger|Viber|Twitter|TikTok|musical_ly|Snapchat|GSA\//i.test(UA);
+function installPlatform() {
+  if (isStandalone()) return "installed";
+  if (inAppBrowser) return "inapp";
+  if (isIOS) return "ios";
+  if (isAndroid || installEvt) return "android";
+  return "desktop";
+}
+const SHARE_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v13"/></svg>';
+const ADD_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M12 8v8M8 12h8"/></svg>';
+function installGuide(hideable) {
+  const pf = installPlatform();
+  const ico = (svg) => h("span", { class: "ig-ico", "aria-hidden": "true", html: svg });
+  const step = (n, ...kids) => h("div", { class: "ig-step" }, h("span", { class: "ig-num" }, String(n)), h("span", null, ...kids));
+  const box = h("section", { class: "install-guide" });
+  const add = (...kids) => box.append(...kids.filter(k => k != null && k !== false));
+  const hide = hideable ? h("button", { class: "btn sm ghost", type: "button", onclick: () => { localStorage_set("installHidden", "1"); render(); } }, "Hide") : null;
+  if (pf === "installed") { add(h("b", { class: "ig-title" }, "The app is installed ✓"), h("span", { class: "muted small" }, "Open it from your Home Screen.")); return box; }
+  if (pf === "inapp") {
+    add(h("b", { class: "ig-title" }, `Open in ${isIOS ? "Safari" : "Chrome"} to install`),
+      h("span", { class: "muted small" }, `You opened this inside another app (like Messenger). Apps can only be installed from ${isIOS ? "Safari" : "Chrome"}.`),
+      step(1, "Tap ", h("b", { class: "ig-dots" }, "•••"), " or ", h("b", null, "⋮"), " at the top right of this screen."),
+      step(2, "Choose ", h("b", null, isIOS ? "Open in Safari" : "Open in Chrome"), " (it may say ", h("b", null, "Open in external browser"), ")."),
+      step(3, `${isIOS ? "Safari" : "Chrome"} will show you the last steps.`),
+      h("div", { class: "row", style: "gap:6px" }, h("button", { class: "btn sm", type: "button", onclick: () => copyText(APP_URL()) }, icon("copy"), `Copy link — then paste it in ${isIOS ? "Safari" : "Chrome"}`), hide));
+    return box;
+  }
+  if (pf === "ios") {
+    const safari = !/CriOS|FxiOS|EdgiOS/.test(UA);
+    add(h("b", { class: "ig-title" }, "Install on your iPhone"), h("span", { class: "muted small" }, "3 taps · works offline after"),
+      step(1, "Tap the ", h("b", null, "Share"), " button ", ico(SHARE_SVG), safari ? " in Safari’s bottom bar (or at the top on iPad)." : " at the top right of the address bar."),
+      step(2, "Scroll down and tap ", h("b", null, "Add to Home Screen"), " ", ico(ADD_SVG)),
+      step(3, "Tap ", h("b", null, "Add"), ". The cross icon appears on your Home Screen."),
+      hide ? h("div", null, hide) : null);
+    return box;
+  }
+  if (pf === "android") {
+    box.classList.add("center");
+    add(h("b", { class: "ig-title" }, "Install A Day With Jesus"), h("span", { class: "muted small" }, "Use it like a normal app, even offline."),
+      installEvt ? h("button", { class: "btn primary", type: "button", onclick: doInstall }, "Install app") : null,
+      h("span", { class: "muted small" }, installEvt ? "Or tap Chrome’s ⋮ menu → Add to Home screen." : "Tap Chrome’s ⋮ menu → Install app (or Add to Home screen)."),
+      hide);
+    return box;
+  }
+  add(h("b", { class: "ig-title" }, "Install on this computer"),
+    installEvt ? h("button", { class: "btn primary", type: "button", style: "justify-self:start", onclick: doInstall }, "Install app") : null,
+    h("span", { class: "muted small" }, "In Chrome or Edge, click the install icon at the right end of the address bar. On a phone, open the link in Safari (iPhone) or Chrome (Android)."));
+  return box;
+}
+function openInstallGuide() {
+  const layer = $("#layer"); const close = () => { layer.textContent = ""; };
+  layer.textContent = "";
+  layer.append(h("div", { class: "overlay", onclick: (e) => { if (e.target === e.currentTarget) close(); } },
+    h("div", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": "Install the app" },
+      h("div", { class: "spread" }, h("h2", { class: "title", style: "font-size:22px;margin:0" }, "Install the app"), h("button", { class: "icon-btn", type: "button", "aria-label": "Close", onclick: close }, icon("x"))),
+      installGuide(false))));
+}
 function installSteps() {
   return h("div", { class: "stack", style: "gap:6px" },
-    h("details", { class: "inst" }, h("summary", null, "Install on iPhone / iPad"), h("ol", null, h("li", null, "Open the link in ", h("b", null, "Safari"), "."), h("li", null, "Tap the ", h("b", null, "Share"), " button."), h("li", null, "Tap ", h("b", null, "Add to Home Screen"), ", then ", h("b", null, "Add"), "."))),
-    h("details", { class: "inst" }, h("summary", null, "Install on Android"), h("ol", null, h("li", null, "Open the link in ", h("b", null, "Chrome"), "."), h("li", null, "Tap ", h("b", null, "Install app"), " (or the ⋮ menu → ", h("b", null, "Add to Home screen"), ")."))));
+    h("details", { class: "inst" }, h("summary", null, "Install on iPhone / iPad"), h("ol", null, h("li", null, "Open the link in ", h("b", null, "Safari"), " (from Messenger: tap ••• → Open in Safari)."), h("li", null, "Tap the ", h("b", null, "Share"), " button."), h("li", null, "Tap ", h("b", null, "Add to Home Screen"), ", then ", h("b", null, "Add"), "."))),
+    h("details", { class: "inst" }, h("summary", null, "Install on Android"), h("ol", null, h("li", null, "Open the link in ", h("b", null, "Chrome"), " (from Messenger: tap ⋮ → Open in Chrome)."), h("li", null, "Tap ", h("b", null, "Install app"), " (or the ⋮ menu → ", h("b", null, "Add to Home screen"), ")."))));
 }
 function shareAppCard() {
   return h("section", { class: "share-app" },
@@ -3200,7 +3275,7 @@ function viewJoin(root) {
   const kinds = { prayer: "Prayer meeting", one: "One-on-one Bible study", group: "Group Bible study" };
   const card = h("section", { class: "join-card" });
   root.append(card);
-  const installCard = h("section", { class: "panel stack", style: "gap:8px" }, h("b", null, "Install A Day With Jesus"), h("span", { class: "muted small" }, "Add it to your Home Screen to use it like an app, even offline."), installSteps());
+  const installCard = h("section", { class: "panel stack", style: "gap:8px" }, h("b", null, "Install A Day With Jesus"), h("span", { class: "muted small" }, "Add it to your Home Screen to use it like an app, even offline."), installGuide(false));
   const head = (eyebrow, title, sub) => card.append(h("div", { class: "eyebrow" }, eyebrow), h("h2", { class: "title", style: "font-size:clamp(24px,5vw,30px)" }, title), sub ? h("p", { class: "muted small", style: "margin:0" }, sub) : null);
   if (!FB_ON || !SYNC_ON) { head("Invitation", "Groups aren’t set up yet", "This copy of the app can’t open group invitations."); return; }
   if (!Sync.email) {
