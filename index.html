@@ -549,6 +549,16 @@ textarea.field { resize: none; overflow-y: hidden; min-height: calc(3 * 1.65em +
 .ig-dots { letter-spacing: 1px; }
 .ig-big { justify-content: center; padding: 12px; font-size: 16px; }
 
+/* members (owner) */
+.mem-list{padding:0;overflow:hidden}
+.mem-row{display:flex;gap:12px;align-items:center;padding:12px 14px;border-top:1px solid var(--line)}
+.mem-row:first-child{border-top:0}
+.mem-mail{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mem-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:1px;background:var(--line)}
+.mem-dot.on{background:var(--ok)}.mem-dot.mid{background:var(--accent)}
+.mem-row .avatar{flex:none}
+.mem-tiles{grid-template-columns:repeat(3,minmax(0,1fr))!important}.mem-tiles .ptile span{font-size:10px}
+
 </style>
 <header class="topbar gutter">
   <div class="shell">
@@ -841,7 +851,7 @@ function openChapter(b, c, opts = {}) {
 const TABS = [["today", "Today"], ["plan", "Plan"], ["bible", "Bible"], ["memory", "Memory"], ["prayer", "Prayer"], ["study", "Bible Study"], ["notes", "Journal"], ["sermons", "Sermons"], ["library", "Library"], ["saved", "Saved"], ["review", "Review"]];
 const PRIMARY = ["today", "plan", "bible", "memory"];
 function go(tab) { if (location.hash !== "#" + tab) location.hash = "#" + tab; else render(); }
-function readHash() { let t = location.hash.slice(1); if (t === "reviews") { S.tab = "reviews"; return; } if (t === "member-reviews") { S.tab = "memberReviews"; return; } if (/^join-[A-Za-z0-9]{6,20}$/.test(t)) { S.joinCode = t.slice(5).toUpperCase(); S.tab = "join"; return; } if (t === "lamp") t = "memory"; S.tab = TABS.some(x => x[0] === t) ? t : "today"; }
+function readHash() { let t = location.hash.slice(1); if (t === "reviews") { S.tab = "reviews"; return; } if (t === "members") { S.tab = "members"; return; } if (t === "member-reviews") { S.tab = "memberReviews"; return; } if (/^join-[A-Za-z0-9]{6,20}$/.test(t)) { S.joinCode = t.slice(5).toUpperCase(); S.tab = "join"; return; } if (t === "lamp") t = "memory"; S.tab = TABS.some(x => x[0] === t) ? t : "today"; }
 function renderTabs() {
   const nav = $("#tabbar"); nav.textContent = "";
   TABS.forEach(([id, label]) => nav.append(h("button", { type: "button", class: PRIMARY.includes(id) ? "primary-tab" : "secondary-tab", "aria-current": S.tab === id ? "page" : null, onclick: () => go(id) }, icon(id), h("span", null, label))));
@@ -869,7 +879,7 @@ function render() {
   renderTabs();
   const v = $("#view"); v.textContent = "";
   const wrap = h("section", { class: "view stack" });
-  ({ today: viewToday, plan: viewPlan, bible: viewBible, memory: viewMemory, saved: viewSaved, notes: viewNotes, sermons: viewSermons, study: viewStudy, prayer: viewPrayer, library: viewLibrary, join: viewJoin, review: viewReview, reviews: viewAppReviews, memberReviews: viewMemberReviews })[S.tab](wrap);
+  ({ today: viewToday, plan: viewPlan, bible: viewBible, memory: viewMemory, saved: viewSaved, notes: viewNotes, sermons: viewSermons, study: viewStudy, prayer: viewPrayer, library: viewLibrary, join: viewJoin, review: viewReview, reviews: viewAppReviews, memberReviews: viewMemberReviews, members: viewMembers })[S.tab](wrap);
   v.append(wrap);
   renderSelbar();
   if (S.tab !== "today") hideDevoBar();
@@ -2067,7 +2077,8 @@ function openSettings() {
     accountSection(),
     h("div", { class: "row", style: "gap:8px" },
       h("button", { class: "btn", type: "button", onclick: () => { layer.textContent = ""; openRateApp(); } }, icon("star"), "Rate & review the app"),
-      SH.reviewAdmin ? h("button", { class: "btn soft", type: "button", onclick: () => { layer.textContent = ""; location.hash = "#reviews"; } }, "App reviews (only you)") : null),
+      SH.reviewAdmin ? h("button", { class: "btn soft", type: "button", onclick: () => { layer.textContent = ""; location.hash = "#reviews"; } }, "App reviews (only you)") : null,
+      SH.reviewAdmin ? h("button", { class: "btn soft", type: "button", onclick: () => { layer.textContent = ""; location.hash = "#members"; } }, "Members (only you)") : null),
 
     h("div", { class: "stack", style: "gap:8px" }, h("h3", { class: "sub" }, "Reading"),
       h("label", { class: "lbl" }, "Bible text size", h("input", { type: "range", id: "set-size", min: "15", max: "26", value: String(S.settings.fontSize || 18), oninput: (e) => { S.settings.fontSize = +e.target.value; applyTheme(); saveKV("settings"); } })),
@@ -2449,7 +2460,7 @@ let fbAuth = null, fdb = null, fbLoading = null;
 const SH = { user: null, spaces: null, unsubSpaces: null, sub: {}, data: {}, error: "", folder: null };
 const meEmail = () => ((SH.user && SH.user.email) || "").toLowerCase();
 const meName = () => Sync.name || (SH.user && SH.user.displayName) || meEmail();
-const shRefresh = () => { if (["prayer", "study", "library", "join", "review", "reviews", "memberReviews"].includes(S.tab)) safeRerender(); };
+const shRefresh = () => { if (["prayer", "study", "library", "join", "review", "reviews", "memberReviews", "members"].includes(S.tab)) safeRerender(); };
 function loadScriptOnce(src) {
   if (document.querySelector(`script[data-src="${src}"]`)) return Promise.resolve();
   return new Promise((res, rej) => { const el = document.createElement("script"); el.src = src; el.dataset.src = src; el.onload = res; el.onerror = () => rej(new Error("load " + src)); document.head.append(el); });
@@ -2466,7 +2477,7 @@ function fbInit() {
     try { await fdb.enablePersistence({ synchronizeTabs: true }); } catch {}
     fbAuth.onAuthStateChanged(u => {
       if (u && Sync.email && (u.email || "").toLowerCase() !== Sync.email.toLowerCase()) { fbAuth.signOut(); return; }
-      SH.user = u; listenSpaces(); shRefresh(); if (u) setTimeout(checkReviewAdmin, 1500);
+      SH.user = u; listenSpaces(); shRefresh(); if (u) { setTimeout(checkReviewAdmin, 1500); setTimeout(recordMember, 2500); }
     });
   })().catch(e => { fbLoading = null; SH.error = "Shared groups couldn’t load. Check your connection."; shRefresh(); throw e; });
   return fbLoading;
@@ -3677,6 +3688,64 @@ function viewMemberReviews(root) {
   root.append(h("div", { style: "text-align:center" }, h("button", { class: "btn primary", type: "button", onclick: () => openRateApp() }, icon("star"), "Write your own review")));
 }
 
+
+
+/* ---- Members (owner only): who signed in, when they joined and were last active ---- */
+async function recordMember() {
+  if (!fdb || !SH.user) return;
+  const uid = SH.user.uid, day = ymd(new Date()), key = "memberSeen-" + uid;
+  if (localStorage_get(key) === day) return;          // once a day is enough
+  const ref = fdb.collection("members").doc(uid);
+  const data = { uid, name: Sync.name || SH.user.displayName || "", email: meEmail(), last: Date.now() };
+  try {
+    const d = await ref.get();
+    if (d.exists) await ref.update(data); else await ref.set({ ...data, joined: Date.now() });
+    localStorage_set(key, day);
+  } catch {}
+}
+function viewMembers(root) {
+  root.append(h("div", null, h("div", { class: "eyebrow" }, "Only you can see this"), h("h2", { class: "title" }, "Members")));
+  if (!SH.user) { root.append(h("div", { class: "loading" }, "Connecting…")); if (Sync.token) fbSignIn(Sync.token); return; }
+  checkReviewAdmin();
+  if (!SH.reviewAdmin) { root.append(h("div", { class: "empty" }, h("b", null, SH.reviewAdminChecked ? "This page is for the app owner" : "Loading…"), h("span", null, "Only the account named in the Firebase rules can see members."))); return; }
+  if (!SH.memUnsub) SH.memUnsub = fdb.collection("members").onSnapshot(sn => { SH.members = sn.docs.map(d => ({ id: d.id, ...d.data() })); if (S.tab === "members") safeRerender(); },
+    () => { SH.members = []; SH.memUnsub = null; if (S.tab === "members") safeRerender(); });
+  if (!SH.members) { root.append(h("div", { class: "loading" }, "Loading members…")); return; }
+  const now = Date.now(), DAY = 864e5, month = ymd(new Date()).slice(0, 7);
+  const all = SH.members.slice().sort((a, b) => (b.last || 0) - (a.last || 0));
+  const isActive = (m) => now - (m.last || 0) <= 7 * DAY, isNew = (m) => m.joined && ymd(new Date(m.joined)).slice(0, 7) === month;
+  const tile = (big, label) => h("div", { class: "ptile" }, h("b", null, String(big)), h("span", null, label));
+  root.append(h("div", { class: "ptiles mem-tiles" }, tile(all.length, "members"), tile(all.filter(isNew).length, "new this month"), tile(all.filter(isActive).length, "active this week")));
+  const f = S.memFilter || "all", q = (S.memQuery || "").trim().toLowerCase();
+  const search = h("input", { class: "field", type: "search", placeholder: "Search name or Gmail", value: S.memQuery || "", "aria-label": "Search members",
+    oninput: (e) => { S.memQuery = e.target.value; paint(); } });
+  root.append(search, h("div", { class: "seg seg-wide", role: "group", "aria-label": "Filter members" }, ...[["all", "All"], ["active", "Active"], ["new", "New"]].map(([k, l]) =>
+    h("button", { type: "button", "aria-pressed": f === k ? "true" : "false", onclick: () => { S.memFilter = k; render(); } }, l))));
+  const count = h("div", { class: "muted small" }), box = h("div", { class: "panel mem-list" });
+  root.append(count, box);
+  const ago = (t) => { if (!t) return "never"; const d = diffDays(ymd(new Date(t)), ymd(new Date())); return d <= 0 ? "today" : d === 1 ? "yesterday" : d < 14 ? d + " days ago" : d < 60 ? Math.round(d / 7) + " weeks ago" : Math.round(d / 30.4) + " months ago"; };
+  const fmtD = (t) => t ? new Date(t).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" }) : "—";
+  function paint() {
+    const qq = (S.memQuery || "").trim().toLowerCase();
+    const list = all.filter(m => (f === "all" || (f === "active" ? isActive(m) : isNew(m))) && (!qq || ((m.name || "") + " " + (m.email || "")).toLowerCase().includes(qq)));
+    count.textContent = `${list.length} of ${all.length} member${all.length === 1 ? "" : "s"} · most recently active first`;
+    box.textContent = "";
+    if (!list.length) box.append(h("div", { class: "muted", style: "padding:14px" }, all.length ? "Nothing matches." : "No members yet. People appear here after they sign in."));
+    list.forEach(m => { const d = now - (m.last || 0);
+      box.append(h("div", { class: "mem-row" },
+        h("span", { class: "avatar" }, ((m.name || m.email || "?").trim()[0] || "?").toUpperCase()),
+        h("div", { style: "flex:1;min-width:0" },
+          h("b", { style: "display:block" }, m.name || (m.email || "").split("@")[0]),
+          h("div", { class: "muted small mem-mail" }, m.email || ""),
+          h("div", { class: "small" }, h("span", { class: "mem-dot " + (d <= 7 * DAY ? "on" : d <= 30 * DAY ? "mid" : "") }), "Active " + ago(m.last), h("span", { class: "muted" }, " · Joined " + fmtD(m.joined)))))); });
+  }
+  paint();
+  if (all.length) root.append(h("div", null, h("button", { class: "btn sm", type: "button", onclick: () => {
+    const qf = (v) => `"${String(v == null ? "" : v).replace(/"/g, '""')}"`, iso = (t) => t ? new Date(t).toISOString().slice(0, 10) : "";
+    const csv = ["Name,Gmail,Joined,Last active", ...all.map(m => [m.name || "", m.email || "", iso(m.joined), iso(m.last)].map(qf).join(","))].join("\n");
+    const a = h("a", { href: URL.createObjectURL(new Blob(["\ufeff" + csv], { type: "text/csv" })), download: "members.csv" }); document.body.append(a); a.click(); a.remove();
+  } }, "Download as spreadsheet (CSV)")));
+}
 
 /* ---- every writing box grows as you type (phone, tablet and computer) ---- */
 function autosize(t) {
