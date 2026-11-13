@@ -3583,6 +3583,13 @@ function checkReviewAdmin() {
   const un = fdb.collection("reviews").onSnapshot(snap => { SH.reviewAdmin = true; SH.reviews = snap.docs.map(d => ({ id: d.id, ...d.data() })); if (S.tab === "reviews") safeRerender(); },
     () => { SH.reviewAdmin = false; try { un && un(); } catch {} });
 }
+function ratingSummary(all) {
+  const n = all.length, avg = n ? all.reduce((a, r) => a + (r.stars || 0), 0) / n : 0;
+  const counts = [5, 4, 3, 2, 1].map(k => all.filter(r => r.stars === k).length);
+  return h("section", { class: "panel rv-sum" },
+    h("div", { class: "rv-avg" }, h("b", null, n ? avg.toFixed(1) : "–"), h("div", { class: "rv-stars" }, "★★★★★".slice(0, Math.round(avg)) + "☆☆☆☆☆".slice(0, 5 - Math.round(avg))), h("span", { class: "muted small" }, `${n} review${n === 1 ? "" : "s"}`)),
+    h("div", { class: "rv-bars" }, ...counts.map((c, i) => h("div", { class: "rv-bar" }, h("span", null, String(5 - i)), h("span", { class: "progress" }, h("i", { style: `width:${n ? c / n * 100 : 0}%` })), h("span", { class: "muted" }, String(c))))));
+}
 const revName = (r) => r.name || (r.email ? r.email.split("@")[0] : "Name not saved");
 function viewAppReviews(root) {
   root.append(h("div", null, h("div", { class: "eyebrow" }, "Only you can see this"), h("h2", { class: "title" }, "App reviews")));
@@ -3591,11 +3598,8 @@ function viewAppReviews(root) {
   if (SH.reviewAdmin && !SH.pubAllUnsub) SH.pubAllUnsub = fdb.collection("publicReviews").onSnapshot(sn => { SH.pubAll = new Map(sn.docs.map(d => [d.id, d.data()])); safeRerender(); }, () => {});
   if (!SH.reviewAdmin) { root.append(h("div", { class: "empty" }, h("b", null, SH.reviewAdminChecked ? "This page is for the app owner" : "Loading…"), h("span", null, "Reviews can only be read by the account named in the Firebase rules."))); return; }
   const all = (SH.reviews || []).slice().sort((a, b) => (b.updated || 0) - (a.updated || 0));
-  const n = all.length, avg = n ? all.reduce((a, r) => a + (r.stars || 0), 0) / n : 0;
-  const counts = [5, 4, 3, 2, 1].map(k => all.filter(r => r.stars === k).length);
-  root.append(h("section", { class: "panel rv-sum" },
-    h("div", { class: "rv-avg" }, h("b", null, n ? avg.toFixed(1) : "–"), h("div", { class: "rv-stars" }, "★★★★★".slice(0, Math.round(avg)) + "☆☆☆☆☆".slice(0, 5 - Math.round(avg))), h("span", { class: "muted small" }, `${n} review${n === 1 ? "" : "s"}`)),
-    h("div", { class: "rv-bars" }, ...counts.map((c, i) => h("div", { class: "rv-bar" }, h("span", null, String(5 - i)), h("span", { class: "progress" }, h("i", { style: `width:${n ? c / n * 100 : 0}%` })), h("span", { class: "muted" }, String(c)))))));
+  const n = all.length;
+  root.append(ratingSummary(all));
   const f = S.reviewFilter || "all";
   root.append(h("div", { class: "seg seg-wide", role: "group", "aria-label": "Filter reviews" }, ...[["all", "All"], ["pub", "Public"], ["notpub", "Not public"]].map(([k, l]) =>
     h("button", { type: "button", "aria-pressed": f === k ? "true" : "false", onclick: () => { S.reviewFilter = k; render(); } }, l))));
@@ -3664,8 +3668,7 @@ function viewMemberReviews(root) {
     () => { SH.pub = []; SH.pubUnsub = null; if (S.tab === "memberReviews") safeRerender(); });
   if (!SH.pub) { root.append(h("div", { class: "loading" }, "Loading reviews…")); return; }
   const list = SH.pub.slice().sort((a, b) => b.updated - a.updated);
-  root.append(h("section", { class: "panel row", style: "gap:14px;flex-wrap:nowrap" }, h("b", { style: "font-family:var(--read);font-size:34px" }, String(list.length)),
-    h("span", null, h("b", null, list.length === 1 ? "review from a member" : "reviews from members"), h("div", { class: "muted small" }, "Chosen by the app owner, with each member’s permission"))));
+  root.append(ratingSummary(list));
   if (!list.length) root.append(h("div", { class: "empty" }, h("b", null, "No shared reviews yet"), h("span", null, "Be the first to tell others how the app helps you.")));
   list.forEach(r => root.append(h("article", { class: "panel stack", style: "gap:6px" },
     h("div", { class: "spread" }, h("b", null, r.name || "A member"), h("span", { class: "muted small" }, fmtTs(r.updated))),
