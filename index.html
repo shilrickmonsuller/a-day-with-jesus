@@ -534,6 +534,7 @@ textarea.field { resize: none; overflow-y: hidden; min-height: calc(3 * 1.65em +
 .ig-ico { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 8px; background: var(--indigo-soft); color: var(--indigo); vertical-align: middle; }
 .ig-ico svg { width: 17px; height: 17px; }
 .ig-dots { letter-spacing: 1px; }
+.ig-big { justify-content: center; padding: 12px; font-size: 16px; }
 
 </style>
 <header class="topbar gutter">
@@ -894,8 +895,9 @@ function heroArt() {
   </svg>` });
 }
 function viewToday(root) {
-  if (!isStandalone() && !localStorage_get("installHidden") && installPlatform() !== "desktop") root.append(installGuide(true));
-  if (SYNC_ON && !Sync.email && !localStorage_get("syncHidden")) {
+  if (inAppBrowser) root.append(installGuide(false));
+  else if (!isStandalone() && !localStorage_get("installHidden") && installPlatform() !== "desktop") root.append(installGuide(true));
+  if (SYNC_ON && !Sync.email && !localStorage_get("syncHidden") && !inAppBrowser) {
     root.append(h("div", { class: "banner" },
       h("span", null, "Sign in with Google to save your notes, prayers and files to your Google Drive and use them on any device."),
       h("div", { class: "row" },
@@ -1029,11 +1031,13 @@ function paceInfo(unit) {
   const res = { total, done, name, names, pct: done / total * 100 };
   if (done >= total) return { ...res, finished: true, headline: "You’ve read the whole Bible! 🎉", detail: "Start again any time — your journal entries stay." };
   if (!timed.length) return { ...res, headline: `Read a few ${names} to see your finish date.`, detail: `Tick ${names} as you read. There’s no schedule — go at your own pace.` };
-  const now = Date.now(), first = Math.min(...timed), since = (now - first) / 864e5;
-  const recent = timed.filter(t => now - t <= 30 * 864e5).length;
-  if (since < 7 || recent < 3) return { ...res, headline: `Keep going — your finish date appears after your first week.`, detail: `${recent} ${recent === 1 ? name : names} read so far.` };
-  const window = Math.min(30, since), rate = recent / window;
+  const now = Date.now(), first = Math.min(...timed);
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const window = Math.min(30, diffDays(ymd(new Date(first)), ymd(today)) + 1);
+  const start = new Date(today); start.setDate(start.getDate() - (window - 1));
+  const recent = timed.filter(t => t >= start.getTime()).length, rate = recent / window;
   if (!rate) return { ...res, headline: `Tick a ${name} to see your finish date again.`, detail: `No reading in the last 30 days.` };
+  res.early = window < 7;
   const daysLeft = (total - done) / rate, finish = new Date(now + daysLeft * 864e5);
   const per = rate >= 1 ? `about ${rate.toFixed(1).replace(/\.0$/, "")} ${rate >= 1.05 ? names : name} a day` : `about ${Math.round(rate * 7)} ${Math.round(rate * 7) === 1 ? name : names} a week`;
   return { ...res, rate, daysLeft, finish, span: fmtSpan(daysLeft), headline: `At your pace, you’ll finish the Bible in about ${fmtSpan(daysLeft)}.`,
@@ -1092,7 +1096,8 @@ function viewPlan(root) {
       tile(p.finished ? "🎉" : p.finish ? p.finish.toLocaleDateString(undefined, { month: "short", year: "numeric" }) : "—", "finish date"),
       tile(String(readStreak()), "day streak"),
       tile(String(daysThisMonth), "days this month")),
-    !p.daysLeft && !p.finished ? h("span", { class: "muted small" }, p.done ? "Finish date shows after your first week of reading." : "Tick stories as you read — no schedule, go at your own pace.") : null));
+    p.early ? h("span", { class: "muted small" }, "Early estimate — it gets steadier as you keep reading.")
+      : !p.daysLeft && !p.finished && !p.done ? h("span", { class: "muted small" }, "Tick stories as you read — no schedule, go at your own pace.") : null));
   const x = nextStory();
   if (x) root.append(h("section", { class: "panel stack", style: "gap:8px" }, h("div", { class: "eyebrow", style: "margin:0" }, "Continue reading"),
     h("div", null, h("b", { class: "next-title" }, x.t), h("div", { class: "muted small" }, storyRef(x))),
@@ -1629,13 +1634,14 @@ function viewNotes(root) {
     h("div", null, h("div", { class: "eyebrow" }, "Notes & reflections"), h("h2", { class: "title" }, "Journal")),
     h("button", { class: "btn primary", type: "button", onclick: () => { newNote({}); render(); setTimeout(() => { const t = $("#note-title"); if (t) t.focus(); }, 30); } }, icon("plus"), "New entry")));
   const q = S.notesQ.toLowerCase();
-  let list = S.notes.filter(n => S.notesFilter !== "plan" || isPlanNote(n))
+  if (!["all", "personal", "plan"].includes(S.notesFilter)) S.notesFilter = "all";
+  let list = S.notes.filter(n => S.notesFilter === "all" || (S.notesFilter === "plan" ? isPlanNote(n) : !isPlanNote(n)))
     .filter(n => !q || [n.title, n.ref, noteText(n), ...(n.attachments || []).map(a => a.name)].join(" ").toLowerCase().includes(q))
     .sort((a, b) => b.updated - a.updated);
   const layout = h("div", { class: "journal" + (S.editing && S.activeNote ? " editing" : "") });
   const listCol = h("div", { class: "note-list" },
     h("input", { class: "field", id: "notes-q", type: "search", placeholder: "Search your journal", value: S.notesQ, oninput: (e) => { S.notesQ = e.target.value; const pos = e.target.selectionStart; render(); const el = $("#notes-q"); if (el) { el.focus(); el.setSelectionRange(pos, pos); } } }),
-    h("div", { class: "seg", role: "group", "aria-label": "Filter notes" }, ...[["all", "All"], ["plan", "From the Plan"]].map(([k, l]) => h("button", { type: "button", "aria-pressed": (S.notesFilter === "plan" ? "plan" : "all") === k ? "true" : "false", onclick: () => { S.notesFilter = k; render(); } }, l))));
+    h("div", { class: "seg seg-wide", role: "group", "aria-label": "Filter entries" }, ...[["all", "All"], ["personal", "Personal"], ["plan", "From the Plan"]].map(([k, l]) => h("button", { type: "button", "aria-pressed": S.notesFilter === k ? "true" : "false", onclick: () => { S.notesFilter = k; render(); } }, l))));
   if (!list.length) listCol.append(h("div", { class: "muted small", style: "padding:6px 4px" }, q ? "Nothing matches your search." : "No entries yet."));
   list.forEach(n => listCol.append(h("button", { type: "button", class: "note-item" + (n.id === S.activeNote ? " active" : ""), onclick: () => { S.activeNote = n.id; S.editing = true; render(); window.scrollTo(0, 0); } },
     h("span", { class: "nt" }, n.title || "Untitled note"),
@@ -2147,6 +2153,7 @@ function syncStatusText() {
 const redirectUri = () => location.origin + location.pathname.replace(/index\.html$/, "");
 function signIn(prompt) {
   if (!SYNC_ON) return;
+  if (inAppBrowser) { openInstallGuide(); return; }
   const state = uid("st");
   localStorage_set("authState", state + "|" + (S.tab === "join" && S.joinCode ? "join-" + S.joinCode : S.tab));
   const p = new URLSearchParams({ client_id: CFG.googleClientId, redirect_uri: redirectUri(), response_type: "token", scope: SCOPES, include_granted_scopes: "true", state });
@@ -3148,15 +3155,7 @@ function installGuide(hideable) {
   const add = (...kids) => box.append(...kids.filter(k => k != null && k !== false));
   const hide = hideable ? h("button", { class: "btn sm ghost", type: "button", onclick: () => { localStorage_set("installHidden", "1"); render(); } }, "Hide") : null;
   if (pf === "installed") { add(h("b", { class: "ig-title" }, "The app is installed ✓"), h("span", { class: "muted small" }, "Open it from your Home Screen.")); return box; }
-  if (pf === "inapp") {
-    add(h("b", { class: "ig-title" }, `Open in ${isIOS ? "Safari" : "Chrome"} to install`),
-      h("span", { class: "muted small" }, `You opened this inside another app (like Messenger). Apps can only be installed from ${isIOS ? "Safari" : "Chrome"}.`),
-      step(1, "Tap ", h("b", { class: "ig-dots" }, "•••"), " or ", h("b", null, "⋮"), " at the top right of this screen."),
-      step(2, "Choose ", h("b", null, isIOS ? "Open in Safari" : "Open in Chrome"), " (it may say ", h("b", null, "Open in external browser"), ")."),
-      step(3, `${isIOS ? "Safari" : "Chrome"} will show you the last steps.`),
-      h("div", { class: "row", style: "gap:6px" }, h("button", { class: "btn sm", type: "button", onclick: () => copyText(APP_URL()) }, icon("copy"), `Copy link — then paste it in ${isIOS ? "Safari" : "Chrome"}`), hide));
-    return box;
-  }
+  if (pf === "inapp") { box.classList.add("ext"); openExternalInto(box, add, step); return box; }
   if (pf === "ios") {
     const safari = !/CriOS|FxiOS|EdgiOS/.test(UA);
     add(h("b", { class: "ig-title" }, "Install on your iPhone"), h("span", { class: "muted small" }, "3 taps · works offline after"),
@@ -3178,6 +3177,26 @@ function installGuide(hideable) {
     installEvt ? h("button", { class: "btn primary", type: "button", style: "justify-self:start", onclick: doInstall }, "Install app") : null,
     h("span", { class: "muted small" }, "In Chrome or Edge, click the install icon at the right end of the address bar. On a phone, open the link in Safari (iPhone) or Chrome (Android)."));
   return box;
+}
+/* in Messenger & co.: a button that hands the page to Safari / Chrome, with by-hand steps if the app blocks it */
+function openExternalInto(box, add, step) {
+  const br = isIOS ? "Safari" : "Chrome";
+  const manual = h("div", { class: "stack", style: "gap:8px", hidden: true },
+    h("span", { class: "small", style: "color:var(--accent);font-weight:700" }, "Didn’t open? Do it by hand:"),
+    step(1, "Tap ", h("b", { class: "ig-dots" }, "•••"), " or ", h("b", null, "⋮"), " at the top right."),
+    step(2, "Choose ", h("b", null, `Open in ${br}`), " (or ", h("b", null, "Open in external browser"), ")."));
+  add(h("b", { class: "ig-title" }, `Open in ${br} to install and sign in`),
+    h("span", { class: "muted small" }, "Messenger and similar apps can’t install apps, and Google sign-in doesn’t work inside them."),
+    h("button", { class: "btn primary ig-big", type: "button", onclick: () => { openExternal(); setTimeout(() => { if (document.visibilityState === "visible") manual.hidden = false; }, 1500); } }, `Open in ${br}`),
+    manual,
+    h("button", { class: "btn sm", type: "button", onclick: () => copyText(APP_URL()) }, icon("copy"), `Copy link — then paste it in ${br}`));
+}
+function openExternal() {
+  const url = location.href.split("#")[0] + (location.hash || "");
+  try {
+    if (isIOS) location.href = "x-safari-" + url;
+    else location.href = `intent://${location.host}${location.pathname}${location.search}${location.hash}#Intent;scheme=https;package=com.android.chrome;end`;
+  } catch {}
 }
 function openInstallGuide() {
   const layer = $("#layer"); const close = () => { layer.textContent = ""; };
@@ -3525,27 +3544,25 @@ function openRateApp(preset) {
   const paint = () => { [...starRow.children].forEach((b, i) => { b.classList.toggle("on", i < stars); b.setAttribute("aria-checked", i + 1 === stars ? "true" : "false"); }); label.textContent = L[stars] || "Tap a star"; if (typeof paintShare === "function") paintShare(); };
   for (let i = 1; i <= 5; i++) starRow.append(h("button", { type: "button", role: "radio", "aria-label": i + (i > 1 ? " stars" : " star"), onclick: () => { stars = i; paint(); } }, "★"));
   const text = h("textarea", { class: "field", id: "rate-text", rows: "4", maxlength: "2000", placeholder: "What do you like? What should be better? Any feature you wish it had?" });
-  const showName = h("input", { type: "checkbox", id: "rate-name", checked: true });
   const paintShare = () => {};
   const msg = h("div", { class: "small", "aria-live": "polite" });
   body.append(h("b", { class: "rate-q" }, "How is A Day With Jesus helping you?"), starRow, label, text,
-    h("label", { class: "row", style: "gap:8px;font-size:14px" }, showName, "Show my name"),
-    h("p", { class: "share-opt muted small", style: "margin:0" }, "By sending, you agree that the app owner may show your review to other users in Member reviews. Untick “Show my name” to appear as “A member.”"),
+    h("p", { class: "share-opt muted small", style: "margin:0" }, "Your name is sent with your review. By sending, you agree that the app owner may show your review to other users in Member reviews, with your name or as “A member.”"),
     h("div", null, h("button", { class: "btn primary", type: "button", onclick: async () => {
       if (!stars) { msg.textContent = "Choose 1 to 5 stars first."; return; }
-      const data = { uid: SH.user.uid, stars, text: text.value.trim().slice(0, 2000), showName: showName.checked, name: showName.checked ? meName() : "", share: true, updated: Date.now() };
+      const data = { uid: SH.user.uid, stars, text: text.value.trim().slice(0, 2000), name: Sync.name || (SH.user && SH.user.displayName) || "", email: meEmail(), share: true, updated: Date.now() };
       try {
         await reviewRef(SH.user.uid).set({ ...data, created: S.myReviewCreated || Date.now() });
         // if the owner already made this review public, keep the public copy up to date (or take it down if permission was removed)
         const pub = pubReviewRef(SH.user.uid);
-        try { const d = await pub.get(); if (d.exists) await pub.set({ uid: SH.user.uid, stars, text: data.text, name: data.name, updated: data.updated }); } catch {}
+        try { const d = await pub.get(); if (d.exists) { const anon = d.data().anon === true; await pub.set({ uid: SH.user.uid, stars, text: data.text, name: anon ? "" : data.name, anon, updated: data.updated }); } } catch {}
         localStorage_set("rated", "1");
         body.textContent = ""; body.append(h("span", { class: "chip ok", style: "justify-self:center" }, "Thank you!"), h("p", { style: "margin:0;text-align:center" }, "Your review was sent to the app owner. You can change it anytime — your latest review replaces the old one."));
       } catch (e) { msg.textContent = "Couldn’t send it. Check your connection and try again."; }
     } }, "Send review")), msg,
     h("button", { class: "btn sm ghost", type: "button", style: "justify-self:center", onclick: () => { close(); location.hash = "#member-reviews"; } }, "Read member reviews"));
   paint(); paintShare();
-  reviewRef(SH.user.uid).get().then(d => { if (d.exists) { const x = d.data(); stars = preset || x.stars || 0; text.value = x.text || ""; showName.checked = x.showName !== false; S.myReviewCreated = x.created; paint(); autosize(text); } }).catch(() => {});
+  reviewRef(SH.user.uid).get().then(d => { if (d.exists) { const x = d.data(); stars = preset || x.stars || 0; text.value = x.text || ""; S.myReviewCreated = x.created; paint(); autosize(text); } }).catch(() => {});
 }
 function checkReviewAdmin() {
   if (!fdb || !SH.user || SH.reviewAdminChecked) return;
@@ -3553,6 +3570,7 @@ function checkReviewAdmin() {
   const un = fdb.collection("reviews").onSnapshot(snap => { SH.reviewAdmin = true; SH.reviews = snap.docs.map(d => ({ id: d.id, ...d.data() })); if (S.tab === "reviews") safeRerender(); },
     () => { SH.reviewAdmin = false; try { un && un(); } catch {} });
 }
+const revName = (r) => r.name || (r.email ? r.email.split("@")[0] : "Name not saved");
 function viewAppReviews(root) {
   root.append(h("div", null, h("div", { class: "eyebrow" }, "Only you can see this"), h("h2", { class: "title" }, "App reviews")));
   if (!SH.user) { root.append(h("div", { class: "loading" }, "Connecting…")); if (Sync.token) fbSignIn(Sync.token); return; }
@@ -3573,17 +3591,22 @@ function viewAppReviews(root) {
   root.append(h("div", { class: "muted small" }, `${all.filter(isPub).length} of ${n} review${n === 1 ? " is" : "s are"} public`));
   if (!list.length) root.append(h("div", { class: "empty" }, h("b", null, n ? "Nothing matches" : "No reviews yet"), h("span", null, "Members can send one from More → Rate & review the app.")));
   list.forEach(r => root.append(h("article", { class: "panel stack", style: "gap:6px" },
-    h("div", { class: "spread" }, h("b", null, r.showName && r.name ? r.name : "Anonymous"), h("span", { class: "muted small" }, fmtTs(r.updated || r.created))),
+    h("div", { class: "spread" }, h("span", null, h("b", null, revName(r)), r.email ? h("div", { class: "muted small" }, r.email) : null), h("span", { class: "muted small" }, fmtTs(r.updated || r.created))),
     h("div", { class: "rv-stars" }, "★".repeat(r.stars || 0) + "☆".repeat(5 - (r.stars || 0))),
     h("p", { style: "margin:0;white-space:pre-wrap" }, (r.text || "").trim() || h("span", { class: "muted" }, "(no comment)")),
-    (() => { const pub = isPub(r), allowed = r.share === true;
-      const label = pub ? "Public" : allowed ? "Not public" : "Sent before public reviews — kept private";
-      return h("div", { class: "spread", style: "gap:8px" }, h("span", { class: "chip" + (pub ? " ok" : "") }, label),
-        pub ? h("button", { class: "btn sm", type: "button", onclick: () => pubReviewRef(r.id).delete().catch(fbErr) }, "Remove from public")
-          : allowed ? h("button", { class: "btn sm primary", type: "button", onclick: () => pubReviewRef(r.id).set({ uid: r.id, stars: r.stars, text: r.text || "", name: r.showName && r.name ? r.name : "", updated: r.updated || Date.now() }).catch(fbErr) }, "Make public") : null); })())));
+    (() => { const pub = isPub(r), allowed = r.share === true, anon = pub && SH.pubAll.get(r.id).anon === true;
+      const label = pub ? (anon ? "Public · as “A member”" : "Public · with name") : allowed ? "Not public" : "Sent before public reviews — kept private";
+      const publish = (asAnon) => pubReviewRef(r.id).set({ uid: r.id, stars: r.stars, text: r.text || "", name: asAnon ? "" : (r.name || ""), anon: asAnon, updated: r.updated || Date.now() }).catch(fbErr);
+      return h("div", { class: "stack", style: "gap:8px" }, h("span", { class: "chip" + (pub ? " ok" : ""), style: "justify-self:start" }, label),
+        pub ? h("div", { class: "row", style: "gap:8px;flex-wrap:wrap" },
+            h("button", { class: "btn sm", type: "button", onclick: () => publish(!anon) }, anon ? "Show their name" : "Hide their name"),
+            h("button", { class: "btn sm", type: "button", onclick: () => pubReviewRef(r.id).delete().catch(fbErr) }, "Remove from public"))
+          : allowed ? h("div", { class: "row", style: "gap:8px;flex-wrap:wrap" },
+            h("button", { class: "btn sm primary", type: "button", onclick: () => publish(false) }, "Make public with name"),
+            h("button", { class: "btn sm", type: "button", onclick: () => publish(true) }, "Make public as “A member”")) : null); })())));
   if (n) root.append(h("div", null, h("button", { class: "btn sm", type: "button", onclick: () => {
     const q = (v) => `"${String(v == null ? "" : v).replace(/"/g, '""')}"`;
-    const csv = ["Name,Stars,Comment,Date", ...all.map(r => [r.showName && r.name ? r.name : "Anonymous", r.stars, r.text || "", new Date(r.updated || r.created).toISOString().slice(0, 10)].map(q).join(","))].join("\n");
+    const csv = ["Name,Email,Stars,Comment,Date", ...all.map(r => [revName(r), r.email || "", r.stars, r.text || "", new Date(r.updated || r.created).toISOString().slice(0, 10)].map(q).join(","))].join("\n");
     const a = h("a", { href: URL.createObjectURL(new Blob(["﻿" + csv], { type: "text/csv" })), download: "app-reviews.csv" }); document.body.append(a); a.click(); a.remove();
   } }, "Download as spreadsheet (CSV)")));
 }
