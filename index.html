@@ -559,6 +559,30 @@ textarea.field { resize: none; overflow-y: hidden; min-height: calc(3 * 1.65em +
 .mem-row .avatar{flex:none}
 .mem-tiles{grid-template-columns:repeat(3,minmax(0,1fr))!important}.mem-tiles .ptile span{font-size:10px}
 
+/* notifications */
+.notif-btn { position: relative; }
+.notif-badge { position: absolute; top: -6px; right: -6px; min-width: 20px; height: 20px; padding: 0 5px; box-sizing: border-box; border-radius: 99px; background: var(--danger); color: #fff; font: 800 11px/16px system-ui, sans-serif; text-align: center; border: 2px solid var(--bg); }
+.notif-sheet { gap: 12px; }
+.notif-pace { display: grid; gap: 6px; text-align: left; background: var(--accent-soft); border: 0; border-radius: 14px; padding: 12px 14px; color: var(--ink); font: inherit; cursor: pointer; width: 100%; }
+.notif-pace .progress { height: 6px; }
+.notif-sec { font: 800 11px system-ui, sans-serif; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
+.notif-list { display: flex; flex-direction: column; background: var(--paper); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.notif-item { display: flex; gap: 12px; align-items: flex-start; padding: 11px 14px; border: 0; border-top: 1px solid var(--line); background: transparent; color: var(--ink); font: inherit; text-align: left; cursor: pointer; width: 100%; }
+.notif-item:first-child { border-top: 0; }
+.notif-item.unread { background: var(--accent-soft); }
+.notif-ico { flex: none; width: 34px; height: 34px; border-radius: 50%; background: var(--indigo-soft); display: grid; place-items: center; font-size: 16px; }
+.notif-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; font-size: 14.5px; line-height: 1.35; }
+.notif-dot { flex: none; width: 9px; height: 9px; border-radius: 50%; background: var(--accent); margin-top: 6px; }
+.notif-pref { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 14.5px; }
+input.switch { appearance: none; -webkit-appearance: none; flex: none; width: 42px; height: 24px; border-radius: 99px; background: var(--line); position: relative; cursor: pointer; transition: background .15s; margin: 0; }
+input.switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: left .15s; box-shadow: 0 1px 2px rgba(0,0,0,.2); }
+input.switch:checked { background: var(--ok); }
+input.switch:checked::after { left: 21px; }
+
+.jc-opt { display: flex; gap: 12px; align-items: flex-start; padding: 13px 14px; border: 0; border-top: 1px solid var(--line); background: transparent; color: var(--ink); font: inherit; text-align: left; cursor: pointer; width: 100%; }
+.jc-opt:first-child { border-top: 0; }
+.jc-ico { flex: none; width: 36px; height: 36px; border-radius: 10px; background: var(--accent-soft); display: grid; place-items: center; font-size: 17px; }
+
 </style>
 <header class="topbar gutter">
   <div class="shell">
@@ -580,7 +604,11 @@ textarea.field { resize: none; overflow-y: hidden; min-height: calc(3 * 1.65em +
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18a4.5 4.5 0 0 1-.6-8.96A6 6 0 0 1 18 8.5a4 4 0 0 1-.5 9.5z"/></svg>
       <i class="sync-dot"></i>
     </button>
-    <button class="icon-btn" id="open-settings" type="button" aria-label="Settings">
+    <button class="icon-btn notif-btn" id="open-notifs" type="button" aria-label="Notifications" title="Notifications">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+      <span class="notif-badge" hidden></span>
+    </button>
+    <button class="icon-btn wide-only" id="open-settings" type="button" aria-label="Settings">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
     </button>
     </div>
@@ -885,6 +913,7 @@ function render() {
   if (S.tab !== "today") hideDevoBar();
   document.querySelectorAll(".rate-pop").forEach(e => { if (!["today", "plan"].includes(S.tab)) e.remove(); });
   if (S.tab === "today") scheduleReviewAsk(4000);
+  paintBellSoon();
 }
 function rerenderKeepScroll() { const y = window.scrollY; render(); window.scrollTo(0, y); }
 
@@ -953,14 +982,6 @@ function viewToday(root) {
     h("div", { class: "devo-aside-label" }, "Edition"),
     ...[["m", "Morning"], ["e", "Evening"]].map(([k, l]) => h("button", { type: "button", "aria-pressed": ed === k ? "true" : "false", onclick: () => setEd(k) }, l)));
 
-  if (new Date().getDay() === 0 && !S.devo.date) {
-    const w = reviewStats("week");
-    root.append(h("button", { type: "button", class: "week-card", onclick: () => { S.reviewRange = "week"; go("review"); } },
-      h("span", { class: "eyebrow" }, "Your week with Jesus"),
-      h("span", null, `${w.chapters} chapters · ${w.journals} journals · ${w.highlights} highlights · ${w.answered} answered prayers`),
-      STORIES && paceInfo().span ? h("span", { class: "muted small", style: "grid-column:1" }, paceInfo().headline) : null, icon("right")));
-    if (!STORIES) loadStories().then(() => { if (S.tab === "today") rerenderKeepScroll(); }).catch(() => {});
-  }
   const paras = text.split(/\n+/).map(s => s.trim()).filter(Boolean);
   const body = h("div", { class: "devo-main" },
     h("p", { class: "devo-key" }, h("span", null, verse.replace(/[.,;:]?$/, "") + " "), "— ",
@@ -1347,11 +1368,30 @@ function renderSelbar() {
     h("div", { class: "row-acts" },
     h("button", { class: "btn sm", type: "button", onclick: async () => { const s = selectionText(); await addSaved({ ref: s.ref, text: s.text, translation: curVer() }); S.bible.sel.clear(); render(); toast("Saved " + s.ref); } }, icon("saved"), "Save"),
     h("button", { class: "btn sm", type: "button", onclick: () => { const s = selectionText(); copyText(`${s.text}\n— ${s.ref} (${curVer()})`); } }, icon("copy"), "Copy"),
-    h("button", { class: "btn sm", type: "button", onclick: () => addToJournal() }, "Journal"),
-    h("button", { class: "btn sm", type: "button", onclick: () => { const s = selectionText(); newNote({ title: s.ref, ref: `“${s.text}” — ${s.ref} (${curVer()})`, body: "" }); S.bible.sel.clear(); go("notes"); } }, icon("notes"), "Note"),
+    h("button", { class: "btn sm", type: "button", onclick: openJournalChoice }, icon("notes"), "Journal"),
     h("button", { class: "btn sm", type: "button", onclick: () => { const s = selectionText(); newSermon({ scripture: s.ref, content: `“${s.text}” — ${s.ref} (${curVer()})\n\n` }); S.bible.sel.clear(); go("sermons"); } }, icon("sermons"), "Sermon"),
     h("button", { class: "btn sm", type: "button", "aria-label": "Clear selection", onclick: () => { S.bible.sel.clear(); render(); } }, icon("x"))));
   document.body.append(bar);
+}
+function openJournalChoice() {
+  const sel = selectionText(), B = S.bible, name = `${BOOKS[B.b]} ${B.c}`, layer = $("#layer"), close = () => { layer.textContent = ""; };
+  const prev = S.notes.find(n => n.id === chapJournalId(B.b, B.c));
+  const nVerses = prev ? (noteScripture(prev).match(/“/g) || []).length : 0;
+  const pick = (k) => { localStorage_set("journalChoice", k); close();
+    if (k === "chapter") addToJournal();
+    else { newNote({ title: sel.ref, ref: `“${sel.text}” — ${sel.ref} (${curVer()})`, body: "" }); S.bible.sel.clear(); go("notes"); } };
+  const opt = (k, ic, title, sub) => h("button", { type: "button", class: "jc-opt", onclick: () => pick(k) }, h("span", { class: "jc-ico", "aria-hidden": "true" }, ic), h("span", { class: "notif-txt" }, h("b", null, title), h("span", { class: "muted small" }, sub)));
+  const opts = [opt("chapter", "📖", `Add to ${name} entry`, `Collects your verses from this chapter in one entry${nVerses ? ` (${nVerses} verse${nVerses === 1 ? "" : "s"} there already)` : ""}.`),
+    opt("new", "✏️", "Start a new entry", "A fresh page just for this verse. It opens so you can write right away.")];
+  if (localStorage_get("journalChoice") === "new") opts.reverse();
+  const short = sel.text.length > 90 ? sel.text.slice(0, 90) + "…" : sel.text;
+  const sheet = h("div", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": "Add to your journal" },
+    h("div", { class: "spread" }, h("h2", { class: "title", style: "font-size:22px;margin:0" }, "Add to your journal"), h("button", { class: "icon-btn", type: "button", "aria-label": "Close", onclick: close }, icon("x"))),
+    h("p", { class: "muted small", style: "margin:0" }, `“${short}” — ${sel.ref}`),
+    h("div", { class: "notif-list" }, ...opts),
+    h("button", { class: "btn ghost", type: "button", onclick: close }, "Cancel"));
+  layer.textContent = "";
+  layer.append(h("div", { class: "overlay", onclick: (e) => { if (e.target === e.currentTarget) close(); } }, sheet));
 }
 async function addToJournal() {
   const sel = selectionText(), B = S.bible, id = chapJournalId(B.b, B.c), name = `${BOOKS[B.b]} ${B.c}`;
@@ -1361,7 +1401,7 @@ async function addToJournal() {
   note.ref = (cur ? cur + "\n" : "") + `“${sel.text}” — ${sel.ref} (${curVer()})`;
   note.soap = { ...(note.soap || {}), s: "" };
   await DB.put("notes", note); const i = S.notes.findIndex(n => n.id === id); i >= 0 ? S.notes[i] = note : S.notes.push(note);
-  S.bible.sel.clear(); render(); toast(`Added to your ${name} note`);
+  S.bible.sel.clear(); render(); toast(`Added to your ${name} entry`);
 }
 
 /* ================= MY MEMORY VERSES ================= */
@@ -2066,7 +2106,7 @@ function applyTheme() {
   document.documentElement.style.setProperty("--read-size", (S.settings.fontSize || 18) + "px");
 }
 async function doInstall() { if (!installEvt) return; installEvt.prompt(); try { await installEvt.userChoice; } catch {} installEvt = null; render(); }
-function openSettings() {
+function openSettings(focus) {
   const layer = $("#layer");
   const close = () => { layer.textContent = ""; render(); };
   const storageLine = h("div", { class: "muted small" }, "Checking storage…");
@@ -2079,6 +2119,8 @@ function openSettings() {
       h("button", { class: "btn", type: "button", onclick: () => { layer.textContent = ""; openRateApp(); } }, icon("star"), "Rate & review the app"),
       SH.reviewAdmin ? h("button", { class: "btn soft", type: "button", onclick: () => { layer.textContent = ""; location.hash = "#reviews"; } }, "App reviews (only you)") : null,
       SH.reviewAdmin ? h("button", { class: "btn soft", type: "button", onclick: () => { layer.textContent = ""; location.hash = "#members"; } }, "Members (only you)") : null),
+
+    notifSettingsSection(),
 
     h("div", { class: "stack", style: "gap:8px" }, h("h3", { class: "sub" }, "Reading"),
       h("label", { class: "lbl" }, "Bible text size", h("input", { type: "range", id: "set-size", min: "15", max: "26", value: String(S.settings.fontSize || 18), oninput: (e) => { S.settings.fontSize = +e.target.value; applyTheme(); saveKV("settings"); } })),
@@ -2105,6 +2147,7 @@ function openSettings() {
   );
   layer.textContent = "";
   layer.append(h("div", { class: "overlay", onclick: (e) => { if (e.target === e.currentTarget) close(); } }, sheet));
+  if (focus === "notifs") setTimeout(() => { const el = $("#notif-settings"); if (el) el.scrollIntoView({ block: "start" }); }, 50);
   (async () => {
     try { const est = await navigator.storage.estimate(); const p = navigator.storage.persisted ? await navigator.storage.persisted() : false; storageLine.textContent = `Using ${fmtBytes(est.usage || 0)} of storage${p ? " · protected" : ""}`; } catch { storageLine.textContent = ""; }
     try { const has = "caches" in window && await caches.match("kjv.json"); offlineLine.textContent = has ? "Ready offline: the Bible and app are saved on this device." : "Offline mode turns on after the app is opened from its web address once."; } catch { offlineLine.textContent = ""; }
@@ -2460,7 +2503,7 @@ let fbAuth = null, fdb = null, fbLoading = null;
 const SH = { user: null, spaces: null, unsubSpaces: null, sub: {}, data: {}, error: "", folder: null };
 const meEmail = () => ((SH.user && SH.user.email) || "").toLowerCase();
 const meName = () => Sync.name || (SH.user && SH.user.displayName) || meEmail();
-const shRefresh = () => { if (["prayer", "study", "library", "join", "review", "reviews", "memberReviews", "members"].includes(S.tab)) safeRerender(); };
+const shRefresh = () => { if (["prayer", "study", "library", "join", "review", "reviews", "memberReviews", "members"].includes(S.tab)) safeRerender(); paintBellSoon(); };
 function loadScriptOnce(src) {
   if (document.querySelector(`script[data-src="${src}"]`)) return Promise.resolve();
   return new Promise((res, rej) => { const el = document.createElement("script"); el.src = src; el.dataset.src = src; el.onload = res; el.onerror = () => rej(new Error("load " + src)); document.head.append(el); });
@@ -2498,7 +2541,7 @@ function listenSpaces() {
   unlistenAll(); SH.spaces = null;
   if (!SH.user || !fdb) return;
   SH.unsubSpaces = fdb.collection("spaces").where("memberEmails", "array-contains", meEmail()).onSnapshot(
-    snap => { SH.spaces = snap.docs.map(d => ({ id: d.id, ...d.data() })); SH.error = ""; shRefresh(); },
+    snap => { SH.spaces = snap.docs.map(d => ({ id: d.id, ...d.data() })); SH.error = ""; notifSubscribe(); shRefresh(); },
     err => { SH.spaces = []; SH.error = "Couldn’t load your groups (" + (err.code || "error") + ")."; shRefresh(); });
 }
 function subData(spaceId, sub) {
@@ -2525,7 +2568,7 @@ function addSub(spaceId, sub, data) {
   spaceRef(spaceId).collection(sub).doc(id).set({ ...data, authorUid: SH.user.uid, authorEmail: meEmail(), authorName: meName(), created: Date.now(), updated: Date.now() }).catch(fbErr);
   return id;
 }
-const updSub = (spaceId, sub, id, data) => spaceRef(spaceId).collection(sub).doc(id).update({ ...data, updated: Date.now() }).catch(fbErr);
+const updSub = (spaceId, sub, id, data) => spaceRef(spaceId).collection(sub).doc(id).update({ ...data, updated: Date.now(), updatedBy: SH.user ? SH.user.uid : "", updatedByName: meName() }).catch(fbErr);
 const delSub = (spaceId, sub, id) => spaceRef(spaceId).collection(sub).doc(id).delete().catch(fbErr);
 const isOwnerOf = (sp) => SH.user && sp.ownerUid === SH.user.uid;
 const canEditItem = (sp, it) => SH.user && (it.authorUid === SH.user.uid || isOwnerOf(sp));
@@ -3418,7 +3461,6 @@ function showDevoBar() {
         overlaps ? btn({ class: "btn sm hl-clear", onclick: () => devoHighlight("") }, "Remove") : null)),
     h("div", { class: "row-acts" },
       btn({ class: "btn sm", onclick: () => { copyText(d.text); } }, icon("copy"), "Copy"),
-      btn({ class: "btn sm", onclick: () => { const date = S.devo.date || ymd(new Date()); const ed = d.dk.split("|")[1]; newNote({ title: `Reflection · ${fmtDate(date, { month: "short", day: "numeric" })}`, ref: "", body: `“${d.text}” — C. H. Spurgeon, ${ed === "m" ? "Morning" : "Evening"}, ${fmtDate(date, { month: "long", day: "numeric" })}\n\n` }); devoSel = null; hideDevoBar(); go("notes"); } }, icon("notes"), "Add to notes"),
       btn({ class: "btn sm", "aria-label": "Close", onclick: () => { devoSel = null; try { window.getSelection().removeAllRanges(); } catch {} hideDevoBar(); } }, icon("x"))));
   document.body.append(bar);
 }
@@ -3591,7 +3633,7 @@ function openRateApp(preset) {
 function checkReviewAdmin() {
   if (!fdb || !SH.user || SH.reviewAdminChecked) return;
   SH.reviewAdminChecked = true;
-  const un = fdb.collection("reviews").onSnapshot(snap => { SH.reviewAdmin = true; SH.reviews = snap.docs.map(d => ({ id: d.id, ...d.data() })); if (S.tab === "reviews") safeRerender(); },
+  const un = fdb.collection("reviews").onSnapshot(snap => { SH.reviewAdmin = true; SH.reviews = snap.docs.map(d => ({ id: d.id, ...d.data() })); if (S.tab === "reviews") safeRerender(); notifSubscribe(); paintBellSoon(); },
     () => { SH.reviewAdmin = false; try { un && un(); } catch {} });
 }
 function ratingSummary(all) {
@@ -3708,7 +3750,7 @@ function viewMembers(root) {
   if (!SH.user) { root.append(h("div", { class: "loading" }, "Connecting…")); if (Sync.token) fbSignIn(Sync.token); return; }
   checkReviewAdmin();
   if (!SH.reviewAdmin) { root.append(h("div", { class: "empty" }, h("b", null, SH.reviewAdminChecked ? "This page is for the app owner" : "Loading…"), h("span", null, "Only the account named in the Firebase rules can see members."))); return; }
-  if (!SH.memUnsub) SH.memUnsub = fdb.collection("members").onSnapshot(sn => { SH.members = sn.docs.map(d => ({ id: d.id, ...d.data() })); if (S.tab === "members") safeRerender(); },
+  if (!SH.memUnsub) SH.memUnsub = fdb.collection("members").onSnapshot(sn => { SH.members = sn.docs.map(d => ({ id: d.id, ...d.data() })); if (S.tab === "members") safeRerender(); paintBellSoon(); },
     () => { SH.members = []; SH.memUnsub = null; if (S.tab === "members") safeRerender(); });
   if (!SH.members) { root.append(h("div", { class: "loading" }, "Loading members…")); return; }
   const now = Date.now(), DAY = 864e5, month = ymd(new Date()).slice(0, 7);
@@ -3745,6 +3787,155 @@ function viewMembers(root) {
     const csv = ["Name,Gmail,Joined,Last active", ...all.map(m => [m.name || "", m.email || "", iso(m.joined), iso(m.last)].map(qf).join(","))].join("\n");
     const a = h("a", { href: URL.createObjectURL(new Blob(["\ufeff" + csv], { type: "text/csv" })), download: "members.csv" }); document.body.append(a); a.click(); a.remove();
   } }, "Download as spreadsheet (CSV)")));
+}
+
+
+/* ================= NOTIFICATIONS (bell, top right) ================= */
+const NOTIF_PREFS = [["prayer", "Prayer meetings — new, updated & answered prayers"], ["study", "Bible studies — sessions & join requests"], ["docs", "Documents shared with your group or with you"],
+  ["progress", "Bible reading progress & streak"], ["devo", "Today’s devotional is ready (6:00 AM)"], ["memory", "Memory verses review"], ["milestones", "Milestones (finished a book, streaks…)"]];
+function notifPrefs() { try { return JSON.parse(localStorage_get("notifPrefs") || "{}"); } catch { return {}; } }
+const notifOn = (k) => notifPrefs()[k] !== false;
+function setNotifPref(k, on) { const p = notifPrefs(); p[k] = on; localStorage_set("notifPrefs", JSON.stringify(p)); paintBellSoon(); }
+function notifState() {
+  let st = null; try { st = JSON.parse(localStorage_get("notifState") || "null"); } catch {}
+  if (!st) { st = { base: Date.now() - 2 * 864e5, read: {} }; localStorage_set("notifState", JSON.stringify(st)); }
+  return st;
+}
+function saveNotifState(st) { const cut = Date.now() - 31 * 864e5; Object.keys(st.read).forEach(k => { if (st.read[k] < cut) delete st.read[k]; }); localStorage_set("notifState", JSON.stringify(st)); }
+function notifSubscribe() {
+  if (!fdb || !SH.user) return;
+  (SH.spaces || []).forEach(sp => {
+    (sp.type === "prayer" ? ["items", "files", "library"] : ["sessions", "files", "library"]).forEach(sub => subData(sp.id, sub));
+    if (isOwnerOf(sp)) subData(sp.id, "requests");
+  });
+  if (SH.reviewAdmin && !SH.memUnsub) SH.memUnsub = fdb.collection("members").onSnapshot(sn => { SH.members = sn.docs.map(d => ({ id: d.id, ...d.data() })); if (S.tab === "members") safeRerender(); paintBellSoon(); }, () => { SH.memUnsub = null; });
+}
+function milestoneTimes() {
+  let m = {}; try { m = JSON.parse(localStorage_get("notifMiles") || "{}"); } catch {}
+  if (!STORIES) return m;
+  const first = !localStorage_get("notifMiles"), now = Date.now(), have = [];
+  const read = STORIES.filter(storyRead), n = read.length;
+  [10, 50, 100, 250, 500, 1000, 2000, 3000].forEach(k => { if (n >= k) have.push(["st" + k, `You’ve read ${k.toLocaleString()} Bible stories!`]); });
+  if (n >= STORIES.length) have.push(["bible", "You finished the whole Bible! Praise God!"]);
+  const best = bestReadStreak(); [7, 30, 100, 365].forEach(k => { if (best >= k) have.push(["sk" + k, `${k}-day reading streak — keep going!`]); });
+  const byBook = {}; STORIES.forEach(x => { (byBook[x.b] = byBook[x.b] || []).push(x); });
+  Object.entries(byBook).forEach(([b, xs]) => { if (xs.every(storyRead)) have.push(["bk" + b, `You finished the book of ${BOOKS[b]}!`]); });
+  let changed = false;
+  have.forEach(([id, text]) => { if (!m[id]) { m[id] = { t: first ? 0 : now, text }; changed = true; } });
+  if (changed || first) localStorage_set("notifMiles", JSON.stringify(m));
+  return m;
+}
+function buildNotifs() {
+  const out = [], me = SH.user && SH.user.uid, now = Date.now(), cut = now - 30 * 864e5;
+  const add = (n) => { if (n.ts && n.ts >= cut && n.ts <= now + 6e4) out.push(n); };
+  const who = (d) => d.authorName || (d.authorEmail || "Someone").split("@")[0];
+  const G = "g", ico = { pray: "🙏", ok: "✅", edit: "💬", doc: "📄", lib: "📚", cal: "📅", hi: "👋" };
+  (SH.spaces || []).forEach(sp => {
+    const open = () => { if (sp.type === "prayer") { S.activeMeeting = sp.id; go("prayer"); } else { S.studyMode = sp.type === "one" ? "one" : "group"; S.activeStudyId = sp.id; go("study"); } };
+    const where = sp.name || groupKind(sp), one = sp.type === "one";
+    const data = (sub) => SH.data[sp.id + "/" + sub] || [];
+    if (sp.type === "prayer" && notifOn("prayer")) data("items").forEach(d => {
+      const what = (d.text || "").slice(0, 70) + ((d.text || "").length > 70 ? "…" : "");
+      if (d.authorUid !== me) add({ id: `${sp.id}/i/${d.id}/c`, ts: d.created, k: G, ico: ico.pray, text: `${who(d)} added a prayer: “${what}”`, where, open });
+      const by = d.updatedBy || d.authorUid;
+      if (d.updated && d.updated - (d.created || 0) > 6e4 && by !== me) add({ id: `${sp.id}/i/${d.id}/u${d.updated}`, ts: d.updated, k: G, ico: d.status === "answered" ? ico.ok : ico.edit,
+        text: d.status === "answered" ? `${d.updatedByName || who(d)} marked a prayer answered: “${what}” — praise God!` : `${d.updatedByName || who(d)} updated a prayer: “${what}”`, where, open });
+    });
+    if (sp.type !== "prayer" && notifOn("study")) data("sessions").forEach(d => {
+      if (d.authorUid !== me) add({ id: `${sp.id}/s/${d.id}/c`, ts: d.created, k: G, ico: ico.cal, text: `${who(d)} added a session${d.topic ? ": " + d.topic : ""}${d.date ? " on " + fmtDate(d.date, { weekday: "short", month: "short", day: "numeric" }) : ""}`, where, open });
+    });
+    if (notifOn("docs")) {
+      data("files").forEach(d => { if (d.authorUid !== me) add({ id: `${sp.id}/f/${d.id}`, ts: d.created, k: G, ico: ico.doc, text: `${who(d)} shared a document with ${one ? "you" : "the group"}: ${d.name || "a file"}`, where, open }); });
+      data("library").forEach(d => { if (d.authorUid !== me) add({ id: `${sp.id}/l/${d.id}`, ts: d.created, k: G, ico: ico.lib, text: `${who(d)} shared a Library document with ${one ? "you" : "the group"}: ${d.title || "a file"}`, where, open }); });
+    }
+    if (isOwnerOf(sp) && notifOn("study")) data("requests").forEach(d => add({ id: `${sp.id}/r/${d.id}`, ts: d.created, k: G, ico: ico.hi, text: `${d.name || (d.email || "Someone").split("@")[0]} asked to join your group`, where, open }));
+  });
+  // my journey
+  const today = ymd(new Date()), at = (h) => { const d = new Date(); d.setHours(h, 0, 0, 0); return d.getTime(); };
+  if (notifOn("devo") && now >= at(6)) {
+    const e = DEVOS && DEVOS[today.slice(5)], v = e && e.m ? e.m[1] : "";
+    add({ id: "devo-" + today, ts: at(6), k: "j", ico: "☀️", text: v ? `Today’s devotional is ready: “${v.replace(/[.,;:]?$/, "")}”` : "Today’s devotional is ready", where: "Today", open: () => { S.devo.date = null; go("today"); } });
+  }
+  if (notifOn("progress") && STORIES && now >= at(12)) {
+    const st = readStreak(), days = readDays();
+    if (st >= 2 && !days.has(today)) add({ id: "streak-" + today, ts: at(12), k: "j", ico: "🔥", text: `Keep your ${st}-day reading streak — read one story today`, where: "Plan", open: () => go("plan") });
+  }
+  if (notifOn("memory") && now >= at(8)) {
+    const n = Object.values(S.mem || {}).filter(x => x && x.m).length, dn = Math.floor(at(8) / 864e5);
+    if (n && dn % 3 === 0) add({ id: "mem-" + today, ts: at(8), k: "j", ico: "🧠", text: `Review your memory verses — you’ve memorized ${n}`, where: "Memory", open: () => go("memory") });
+  }
+  if (notifOn("milestones")) Object.entries(milestoneTimes()).forEach(([id, x]) => add({ id: "mile-" + id, ts: x.t, k: "j", ico: "🏅", text: "Milestone: " + x.text, where: "Plan", open: () => go("plan") }));
+  // owner
+  if (SH.reviewAdmin) {
+    (SH.reviews || []).forEach(r => { if (r.id !== me) add({ id: `rev-${r.id}-${r.updated || r.created}`, ts: r.updated || r.created, k: "o", ico: "⭐", text: `App review: ${"★".repeat(r.stars || 0)} from ${revName(r)}`, where: "App reviews (only you)", open: () => { location.hash = "#reviews"; } }); });
+    (SH.members || []).forEach(m => { if (m.id !== me && m.joined) add({ id: "memb-" + m.id, ts: m.joined, k: "o", ico: "🧑", text: `${m.name || (m.email || "").split("@")[0]} joined the app`, where: "Members (only you)", open: () => { location.hash = "#members"; } }); });
+  }
+  const st = notifState();
+  out.forEach(n => { n.unread = n.ts > st.base && !st.read[n.id]; });
+  return out.sort((a, b) => b.ts - a.ts);
+}
+let bellT = 0;
+function paintBellSoon() { clearTimeout(bellT); bellT = setTimeout(paintBell, 250); }
+function paintBell() {
+  const b = $("#open-notifs .notif-badge"); if (!b) return;
+  if (!STORIES && notifOn("milestones")) loadStories().then(paintBellSoon).catch(() => {});
+  const n = buildNotifs().filter(x => x.unread).length;
+  b.hidden = !n; b.textContent = n > 9 ? "9+" : String(n);
+  $("#open-notifs").setAttribute("aria-label", n ? `Notifications, ${n} new` : "Notifications");
+  if ($(".notif-sheet")) renderNotifSheet();
+}
+function progressCard(close) {
+  if (!STORIES || !notifOn("progress")) return null;
+  const wk = Date.now() - 7 * 864e5, nWeek = readEvents("story").filter(e => e.t >= wk).length, st = readStreak(), p = paceInfo();
+  const pct = Math.round(STORIES.filter(storyRead).length / STORIES.length * 1000) / 10;
+  return h("button", { type: "button", class: "notif-pace", onclick: () => { close(); go("plan"); } },
+    h("span", { class: "spread" }, h("span", { class: "eyebrow" }, "Bible reading progress"), h("span", { class: "muted small" }, "This week")),
+    h("span", { class: "progress" }, h("i", { style: `width:${Math.max(pct, 1)}%` })),
+    h("span", null, h("b", null, `${nWeek} ${nWeek === 1 ? "story" : "stories"}`), " this week", st ? ` · ${st}-day streak 🔥` : ""),
+    p && p.headline ? h("span", { class: "muted small" }, p.headline) : null);
+}
+function renderNotifSheet() {
+  const sheet = $(".notif-sheet"); if (!sheet) return;
+  const close = () => { $("#layer").textContent = ""; };
+  const f = S.notifFilter || "all", all = buildNotifs();
+  const list = all.filter(n => f === "all" || (f === "groups" ? n.k === "g" : n.k !== "g"));
+  const day = (t) => { const d = diffDays(ymd(new Date(t)), ymd(new Date())); return d <= 0 ? "Today" : d === 1 ? "Yesterday" : "Earlier"; };
+  const when = (t) => { const m = Math.round((Date.now() - t) / 6e4); return m < 1 ? "just now" : m < 60 ? m + " min ago" : m < 24 * 60 ? Math.round(m / 60) + " h ago" : fmtDate(ymd(new Date(t)), { month: "short", day: "numeric" }); };
+  const body = h("div", { class: "stack", style: "gap:10px" });
+  if (f !== "groups") { const pc = progressCard(close); if (pc) body.append(pc); }
+  if (!list.length) body.append(h("div", { class: "empty" }, h("b", null, "You’re all caught up"), h("span", null, f === "groups" ? "When someone in your prayer meetings or Bible studies adds something, it shows here." : "New things will show up here.")));
+  ["Today", "Yesterday", "Earlier"].forEach(d => {
+    const xs = list.filter(n => day(n.ts) === d); if (!xs.length) return;
+    body.append(h("div", { class: "notif-sec" }, d), h("div", { class: "notif-list" }, ...xs.map(n => h("button", { type: "button", class: "notif-item" + (n.unread ? " unread" : ""),
+      onclick: () => { const st = notifState(); st.read[n.id] = Date.now(); saveNotifState(st); close(); n.open(); } },
+      h("span", { class: "notif-ico", "aria-hidden": "true" }, n.ico),
+      h("span", { class: "notif-txt" }, h("span", null, n.text), h("span", { class: "muted small" }, `${n.where} · ${when(n.ts)}`)),
+      n.unread ? h("span", { class: "notif-dot", "aria-label": "new" }) : null))));
+  });
+  sheet.textContent = "";
+  sheet.append(
+    h("div", { class: "spread" }, h("h2", { class: "title", style: "font-size:24px;margin:0" }, "Notifications"),
+      h("div", { class: "row", style: "gap:6px;flex-wrap:nowrap" },
+        all.some(n => n.unread) ? h("button", { class: "btn sm ghost", type: "button", onclick: () => { saveNotifState({ base: Date.now(), read: {} }); paintBell(); } }, "Mark all read") : null,
+        h("button", { class: "icon-btn", type: "button", "aria-label": "Close notifications", onclick: close }, icon("x")))),
+    h("div", { class: "seg seg-wide", role: "group", "aria-label": "Filter notifications" }, ...[["all", "All"], ["groups", "Groups"], ["me", "My journey"]].map(([k, l]) =>
+      h("button", { type: "button", "aria-pressed": f === k ? "true" : "false", onclick: () => { S.notifFilter = k; renderNotifSheet(); } }, l))),
+    body,
+    h("div", { style: "text-align:center" }, h("button", { class: "btn sm ghost", type: "button", onclick: () => { close(); openSettings("notifs"); } }, "Notification settings")));
+}
+function openNotifs() {
+  const layer = $("#layer"); layer.textContent = "";
+  const sheet = h("div", { class: "sheet notif-sheet", role: "dialog", "aria-modal": "true", "aria-label": "Notifications" });
+  layer.append(h("div", { class: "overlay", onclick: (e) => { if (e.target === e.currentTarget) layer.textContent = ""; } }, sheet));
+  renderNotifSheet();
+  if (!STORIES) loadStories().then(() => renderNotifSheet()).catch(() => {});
+  if (!DEVOS) loadDevos().then(() => renderNotifSheet()).catch(() => {});
+}
+function notifSettingsSection() {
+  return h("div", { class: "stack", style: "gap:8px", id: "notif-settings" }, h("h3", { class: "sub" }, "Notifications"),
+    h("p", { class: "muted small", style: "margin:0" }, "Choose what shows in the bell at the top of the app."),
+    ...NOTIF_PREFS.map(([k, l]) => h("label", { class: "notif-pref" }, h("span", null, l),
+      h("input", { type: "checkbox", class: "switch", role: "switch", checked: notifOn(k) ? true : null, onchange: (e) => setNotifPref(k, e.target.checked) }))));
 }
 
 /* ---- every writing box grows as you type (phone, tablet and computer) ---- */
@@ -3805,6 +3996,7 @@ async function start() {
 window.addEventListener("hashchange", () => { readHash(); if (S.tab !== "bible") S.bible.sel.clear(); render(); window.scrollTo(0, 0); });
 window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); installEvt = e; if (S.tab === "today") rerenderKeepScroll(); });
 $("#open-settings").addEventListener("click", openSettings);
+$("#open-notifs").addEventListener("click", openNotifs);
 $("#share-app").addEventListener("click", openShareApp);
 $("#sync-btn").addEventListener("click", openSettings);
 // Re-check the day when the app comes back to the foreground (e.g. the next morning)
