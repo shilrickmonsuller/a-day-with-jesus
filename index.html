@@ -641,6 +641,8 @@ body.reading { touch-action: pan-y; }
 .artfull-nav .rd-b:disabled { visibility: hidden; }
 .artfull-pic { padding: 0 40px; }
 @media (max-width: 600px) { .artfull-pic { padding: 0 26px; } .artfull-nav .rd-b { width: 30px; } }
+.artfull-bar, .artfull-nav .rd-b { transition: opacity .3s; }
+.artfull.idle .artfull-bar, .artfull.idle .artfull-nav .rd-b { opacity: 0; pointer-events: none; }
 
 </style>
 <header class="topbar gutter">
@@ -1503,7 +1505,7 @@ function openArtFull(slides, start) {
   const seg = h("div", { class: "seg artfull-seg", role: "group", "aria-label": "Illustration" });
   const prev = h("button", { class: "rd-b rd-ic", type: "button", "aria-label": "Previous picture", onclick: () => go2(cur - 1) }, icon("left"));
   const next = h("button", { class: "rd-b rd-ic", type: "button", "aria-label": "Next picture", onclick: () => go2(cur + 1) }, icon("right"));
-  const go2 = (i) => { cur = Math.max(0, Math.min(slides.length - 1, i)); const sl = slides[cur]; S.witIllus = sl.key; if (sl.key === "bridge") S.bridgePage = sl.page; paint(); };
+  const go2 = (i) => { if (typeof wake === "function") wake(); cur = Math.max(0, Math.min(slides.length - 1, i)); const sl = slides[cur]; S.witIllus = sl.key; if (sl.key === "bridge") S.bridgePage = sl.page; paint(); };
   const paint = () => { const sl = slides[cur]; art.innerHTML = sl.svg;
     seg.textContent = ""; seg.append(...[["bridge", "Bridge", 0], ["hand", "Hand", slides.length - 1]].map(([k, l, i]) => h("button", { type: "button", "aria-pressed": sl.key === k ? "true" : "false", onclick: () => go2(k === "bridge" ? (S.bridgePage || 0) : i) }, l)));
     prev.disabled = cur === 0; next.disabled = cur === slides.length - 1; };
@@ -1515,6 +1517,10 @@ function openArtFull(slides, start) {
     h("div", { class: "artfull-bar" }, seg, h("button", { class: "rd-b rd-ic", type: "button", "aria-label": "Exit full screen", onclick: close }, icon("x"))), art,
     h("div", { class: "artfull-nav" }, prev, next));
   layer.textContent = ""; layer.append(box); paint();
+  let idleT = 0;
+  const wake = () => { box.classList.remove("idle"); clearTimeout(idleT); idleT = setTimeout(() => box.classList.add("idle"), 3000); };
+  box.addEventListener("click", (e) => { if (e.target.closest("button")) { wake(); return; } if (box.classList.contains("idle")) wake(); else { clearTimeout(idleT); box.classList.add("idle"); } });
+  wake();
   document.addEventListener("keydown", key);
   try { const r = box.requestFullscreen || box.webkitRequestFullscreen; if (r) { const pr = r.call(box); if (pr && pr.catch) pr.catch(() => {}); } } catch {}
   box.addEventListener("fullscreenchange", () => { if (!document.fullscreenElement && $(".artfull")) close(); });
