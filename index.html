@@ -2149,8 +2149,7 @@ function openSettings(focus) {
     accountSection(),
     h("div", { class: "row", style: "gap:8px" },
       h("button", { class: "btn", type: "button", onclick: () => { layer.textContent = ""; openRateApp(); } }, icon("star"), "Rate & review the app"),
-      SH.reviewAdmin ? h("button", { class: "btn soft", type: "button", onclick: () => { layer.textContent = ""; location.hash = "#reviews"; } }, "App reviews (only you)") : null,
-      SH.reviewAdmin ? h("button", { class: "btn soft", type: "button", onclick: () => { layer.textContent = ""; location.hash = "#members"; } }, "Members (only you)") : null),
+      h("span", { id: "owner-links", class: "row", style: "gap:8px;display:contents" })),
 
     notifSettingsSection(),
 
@@ -2179,6 +2178,7 @@ function openSettings(focus) {
   );
   layer.textContent = "";
   layer.append(h("div", { class: "overlay", onclick: (e) => { if (e.target === e.currentTarget) close(); } }, sheet));
+  fillOwnerLinks(); if (SH.user && !SH.reviewAdmin) checkReviewAdmin();
   if (focus === "notifs") setTimeout(() => { const el = $("#notif-settings"); if (el) el.scrollIntoView({ block: "start" }); }, 50);
   (async () => {
     try { const est = await navigator.storage.estimate(); const p = navigator.storage.persisted ? await navigator.storage.persisted() : false; storageLine.textContent = `Using ${fmtBytes(est.usage || 0)} of storage${p ? " · protected" : ""}`; } catch { storageLine.textContent = ""; }
@@ -2509,7 +2509,7 @@ function accountSection() {
       h("button", { class: "btn primary gbtn", type: "button", onclick: () => signIn() }, googleG(), "Sign in with Google"));
     return box;
   }
-  box.append(
+  box.append(...[
     h("div", { class: "row" }, h("span", { class: "avatar" }, (Sync.name || Sync.email).slice(0, 1).toUpperCase()), h("div", null, h("b", null, Sync.name || Sync.email), h("div", { class: "muted small" }, Sync.email))),
     h("div", { class: "acct-status small" }, syncStatusText()),
     (!drivePerm().appdata || !drivePerm().file) ? h("div", { class: "banner perm-banner" }, h("span", null, !drivePerm().appdata && !drivePerm().file ? "Google Drive isn’t allowed, so syncing and file sharing are off." : !drivePerm().appdata ? "Google Drive’s app folder isn’t allowed, so your notes and progress don’t sync." : "Google Drive files aren’t allowed, so you can’t upload or share files."),
@@ -2523,7 +2523,7 @@ function accountSection() {
           h("button", { class: "btn sm danger", type: "button", onclick: () => signOut(true) }, "Sign out & remove"),
           h("button", { class: "btn sm ghost", type: "button", onclick: () => openSettings() }, "Keep")));
       } }, "Sign out & remove from this device")),
-    h("p", { class: "muted small", style: "margin:0" }, "Your data is saved in a private app folder in your Google Drive. Only this app can see it; it doesn’t appear in your Drive file list."));
+    h("p", { class: "muted small", style: "margin:0" }, "Your data is saved in a private app folder in your Google Drive. Only this app can see it; it doesn’t appear in your Drive file list.")].filter(Boolean));
   return box;
 }
 function googleG() { return h("span", { "aria-hidden": "true", style: "display:inline-grid;background:#fff;border-radius:50%;padding:2px", html: '<svg width="16" height="16" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.6 5.4 2.7 13.3l7.9 6.1C12.5 13.6 17.8 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.7 6c4.5-4.2 6.9-10.3 6.9-17.7z"/><path fill="#FBBC05" d="M10.6 28.6c-.5-1.4-.8-3-.8-4.6s.3-3.2.8-4.6l-7.9-6.1C1 16.6 0 20.2 0 24s1 7.4 2.7 10.7l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.7-6c-2.2 1.5-5 2.3-8.2 2.3-6.2 0-11.5-4.1-13.4-9.9l-7.9 6.1C6.6 42.6 14.6 48 24 48z"/></svg>' }); }
@@ -3409,7 +3409,7 @@ function viewJoin(root) {
   const card = h("section", { class: "join-card" });
   root.append(card);
   const installCard = h("section", { class: "panel stack", style: "gap:8px" }, h("b", null, "Install A Day With Jesus"), h("span", { class: "muted small" }, "Add it to your Home Screen to use it like an app, even offline."), installGuide(false));
-  const head = (eyebrow, title, sub) => card.append(h("div", { class: "eyebrow" }, eyebrow), h("h2", { class: "title", style: "font-size:clamp(24px,5vw,30px)" }, title), sub ? h("p", { class: "muted small", style: "margin:0" }, sub) : null);
+  const head = (eyebrow, title, sub) => card.append(...[h("div", { class: "eyebrow" }, eyebrow), h("h2", { class: "title", style: "font-size:clamp(24px,5vw,30px)" }, title), sub ? h("p", { class: "muted small", style: "margin:0" }, sub) : null].filter(Boolean));
   if (!FB_ON || !SYNC_ON) { head("Invitation", "Groups aren’t set up yet", "This copy of the app can’t open group invitations."); return; }
   if (!Sync.email) {
     head("You’re invited", "Join a group in A Day With Jesus", "Sign in with your Google account to see the invitation and ask to join.");
@@ -3680,8 +3680,16 @@ function openRateApp(preset) {
 function checkReviewAdmin() {
   if (!fdb || !SH.user || SH.reviewAdminChecked) return;
   SH.reviewAdminChecked = true;
-  const un = fdb.collection("reviews").onSnapshot(snap => { SH.reviewAdmin = true; SH.reviews = snap.docs.map(d => ({ id: d.id, ...d.data() })); if (S.tab === "reviews") safeRerender(); notifSubscribe(); paintBellSoon(); },
-    () => { SH.reviewAdmin = false; try { un && un(); } catch {} });
+  const un = fdb.collection("reviews").onSnapshot(snap => { SH.reviewAdmin = true; SH.reviews = snap.docs.map(d => ({ id: d.id, ...d.data() })); if (S.tab === "reviews") safeRerender(); notifSubscribe(); paintBellSoon(); fillOwnerLinks(); },
+    () => { SH.reviewAdmin = false; try { un && un(); } catch {} setTimeout(() => { SH.reviewAdminChecked = false; }, 5000); });   // allow a later retry
+}
+function fillOwnerLinks() {
+  const slot = $("#owner-links"); if (!slot) return;
+  slot.textContent = "";
+  if (!SH.reviewAdmin) return;
+  const go2 = (hash) => () => { $("#layer").textContent = ""; location.hash = hash; };
+  slot.append(h("button", { class: "btn soft", type: "button", onclick: go2("#reviews") }, "App reviews (only you)"),
+    h("button", { class: "btn soft", type: "button", onclick: go2("#members") }, "Members (only you)"));
 }
 function ratingSummary(all) {
   const n = all.length, avg = n ? all.reduce((a, r) => a + (r.stars || 0), 0) / n : 0;
