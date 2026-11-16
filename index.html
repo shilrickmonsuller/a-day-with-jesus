@@ -54,20 +54,20 @@
   --ui: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --read-size: 18px;
   --sky-top: #f6e6c8; --sky-bot: #fbf3e6; --hill-far: #a9b3c9; --hill-near: #7d8aa8;
-  --bridge-sky: #eef1f8; --bridge-cliff: #c9d1e3; --bridge-chasm: #2a3352; --bridge-chasm-text: #f1c27a; --bridge-cross: #8a5a22; --bridge-label: #1b2440; --hand-fill: #f6e4c8;
+  --bridge-sky: #eef1f8; --bridge-cliff: #c9d1e3; --bridge-chasm: #2a3352; --bridge-chasm-text: #f1c27a; --bridge-cross: #8a5a22; --bridge-label: #1b2440; --hand-fill: #f6e4c8; --bridge-cliff-edge: #9aa6c2;
   --nav-h: 64px;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #10152a; --paper: #182039; --ink: #e7eaf3; --muted: #9aa4bd; --line: #2a3352;
     --accent: #e4a94c; --accent-soft: #33291a; --indigo: #aab8ea; --indigo-soft: #222c4c;
-    --ok: #6cc796; --ok-soft: #173326; --danger: #ef8077; --hl: rgba(228, 169, 76, .25); --sky-top: #2a2f4d; --sky-bot: #1a2038; --hill-far: #39436a; --hill-near: #2b3456; --bridge-sky: #1b2240; --bridge-cliff: #34406a; --bridge-chasm: #0b0f1f; --bridge-chasm-text: #e4a94c; --bridge-cross: #d39a52; --bridge-label: #e7eaf3; --hand-fill: #4a3a28; color-scheme: dark;
+    --ok: #6cc796; --ok-soft: #173326; --danger: #ef8077; --hl: rgba(228, 169, 76, .25); --sky-top: #2a2f4d; --sky-bot: #1a2038; --hill-far: #39436a; --hill-near: #2b3456; --bridge-sky: #1b2240; --bridge-cliff: #34406a; --bridge-chasm: #0b0f1f; --bridge-chasm-text: #e4a94c; --bridge-cross: #d39a52; --bridge-label: #e7eaf3; --hand-fill: #4a3a28; --bridge-cliff-edge: #4a5888; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #10152a; --paper: #182039; --ink: #e7eaf3; --muted: #9aa4bd; --line: #2a3352;
   --accent: #e4a94c; --accent-soft: #33291a; --indigo: #aab8ea; --indigo-soft: #222c4c;
-  --ok: #6cc796; --ok-soft: #173326; --danger: #ef8077; --hl: rgba(228, 169, 76, .25); --sky-top: #2a2f4d; --sky-bot: #1a2038; --hill-far: #39436a; --hill-near: #2b3456; --bridge-sky: #1b2240; --bridge-cliff: #34406a; --bridge-chasm: #0b0f1f; --bridge-chasm-text: #e4a94c; --bridge-cross: #d39a52; --bridge-label: #e7eaf3; --hand-fill: #4a3a28; color-scheme: dark;
+  --ok: #6cc796; --ok-soft: #173326; --danger: #ef8077; --hl: rgba(228, 169, 76, .25); --sky-top: #2a2f4d; --sky-bot: #1a2038; --hill-far: #39436a; --hill-near: #2b3456; --bridge-sky: #1b2240; --bridge-cliff: #34406a; --bridge-chasm: #0b0f1f; --bridge-chasm-text: #e4a94c; --bridge-cross: #d39a52; --bridge-label: #e7eaf3; --hand-fill: #4a3a28; --bridge-cliff-edge: #4a5888; color-scheme: dark;
 }
 * { box-sizing: border-box; }
 html, body { background: var(--bg); }
@@ -1552,23 +1552,23 @@ function gospelIllustrations() {
       svg: `<svg viewBox="0 0 560 300" role="img" aria-label="Sin entered the world: the land is split by a deep chasm with the lake of fire below; man stands on one cliff and God on the other; broken bridges of good deeds, morals, education and religion fall into the fire">
         <rect width="560" height="300" rx="16" fill="var(--bridge-sky)"/>
         <path d="M0 132 H176 L196 300 H0Z" fill="var(--bridge-cliff)"/><path d="M560 132 H384 L364 300 H560Z" fill="var(--bridge-cliff)"/>
-        <path d="M196 300 L176 132 H384 L364 300Z" fill="var(--bridge-chasm)"/>
+        <path d="M176 132 L196 300 M384 132 L364 300" stroke="var(--bridge-cliff-edge)" stroke-width="4" fill="none"/>
         <rect x="190" y="258" width="180" height="42" fill="#b8321f"/>${flames(192, 362, 262)}
         ${T(280, 290, "LAKE OF FIRE · Revelation 21:8", 11, 800, "#fff")}
-        ${[["GOOD DEEDS", 152], ["GOOD MORALS", 176], ["EDUCATION", 200], ["RELIGION", 224]].map(([t, y], i) => `<g transform="rotate(${24 + i * 5} 180 ${y})"><rect x="180" y="${y - 9}" width="${88 - i * 4}" height="18" rx="3" fill="#7a6a58"/><path d="M${268 - i * 4} ${y - 9} l8 9 l-8 9z" fill="var(--bridge-chasm)"/><text x="188" y="${y + 4}" font-size="10" font-weight="800" fill="#fff" font-family="system-ui, sans-serif">${t}</text></g>`).join("")}
-        ${T(280, 172, "SIN", 22, 800, "var(--bridge-chasm-text)")}
+        ${[["GOOD DEEDS", 152], ["GOOD MORALS", 176], ["EDUCATION", 200], ["RELIGION", 224]].map(([t, y], i) => `<g transform="rotate(${24 + i * 5} 180 ${y})"><rect x="180" y="${y - 9}" width="${88 - i * 4}" height="18" rx="3" fill="#7a6a58"/><path d="M${268 - i * 4} ${y - 9} l8 9 l-8 9z" fill="var(--bridge-sky)"/><text x="188" y="${y + 4}" font-size="10" font-weight="800" fill="#fff" font-family="system-ui, sans-serif">${t}</text></g>`).join("")}
+        ${T(300, 172, "SIN", 24, 800, "#b8321f")}
         ${person(84, 112)}${godLight(476, 90)}
         ${T(84, 156, "MAN", 15, 800)}${T(84, 174, "Eternal death", 11, 600)}${T(476, 156, "Eternal life", 11, 600)}
         ${T(280, 34, "SIN ENTERED THE WORLD", 15, 800)}${T(280, 54, "Romans 3:23 · Romans 6:23 · Hebrews 9:27", 11, 600)}
       </svg>` },
-    { title: "3 · Reunited through the cross", steps: [
+    { title: "3 · Reunited through Jesus", steps: [
         ["6", "Jesus Christ is the only bridge", ["John 14:6", "Acts 4:12", "1 Timothy 2:5", "Romans 5:6-8", "1 Peter 3:18", "1 Peter 2:24", "1 Corinthians 15:3-4"], "Christ died for our sins, was buried, and rose from death."],
         ["7", "Hear and believe — receive him", ["John 5:24", "John 1:12", "Revelation 3:20", "Romans 10:9-10"]],
         ["8", "Be sure of eternal life", ["John 5:24", "1 John 5:11-12"], "You have eternal life (now), will not come into judgment (future), and have passed from death to life (past)."]],
-      svg: `<svg viewBox="0 0 560 300" role="img" aria-label="Reunited with God through the cross: the cross lies across the chasm as a bridge, and man walks across it to God; hear and believe; John 14:6">
+      svg: `<svg viewBox="0 0 560 300" role="img" aria-label="Reunited with God through Jesus: the cross lies across the chasm as a bridge, and man walks across it to God; hear and believe; John 14:6">
         <rect width="560" height="300" rx="16" fill="var(--bridge-sky)"/>
         <path d="M0 132 H176 L196 300 H0Z" fill="var(--bridge-cliff)"/><path d="M560 132 H384 L364 300 H560Z" fill="#9fd08f"/>
-        <path d="M196 300 L176 132 H384 L364 300Z" fill="var(--bridge-chasm)"/>
+        <path d="M176 132 L196 300 M384 132 L364 300" stroke="var(--bridge-cliff-edge)" stroke-width="4" fill="none"/>
         <rect x="190" y="258" width="180" height="42" fill="#b8321f" opacity=".55"/>${flames(192, 362, 262).replace(/fill="#e8622c"/g, 'fill="#e8622c" opacity=".5"')}
         <rect x="160" y="124" width="240" height="16" rx="3" fill="var(--bridge-cross)"/>
         <rect x="272" y="40" width="16" height="86" rx="3" fill="var(--bridge-cross)"/><rect x="248" y="62" width="64" height="13" rx="3" fill="var(--bridge-cross)"/>
@@ -1576,7 +1576,7 @@ function gospelIllustrations() {
         ${person(420, 112)}${godLight(490, 84)}
         <path d="M84 108 C 180 70, 360 70, 410 96" fill="none" stroke="var(--accent)" stroke-width="3" stroke-dasharray="6 6"/><path d="M410 96 l-13 -3 l7 11z" fill="var(--accent)"/>
         ${T(84, 156, "Old life", 12, 700)}${T(470, 160, "ETERNAL LIFE", 13, 800, "#173a17")}${T(470, 176, "John 5:24", 11, 600, "#173a17")}
-        ${T(280, 28, "MAN REUNITED WITH GOD THROUGH THE CROSS", 14, 800)}
+        ${T(280, 28, "MAN REUNITED WITH GOD THROUGH JESUS", 14, 800)}
         <path d="M300 220 c-8 -12 -26 -4 -18 10 l18 16 l18 -16 c8 -14 -10 -22 -18 -10z" fill="#e05a6a" opacity="0"/>
       </svg>` },
   ];
