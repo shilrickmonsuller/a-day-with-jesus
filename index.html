@@ -582,6 +582,27 @@ input.switch:checked::after { left: 21px; }
 .jc-opt { display: flex; gap: 12px; align-items: flex-start; padding: 13px 14px; border: 0; border-top: 1px solid var(--line); background: transparent; color: var(--ink); font: inherit; text-align: left; cursor: pointer; width: 100%; }
 .jc-opt:first-child { border-top: 0; }
 .jc-ico { flex: none; width: 36px; height: 36px; border-radius: 10px; background: var(--accent-soft); display: grid; place-items: center; font-size: 17px; }
+.notif-sheet { height: min(85vh, 900px); height: min(85dvh, 900px); align-content: start; }
+
+/* full-screen reading */
+.fs-btn { margin-top: 8px; }
+.devo-head .fs-btn { justify-self: center; }
+body.reading .topbar, body.reading .tabbar-wrap, body.reading .banner, body.reading .install-guide,
+body.reading .devo-hero, body.reading .devo-aside, body.reading .devo-rule, body.reading .devo-foot, body.reading .devo-credit, body.reading .fs-btn,
+body.reading .devo-head .btn { display: none !important; }
+body.reading #view .view > *:not(.devo):not(.verses):not(.rd-keep) { display: none !important; }
+body.reading .rd-keep > *:not(.chapter-title) { display: none !important; }
+body.reading .rd-keep { justify-content: center; }
+body.reading .devo-grid { display: block; }
+body.reading .devo-main, body.reading .verses { max-width: 760px; margin-inline: auto; }
+body.reading .devo-body, body.reading .devo-body p, body.reading .verses { font-size: var(--rd-fs, 19px) !important; }
+body.reading #view { padding-top: calc(52px + env(safe-area-inset-top, 0px)); padding-bottom: 90px; }
+#rd-ctrl .rd-top { position: fixed; z-index: 30; top: calc(10px + env(safe-area-inset-top, 0px)); right: max(12px, env(safe-area-inset-right, 0px)); display: flex; gap: 6px; }
+#rd-ctrl .rd-bot { position: fixed; z-index: 30; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); left: 0; right: 0; display: flex; justify-content: center; gap: 8px; pointer-events: none; }
+#rd-ctrl .rd-bot .rd-b { pointer-events: auto; }
+#rd-ctrl .rd-b { display: inline-flex; align-items: center; gap: 6px; border: 0; border-radius: 99px; padding: 8px 14px; background: rgba(27, 36, 64, .88); color: #fff; font: 700 13px system-ui, sans-serif; cursor: pointer; transition: opacity .3s; }
+#rd-ctrl .rd-b svg { width: 16px; height: 16px; }
+#rd-ctrl.idle .rd-b { opacity: 0; pointer-events: none; }
 
 </style>
 <header class="topbar gutter">
@@ -662,7 +683,7 @@ const ICONS = {
   left: '<path d="M15 18l-6-6 6-6"/>', right: '<path d="M9 18l6-6-6-6"/>',
   ext: '<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
   clip: '<path d="M21 11.5l-8.5 8.5a5 5 0 0 1-7-7L14 4.5a3.3 3.3 0 0 1 4.7 4.7l-8.6 8.6a1.7 1.7 0 0 1-2.4-2.4L15.5 7.5"/>',
-  x: '<path d="M6 6l12 12M18 6L6 18"/>', search: '<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>',
+  x: '<path d="M6 6l12 12M18 6L6 18"/>', expand: '<path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>', search: '<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>',
   plan: '<rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4M7.5 13.5l2 2 4-4"/>',
   memory: '<path d="M8 14c-2.5 0-5-1-5-3h18c0 2-2.5 3-5 3"/><path d="M8 14l1 4h6l1-4"/><path d="M12 11c-1.5-1.5-1.5-4 0-7 1.5 3 1.5 5.5 0 7z"/><path d="M8 21h8"/>',
   study: '<circle cx="9" cy="7.5" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 4.5a3 3 0 0 1 0 6M18 14a5 5 0 0 1 3 6"/>',
@@ -878,7 +899,7 @@ function openChapter(b, c, opts = {}) {
 /* ---------- routing ---------- */
 const TABS = [["today", "Today"], ["plan", "Plan"], ["bible", "Bible"], ["memory", "Memory"], ["prayer", "Prayer"], ["study", "Bible Study"], ["notes", "Journal"], ["sermons", "Sermons"], ["library", "Library"], ["saved", "Saved"], ["review", "Review"]];
 const PRIMARY = ["today", "plan", "bible", "memory"];
-function go(tab) { if (location.hash !== "#" + tab) location.hash = "#" + tab; else render(); }
+function go(tab) { if (S.reading && tab !== S.tab) exitReading(true); if (location.hash !== "#" + tab) location.hash = "#" + tab; else render(); }
 function readHash() { let t = location.hash.slice(1); if (t === "reviews") { S.tab = "reviews"; return; } if (t === "members") { S.tab = "members"; return; } if (t === "member-reviews") { S.tab = "memberReviews"; return; } if (/^join-[A-Za-z0-9]{6,20}$/.test(t)) { S.joinCode = t.slice(5).toUpperCase(); S.tab = "join"; return; } if (t === "lamp") t = "memory"; S.tab = TABS.some(x => x[0] === t) ? t : "today"; }
 function renderTabs() {
   const nav = $("#tabbar"); nav.textContent = "";
@@ -1000,7 +1021,8 @@ function viewToday(root) {
     h("header", { class: "devo-head" },
       date !== today ? h("button", { class: "btn sm", type: "button", onclick: () => setDate(today) }, "Back to today") : null,
       h("h2", { class: "devo-title" }, devoTitle(verse)),
-      h("div", { class: "devo-by" }, "By C. H. Spurgeon")),
+      h("div", { class: "devo-by" }, "By C. H. Spurgeon"),
+      h("button", { class: "btn sm fs-btn", type: "button", onclick: enterReading }, icon("expand"), "Full screen")),
     h("div", { class: "devo-grid" },
       h("aside", { class: "devo-aside" }, datePicker, editions),
       body)));
@@ -1272,8 +1294,9 @@ function viewBible(root) {
   root.append(h("div", { class: "bible-bar" },
     h("button", { class: "btn", type: "button", style: "justify-content:flex-start", onclick: () => { B.mode = "books"; B.pickBook = B.b; render(); } }, `${BOOKS[B.b]} ${B.c}`),
     h("button", { class: "icon-btn", type: "button", "aria-label": "Previous chapter", onclick: () => stepChapter(-1) }, icon("left")),
-    h("button", { class: "icon-btn", type: "button", "aria-label": "Next chapter", onclick: () => stepChapter(1) }, icon("right"))));
-  root.append(h("div", { class: "spread" },
+    h("button", { class: "icon-btn", type: "button", "aria-label": "Next chapter", onclick: () => stepChapter(1) }, icon("right")),
+    h("button", { class: "icon-btn fs-btn", type: "button", "aria-label": "Full screen", title: "Full screen", onclick: enterReading }, icon("expand"))));
+  root.append(h("div", { class: "spread rd-keep" },
     h("h2", { class: "chapter-title" }, BOOKS[B.b] === "Psalms" ? `Psalm ${B.c}` : `${BOOKS[B.b]} ${B.c}`),
     versionSeg()));
   root.append(h("div", { class: "row", style: "margin-top:-6px" }, h("span", { class: "muted small" }, VERSIONS[curVer()].name + " · also read in"), nivLink(`${BOOKS[B.b]} ${B.c}`)));
@@ -3937,6 +3960,54 @@ function notifSettingsSection() {
     ...NOTIF_PREFS.map(([k, l]) => h("label", { class: "notif-pref" }, h("span", null, l),
       h("input", { type: "checkbox", class: "switch", role: "switch", checked: notifOn(k) ? true : null, onchange: (e) => setNotifPref(k, e.target.checked) }))));
 }
+
+
+/* ================= Full-screen reading (Today & Bible) ================= */
+let rdTimer = 0;
+function rdFont() { const v = parseInt(localStorage_get("readFs") || "", 10); return v >= 14 && v <= 28 ? v : 19; }
+function rdWake() {
+  const c = $("#rd-ctrl"); if (!c) return;
+  c.classList.remove("idle"); clearTimeout(rdTimer); rdTimer = setTimeout(() => c.classList.add("idle"), 3000);
+}
+function enterReading() {
+  if (S.reading) return;
+  S.reading = true; S.readTab = S.tab;
+  document.body.classList.add("reading");
+  document.body.style.setProperty("--rd-fs", rdFont() + "px");
+  const step = (d) => {
+    if (S.tab === "today") { const today = ymd(new Date()), cur = S.devo.date || today, nx = addDays(cur, d); S.devo.date = nx === today ? null : nx; render(); }
+    else if (S.tab === "bible") stepChapter(d);
+    window.scrollTo(0, 0); rdWake();
+  };
+  const size = (d) => { const v = Math.min(28, Math.max(14, rdFont() + d)); localStorage_set("readFs", String(v)); document.body.style.setProperty("--rd-fs", v + "px"); rdWake(); };
+  const lbl = S.tab === "bible" ? ["Previous chapter", "Next chapter"] : ["Previous day", "Next day"];
+  const ctrl = h("div", { id: "rd-ctrl" },
+    h("div", { class: "rd-top" },
+      h("button", { class: "rd-b", type: "button", "aria-label": "Smaller text", onclick: () => size(-1) }, "A−"),
+      h("button", { class: "rd-b", type: "button", "aria-label": "Bigger text", onclick: () => size(1) }, "A+"),
+      h("button", { class: "rd-b", type: "button", onclick: () => exitReading() }, icon("x"), "Exit")),
+    h("div", { class: "rd-bot" },
+      h("button", { class: "rd-b", type: "button", onclick: () => step(-1) }, icon("left"), lbl[0]),
+      h("button", { class: "rd-b", type: "button", onclick: () => step(1) }, lbl[1], icon("right"))));
+  document.body.append(ctrl);
+  try { history.pushState({ rd: 1 }, ""); } catch {}
+  const el = document.documentElement;
+  try { const r = (el.requestFullscreen || el.webkitRequestFullscreen); if (r) { const pr = r.call(el); if (pr && pr.catch) pr.catch(() => {}); } } catch {}
+  window.scrollTo(0, 0); rdWake();
+}
+function exitReading(fromNav) {
+  if (!S.reading) return;
+  S.reading = false; clearTimeout(rdTimer);
+  document.body.classList.remove("reading");
+  const c = $("#rd-ctrl"); if (c) c.remove();
+  try { if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(() => {}); else if (document.webkitFullscreenElement && document.webkitExitFullscreen) document.webkitExitFullscreen(); } catch {}
+  if (!fromNav && history.state && history.state.rd) { S.rdPopping = true; history.back(); }
+}
+window.addEventListener("popstate", () => { if (S.rdPopping) { S.rdPopping = false; return; } if (S.reading) exitReading(true); });
+document.addEventListener("fullscreenchange", () => { if (!document.fullscreenElement && S.reading && S.rdFs) exitReading(); S.rdFs = !!document.fullscreenElement; });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && S.reading) exitReading(); });
+document.addEventListener("click", (e) => { if (!S.reading || e.target.closest(".fs-btn")) return; if (e.target.closest("#rd-ctrl") || e.target.closest(".selbar") || e.target.closest("#layer")) { rdWake(); return; }
+  const c = $("#rd-ctrl"); if (!c) return; if (c.classList.contains("idle")) rdWake(); else { clearTimeout(rdTimer); c.classList.add("idle"); } });
 
 /* ---- every writing box grows as you type (phone, tablet and computer) ---- */
 function autosize(t) {
