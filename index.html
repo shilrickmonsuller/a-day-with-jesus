@@ -609,6 +609,9 @@ body.reading { touch-action: pan-y; }
 #rd-tip { position: fixed; z-index: 31; left: 50%; top: 45%; transform: translate(-50%, -50%); background: rgba(27, 36, 64, .9); color: #fff; border-radius: 12px; padding: 10px 16px; font: 700 15px system-ui, sans-serif; opacity: 0; pointer-events: none; transition: opacity .25s; }
 #rd-tip.on { opacity: 1; }
 
+@media (min-width: 700px) { .fs-btn { display: none !important; } .tabbar .fs-tab { border-left: 1px solid var(--line); border-radius: 0 10px 10px 0; } }
+@media (min-width: 700px) { .tabbar button { padding: 9px 9px; } }
+
 </style>
 <header class="topbar gutter">
   <div class="shell">
@@ -909,6 +912,7 @@ function readHash() { let t = location.hash.slice(1); if (t === "reviews") { S.t
 function renderTabs() {
   const nav = $("#tabbar"); nav.textContent = "";
   TABS.forEach(([id, label]) => nav.append(h("button", { type: "button", class: PRIMARY.includes(id) ? "primary-tab" : "secondary-tab", "aria-current": S.tab === id ? "page" : null, onclick: () => go(id) }, icon(id), h("span", null, label))));
+  if (S.tab === "today" || S.tab === "bible") nav.append(h("button", { type: "button", class: "fs-tab wide-only", "aria-label": "Full screen", title: "Full screen", onclick: enterReading }, icon("expand")));
   nav.append(h("button", { type: "button", class: "more-tab", "aria-current": PRIMARY.includes(S.tab) ? null : "page", "aria-haspopup": "dialog", onclick: openMore }, icon("more"), h("span", null, PRIMARY.includes(S.tab) ? "More" : (TABS.find(t => t[0] === S.tab) || [, "More"])[1])));
 }
 function openMore() {
@@ -2599,7 +2603,8 @@ function addSub(spaceId, sub, data) {
 const updSub = (spaceId, sub, id, data) => spaceRef(spaceId).collection(sub).doc(id).update({ ...data, updated: Date.now(), updatedBy: SH.user ? SH.user.uid : "", updatedByName: meName() }).catch(fbErr);
 const delSub = (spaceId, sub, id) => spaceRef(spaceId).collection(sub).doc(id).delete().catch(fbErr);
 const isOwnerOf = (sp) => SH.user && sp.ownerUid === SH.user.uid;
-const canEditItem = (sp, it) => SH.user && (it.authorUid === SH.user.uid || isOwnerOf(sp));
+const canEditItem = (sp, it) => !!SH.user && (sp.memberEmails || []).includes(meEmail());          // every member can edit
+const canDeleteItem = (sp, it) => !!SH.user && (it.authorUid === SH.user.uid || isOwnerOf(sp));       // only the writer or the leader removes
 
 /* gate shown when shared features can’t run yet */
 function sharedGate(root, what) {
@@ -2768,7 +2773,7 @@ async function shareUpload(sp, files) {
 }
 
 /* ---------- collapsible helpers (approved layout) ---------- */
-function isOpenKey(key, dflt) { return key in S.collapse ? S.collapse[key] : !!dflt; }
+function isOpenKey(key, dflt) { return key in S.collapse ? S.collapse[key] : false; }   // everything starts closed
 function setOpenKey(key, v) { S.collapse[key] = v; }
 function chevronSvg(open) { return h("span", { "aria-hidden": "true", class: "chev" + (open ? " open" : ""), html: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">${ICONS.down}</svg>` }); }
 /* A section bar below the items: "+ Add …" or "3 Members" */
@@ -2842,7 +2847,7 @@ function groupFileRow(sp, f) {
           toast("Saved to your library"); rerenderKeepScroll();
         } }, saved ? "Saved" : "Save to my library") : null,
         f.src === "lib" && (mineF || isOwnerOf(sp)) ? deleteRow("Stop sharing", "Stop sharing this file with the group?", () => delSub(sp.id, "library", f.id)) : null,
-        f.src === "up" && canEditItem(sp, f) ? deleteRow("Remove", "Remove for everyone?", async () => {
+        f.src === "up" && canDeleteItem(sp, f) ? deleteRow("Remove", "Remove for everyone?", async () => {
           if (f.authorUid === SH.user.uid && Sync.token) await gfetch(`files/${encodeURIComponent(f.driveId)}`, { method: "DELETE" }).catch(() => {});
           delSub(sp.id, "files", f.id);
         }) : null)));
@@ -2925,6 +2930,17 @@ function meetingView(root, m) {
   root.append(collapseBar(`pm-mem:${m.id}`, "Members", String(m.memberEmails.length), false, () => membersPanel(m, 0, true)));
   if (isOwnerOf(m)) root.append(h("div", { class: "row", style: "justify-content:flex-end" }, deleteRow("Delete meeting", "Delete this meeting for everyone?", () => { spaceRef(m.id).delete().catch(fbErr); S.activeMeeting = null; render(); })));
 }
+function sessionEditor(sp, x) {
+  const d = h("input", { class: "field", type: "date", value: x.date || ymd(new Date()) });
+  const t = h("input", { class: "field", value: x.topic || "", placeholder: "Lesson or passage" });
+  const n = h("textarea", { class: "field", rows: "4", placeholder: "Notes" }, x.notes || "");
+  return h("div", { class: "stack", style: "gap:10px" },
+    h("div", { class: "two" }, h("label", { class: "lbl" }, "Date", d), h("label", { class: "lbl" }, "Lesson or passage", t)),
+    h("label", { class: "lbl" }, "Notes", n),
+    h("div", { class: "row" },
+      h("button", { class: "btn sm primary", type: "button", onclick: () => { updSub(sp.id, "sessions", x.id, { date: d.value || x.date, topic: t.value.trim(), notes: n.value.trim() }); S.editingItem = null; rerenderKeepScroll(); toast("Session saved"); } }, "Save"),
+      h("button", { class: "btn sm ghost", type: "button", onclick: () => { S.editingItem = null; rerenderKeepScroll(); } }, "Cancel")));
+}
 function prayerItemCard(m, it) {
   const mine = canEditItem(m, it), answering = S.answering === it.id, editing = S.editingItem === it.id;
   const card = h("article", { class: "pitem" + (it.status === "answered" ? " answered" : "") },
@@ -2935,6 +2951,7 @@ function prayerItemCard(m, it) {
     const t = h("textarea", { class: "field", id: "pm-edit", rows: "3" }, it.text);
     card.append(t, h("div", { class: "row" }, h("button", { class: "btn sm primary", type: "button", onclick: () => { updSub(m.id, "items", it.id, { text: t.value.trim() }); S.editingItem = null; rerenderKeepScroll(); } }, "Save"), h("button", { class: "btn sm ghost", type: "button", onclick: () => { S.editingItem = null; rerenderKeepScroll(); } }, "Cancel")));
   } else card.append(h("p", { class: "txt", style: "white-space:pre-wrap" }, it.text));
+  if (!editing && it.updatedByName && it.updatedBy !== it.authorUid && it.updated - (it.created || 0) > 6e4) card.append(h("div", { class: "muted small" }, `Edited by ${SH.user && it.updatedBy === SH.user.uid ? "you" : it.updatedByName}`));
   if (it.status === "answered") card.append(h("div", { class: "answer" }, h("b", null, "Answered" + (it.answeredDate ? " " + fmtDate(it.answeredDate, { month: "short", day: "numeric", year: "numeric" }) : "")), it.answerNote ? h("div", { style: "white-space:pre-wrap" }, it.answerNote) : null));
   if (answering) {
     const aDate = h("input", { class: "field", type: "date", id: "pm-adate", value: ymd(new Date()) });
@@ -2947,7 +2964,7 @@ function prayerItemCard(m, it) {
     it.status === "answered" ? h("button", { class: "btn sm", type: "button", onclick: () => updSub(m.id, "items", it.id, { status: "praying" }) }, "Still praying")
       : h("button", { class: "btn sm on", type: "button", onclick: () => { S.answering = it.id; rerenderKeepScroll(); } }, icon("check"), "Mark answered"),
     h("button", { class: "btn sm ghost", type: "button", onclick: () => { S.editingItem = it.id; rerenderKeepScroll(); } }, "Edit"),
-    deleteRow("Delete", "Delete this item?", () => delSub(m.id, "items", it.id))));
+    canDeleteItem(m, it) ? deleteRow("Delete", "Delete this item?", () => delSub(m.id, "items", it.id)) : null));
   return card;
 }
 
@@ -2967,8 +2984,11 @@ function studySpaceView(root, sp) {
     else if (!sessions.length) box.append(h("div", { class: "muted small", style: "padding:0 4px 4px" }, "No sessions yet. Open “Add a session” below."));
     else [...sessions].sort((a, b) => (b.date || "").localeCompare(a.date || "") || b.created - a.created).forEach((x, idx) => box.append(collapseRow(`ss:${sp.id}:${x.id}`, idx === 0,
       h("span", { class: "crow-text" }, h("b", null, x.topic || "Session"), h("span", { class: "muted small" }, `${fmtDate(x.date, { weekday: "short", month: "short", day: "numeric" })} · by ${x.authorEmail === meEmail() ? "you" : (x.authorName || x.authorEmail)}`)),
-      () => h("div", { class: "stack", style: "gap:8px" }, x.notes ? h("div", { class: "log-text log-item" }, x.notes) : h("div", { class: "muted small" }, "No notes."),
-        canEditItem(sp, x) ? h("div", null, deleteRow("Remove", "Remove this session?", () => delSub(sp.id, "sessions", x.id))) : null))));
+      () => S.editingItem === x.id ? sessionEditor(sp, x) : h("div", { class: "stack", style: "gap:8px" }, x.notes ? h("div", { class: "log-text log-item" }, x.notes) : h("div", { class: "muted small" }, "No notes."),
+        x.updatedByName && x.updated - (x.created || 0) > 6e4 ? h("div", { class: "muted small" }, `Edited by ${x.updatedBy === SH.user.uid ? "you" : x.updatedByName}`) : null,
+        h("div", { class: "row" },
+          canEditItem(sp, x) ? h("button", { class: "btn sm ghost", type: "button", onclick: () => { S.editingItem = x.id; rerenderKeepScroll(); } }, "Edit") : null,
+          canDeleteItem(sp, x) ? deleteRow("Remove", "Remove this session?", () => delSub(sp.id, "sessions", x.id)) : null)))));
     return box;
   }));
   // Shared files (closed): uploads here + files shared from members' Libraries
@@ -3355,7 +3375,6 @@ function inviteBars(root, sp) {
   }));
   const reqs = subData(sp.id, "requests") || [];
   const rk = `req:${sp.id}`;
-  if (reqs.length && !(rk in S.collapse)) setOpenKey(rk, true);
   root.append(collapseBar(rk, "Join requests", String(reqs.length), false, () => {
     if (!reqs.length) return h("div", { class: "muted small" }, "No requests waiting. People who use your invite link appear here.");
     return h("div", { class: "stack", style: "gap:8px" }, [...reqs].sort((a, b) => a.created - b.created).map(r => h("div", { class: "crow", style: "padding:10px 12px;display:grid;gap:8px" },
