@@ -604,6 +604,11 @@ body.reading #view { padding-top: calc(52px + env(safe-area-inset-top, 0px)); pa
 #rd-ctrl .rd-b svg { width: 16px; height: 16px; }
 #rd-ctrl.idle .rd-b { opacity: 0; pointer-events: none; }
 
+body.reading { touch-action: pan-y; }
+#rd-ctrl .rd-hint { background: rgba(27, 36, 64, .6); font-weight: 600; cursor: default; }
+#rd-tip { position: fixed; z-index: 31; left: 50%; top: 45%; transform: translate(-50%, -50%); background: rgba(27, 36, 64, .9); color: #fff; border-radius: 12px; padding: 10px 16px; font: 700 15px system-ui, sans-serif; opacity: 0; pointer-events: none; transition: opacity .25s; }
+#rd-tip.on { opacity: 1; }
+
 </style>
 <header class="topbar gutter">
   <div class="shell">
@@ -1021,7 +1026,7 @@ function viewToday(root) {
     h("header", { class: "devo-head" },
       date !== today ? h("button", { class: "btn sm", type: "button", onclick: () => setDate(today) }, "Back to today") : null,
       h("h2", { class: "devo-title" }, devoTitle(verse)),
-      h("div", { class: "devo-by" }, "By C. H. Spurgeon"),
+      h("div", { class: "devo-by" }, "By Charles H. Spurgeon"),
       h("button", { class: "btn sm fs-btn", type: "button", onclick: enterReading }, icon("expand"), "Full screen")),
     h("div", { class: "devo-grid" },
       h("aside", { class: "devo-aside" }, datePicker, editions),
@@ -3964,7 +3969,22 @@ function notifSettingsSection() {
 
 /* ================= Full-screen reading (Today & Bible) ================= */
 let rdTimer = 0;
-function rdFont() { const v = parseInt(localStorage_get("readFs") || "", 10); return v >= 14 && v <= 28 ? v : 19; }
+function rdFont() { const v = parseFloat(localStorage_get("readFs") || ""); return v >= 14 && v <= 36 ? v : 19; }
+let rdPinch = null, rdTipT = 0;
+function rdSetFont(v, save) {
+  v = Math.round(Math.min(36, Math.max(14, v)) * 2) / 2;
+  document.body.style.setProperty("--rd-fs", v + "px");
+  if (save) localStorage_set("readFs", String(v));
+  let tip = $("#rd-tip"); if (!tip) { tip = h("div", { id: "rd-tip", role: "status" }); document.body.append(tip); }
+  tip.textContent = "Text size " + Math.round(v / 19 * 100) + "%"; tip.classList.add("on");
+  clearTimeout(rdTipT); rdTipT = setTimeout(() => tip.classList.remove("on"), 900);
+  return v;
+}
+const rdDist = (t) => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+document.addEventListener("touchstart", (e) => { if (S.reading && e.touches.length === 2) { rdPinch = { d: rdDist(e.touches), fs: rdFont(), v: rdFont() }; } }, { passive: true });
+document.addEventListener("touchmove", (e) => { if (!rdPinch || e.touches.length !== 2) return; e.preventDefault(); rdPinch.v = rdSetFont(rdPinch.fs * rdDist(e.touches) / rdPinch.d, false); }, { passive: false });
+document.addEventListener("touchend", (e) => { if (rdPinch && e.touches.length < 2) { localStorage_set("readFs", String(rdPinch.v)); rdPinch = null; } }, { passive: true });
+document.addEventListener("wheel", (e) => { if (!S.reading || !e.ctrlKey) return; e.preventDefault(); rdSetFont(rdFont() * Math.exp(-e.deltaY / 200), true); }, { passive: false });
 function rdWake() {
   const c = $("#rd-ctrl"); if (!c) return;
   c.classList.remove("idle"); clearTimeout(rdTimer); rdTimer = setTimeout(() => c.classList.add("idle"), 3000);
@@ -3979,12 +3999,10 @@ function enterReading() {
     else if (S.tab === "bible") stepChapter(d);
     window.scrollTo(0, 0); rdWake();
   };
-  const size = (d) => { const v = Math.min(28, Math.max(14, rdFont() + d)); localStorage_set("readFs", String(v)); document.body.style.setProperty("--rd-fs", v + "px"); rdWake(); };
   const lbl = S.tab === "bible" ? ["Previous chapter", "Next chapter"] : ["Previous day", "Next day"];
   const ctrl = h("div", { id: "rd-ctrl" },
     h("div", { class: "rd-top" },
-      h("button", { class: "rd-b", type: "button", "aria-label": "Smaller text", onclick: () => size(-1) }, "A−"),
-      h("button", { class: "rd-b", type: "button", "aria-label": "Bigger text", onclick: () => size(1) }, "A+"),
+      h("span", { class: "rd-b rd-hint" }, "Pinch to zoom text"),
       h("button", { class: "rd-b", type: "button", onclick: () => exitReading() }, icon("x"), "Exit")),
     h("div", { class: "rd-bot" },
       h("button", { class: "rd-b", type: "button", onclick: () => step(-1) }, icon("left"), lbl[0]),
