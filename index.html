@@ -54,20 +54,20 @@
   --ui: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --read-size: 18px;
   --sky-top: #f6e6c8; --sky-bot: #fbf3e6; --hill-far: #a9b3c9; --hill-near: #7d8aa8;
-  --bridge-sky: #eef1f8; --bridge-cliff: #c9d1e3; --bridge-chasm: #2a3352; --bridge-chasm-text: #f1c27a; --bridge-cross: #8a5a22; --bridge-label: #1b2440;
+  --bridge-sky: #eef1f8; --bridge-cliff: #c9d1e3; --bridge-chasm: #2a3352; --bridge-chasm-text: #f1c27a; --bridge-cross: #8a5a22; --bridge-label: #1b2440; --hand-fill: #f6e4c8;
   --nav-h: 64px;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #10152a; --paper: #182039; --ink: #e7eaf3; --muted: #9aa4bd; --line: #2a3352;
     --accent: #e4a94c; --accent-soft: #33291a; --indigo: #aab8ea; --indigo-soft: #222c4c;
-    --ok: #6cc796; --ok-soft: #173326; --danger: #ef8077; --hl: rgba(228, 169, 76, .25); --sky-top: #2a2f4d; --sky-bot: #1a2038; --hill-far: #39436a; --hill-near: #2b3456; --bridge-sky: #1b2240; --bridge-cliff: #34406a; --bridge-chasm: #0b0f1f; --bridge-chasm-text: #e4a94c; --bridge-cross: #d39a52; --bridge-label: #e7eaf3; color-scheme: dark;
+    --ok: #6cc796; --ok-soft: #173326; --danger: #ef8077; --hl: rgba(228, 169, 76, .25); --sky-top: #2a2f4d; --sky-bot: #1a2038; --hill-far: #39436a; --hill-near: #2b3456; --bridge-sky: #1b2240; --bridge-cliff: #34406a; --bridge-chasm: #0b0f1f; --bridge-chasm-text: #e4a94c; --bridge-cross: #d39a52; --bridge-label: #e7eaf3; --hand-fill: #4a3a28; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #10152a; --paper: #182039; --ink: #e7eaf3; --muted: #9aa4bd; --line: #2a3352;
   --accent: #e4a94c; --accent-soft: #33291a; --indigo: #aab8ea; --indigo-soft: #222c4c;
-  --ok: #6cc796; --ok-soft: #173326; --danger: #ef8077; --hl: rgba(228, 169, 76, .25); --sky-top: #2a2f4d; --sky-bot: #1a2038; --hill-far: #39436a; --hill-near: #2b3456; --bridge-sky: #1b2240; --bridge-cliff: #34406a; --bridge-chasm: #0b0f1f; --bridge-chasm-text: #e4a94c; --bridge-cross: #d39a52; --bridge-label: #e7eaf3; color-scheme: dark;
+  --ok: #6cc796; --ok-soft: #173326; --danger: #ef8077; --hl: rgba(228, 169, 76, .25); --sky-top: #2a2f4d; --sky-bot: #1a2038; --hill-far: #39436a; --hill-near: #2b3456; --bridge-sky: #1b2240; --bridge-cliff: #34406a; --bridge-chasm: #0b0f1f; --bridge-chasm-text: #e4a94c; --bridge-cross: #d39a52; --bridge-label: #e7eaf3; --hand-fill: #4a3a28; color-scheme: dark;
 }
 * { box-sizing: border-box; }
 html, body { background: var(--bg); }
@@ -1439,6 +1439,7 @@ async function addToJournal() {
 /* ================= MY MEMORY VERSES ================= */
 const collections = () => (MEMORY ? MEMORY.collections : []);
 const getColl = (id) => collections().find(c => c.id === id);
+const ownText = (c) => c && (c.id === "lamp2" || c.id === "lamp1");   // collections that carry their own NIV text
 function memKey(c, s, v) { return c.id === "lamp2" ? s.id + v.n : `${c.id}:${s.id}${v.n}`; }
 function kjvText(ref) {
   if (!BIBLE) return "";
@@ -1447,7 +1448,7 @@ function kjvText(ref) {
 }
 function memFlat(id = "lamp2") {
   const c = getColl(id); if (!c) return [];
-  return c.sections.flatMap(s => s.verses.map(v => ({ ...v, sec: s.id, secName: s.name, key: memKey(c, s, v), coll: c.id, trans: c.id === "lamp2" ? "NIV" : curVer(), text: v.text || kjvText(v.ref) })));
+  return c.sections.flatMap(s => s.verses.map(v => ({ ...v, sec: s.id, secName: s.name, key: memKey(c, s, v), coll: c.id, trans: ownText(c) ? "NIV" : curVer(), text: v.text || kjvText(v.ref) })));
 }
 function weekVerses(day) {
   const flat = memFlat("lamp2"); if (!flat.length) return [];
@@ -1458,41 +1459,77 @@ const isMem = (key) => !!(S.mem[key] && S.mem[key].m);
 function memCard(v) { return { key: v.key, kind: "mem", ref: v.ref, text: v.text, topic: `${v.sec}${v.n} · ${v.topic}`, trans: v.trans }; }
 function setMem(key, on) { S.mem[key] = { m: on, t: Date.now() }; saveKV("mem"); }
 
-function bridgeIllustration() {
-  const steps = [
-    ["1", "God loves you", ["John 3:16"]],
-    ["2", "All have sinned", ["Romans 3:23"]],
-    ["3", "Sin brings death and judgment", ["Romans 6:23", "Hebrews 9:27"]],
-    ["4", "Christ is the only bridge", ["Romans 5:8", "1 Timothy 2:5", "John 14:6", "1 Corinthians 15:3-4"]],
-    ["5", "Receive him by faith", ["Ephesians 2:8-9", "Romans 10:9-10"]],
-    ["6", "You can be sure of eternal life", ["John 5:24"]],
-  ];
-  const svg = `<svg viewBox="0 0 520 250" role="img" aria-label="Bridge illustration: people on one cliff and God on the other, separated by the chasm of sin, joined by the cross of Christ">
-    <rect x="0" y="0" width="520" height="250" rx="16" fill="var(--bridge-sky)"/>
-    <path d="M0 120 H178 L196 250 H0Z" fill="var(--bridge-cliff)"/>
-    <path d="M520 120 H342 L324 250 H520Z" fill="var(--bridge-cliff)"/>
-    <path d="M196 250 L178 120 H342 L324 250Z" fill="var(--bridge-chasm)"/>
-    <text x="260" y="214" text-anchor="middle" font-size="15" font-weight="700" fill="var(--bridge-chasm-text)" font-family="system-ui, sans-serif">SIN · DEATH · JUDGMENT</text>
-    <rect x="160" y="112" width="200" height="14" rx="3" fill="var(--bridge-cross)"/>
-    <rect x="252" y="42" width="16" height="92" rx="3" fill="var(--bridge-cross)"/>
-    <rect x="232" y="62" width="56" height="13" rx="3" fill="var(--bridge-cross)"/>
-    <text x="78" y="150" text-anchor="middle" font-size="18" font-weight="800" fill="var(--bridge-label)" font-family="system-ui, sans-serif">PEOPLE</text>
-    <text x="442" y="150" text-anchor="middle" font-size="18" font-weight="800" fill="var(--bridge-label)" font-family="system-ui, sans-serif">GOD</text>
-    <text x="442" y="172" text-anchor="middle" font-size="13" fill="var(--bridge-label)" font-family="system-ui, sans-serif">Eternal life</text>
-    <text x="78" y="172" text-anchor="middle" font-size="13" fill="var(--bridge-label)" font-family="system-ui, sans-serif">Separated by sin</text>
-    <text x="260" y="34" text-anchor="middle" font-size="14" font-weight="800" fill="var(--bridge-label)" font-family="system-ui, sans-serif">JESUS CHRIST</text>
-    <path d="M70 98 C 150 70, 370 70, 430 96" fill="none" stroke="var(--accent)" stroke-width="3" stroke-dasharray="6 6"/>
-    <path d="M430 96 l-12 -2 l6 10z" fill="var(--accent)"/>
-    ${[[442, 92, "1"], [78, 92, "2"], [208, 186, "3"], [300, 86, "4"], [140, 84, "5"], [478, 112, "6"]].map(([x, y, n]) =>
-      `<g><circle cx="${x}" cy="${y}" r="13" fill="var(--ink)"/><text x="${x}" y="${y + 5}" text-anchor="middle" font-size="14" font-weight="800" fill="var(--paper)" font-family="system-ui, sans-serif">${n}</text></g>`).join("")}
-  </svg>`;
-  return collapseSec("mem-bridge", false, "The Bridge illustration", "6 steps · tap a verse to jump to it", null, () => h("div", { class: "bridge stack", style: "gap:12px" },
-    h("div", { class: "bridge-art", html: svg }),
-    h("ol", { class: "bridge-steps" }, steps.map(([n, label, refs]) => h("li", null,
-      h("span", { class: "bridge-num" }, n),
-      h("div", null, h("b", null, label), h("div", { class: "row", style: "gap:6px;margin-top:4px" }, refs.map(r => h("button", { class: "chip", type: "button", onclick: () => { openMemRef("witness", r); const el = document.querySelector(`[data-ref="${CSS.escape(r)}"]`); if (el) { el.scrollIntoView({ block: "center", behavior: "smooth" }); el.classList.add("flash-hl"); setTimeout(() => el.classList.remove("flash-hl"), 1600); } } }, r))))))),
-    h("p", { class: "muted small", style: "margin:0" }, "Draw it on paper as you explain each step, then read the verse together.")));
+const WIT_OLD = { W1: "A4", W2: "B1", W3: "B3", W4: "B4", W5: "C1", W6: "C3", W7: "C4", W8: "C7", W9: "B8", W10: "D3", W11: "E1" };
+function migrateWitnessKeys() {   // the Witnessing list was regrouped into sections; carry "memorized" marks over
+  let moved = false;
+  Object.keys(S.mem || {}).forEach(k => { const m = /^witness:(W\d+)$/.exec(k); if (!m) return;
+    const nk = WIT_OLD[m[1]] ? "witness:" + WIT_OLD[m[1]] : null; if (nk && !S.mem[nk]) S.mem[nk] = S.mem[k]; delete S.mem[k]; moved = true; });
+  if (moved) saveKV("mem");
 }
+function gospelIllustrations() {
+  const mode = S.witIllus || "bridge";
+  const chips = (refs) => h("div", { class: "row", style: "gap:6px;margin-top:4px" }, refs.map(r => h("button", { class: "chip", type: "button", onclick: () => {
+    openMemRef("witness", r); setTimeout(() => { const el = document.querySelector(`[data-ref="${CSS.escape(r)}"]`); if (el) el.scrollIntoView({ behavior: "smooth", block: "center" }); }, 60); } }, r)));
+  const stepList = (steps) => h("ol", { class: "bridge-steps" }, steps.map(([n, label, refs, sub]) => h("li", null,
+    h("span", { class: "bridge-num" }, n), h("div", null, h("b", null, label), sub ? h("div", { class: "muted small" }, sub) : null, chips(refs)))));
+  const T = (x, y, txt, size, weight, fill, anchor) => `<text x="${x}" y="${y}" text-anchor="${anchor || "middle"}" font-size="${size}" font-weight="${weight || 700}" fill="${fill || "var(--bridge-label)"}" font-family="system-ui, sans-serif">${txt}</text>`;
+  const dot = (x, y, n) => `<g><circle cx="${x}" cy="${y}" r="13" fill="var(--ink)"/>${T(x, y + 5, n, 14, 800, "var(--paper)")}</g>`;
+
+  const bridgeSteps = [
+    ["1", "God made us and loves us", ["Genesis 1:1", "Genesis 1:27", "1 John 4:8", "John 3:16"]],
+    ["2", "All have sinned and are separated from God", ["Romans 3:23", "Isaiah 59:2"]],
+    ["3", "Sin leads to death and judgment", ["Romans 6:23", "Hebrews 9:27", "Revelation 21:8"]],
+    ["4", "Our own bridges fall short", ["Isaiah 64:6", "Romans 2:13", "Ephesians 2:8-9"], "Good deeds, good morals, education and religion cannot reach God."],
+    ["5", "Jesus Christ is the only bridge", ["John 14:6", "Acts 4:12", "1 Timothy 2:5", "Romans 5:6-8", "1 Peter 3:18", "1 Peter 2:24", "1 Corinthians 15:3-4"], "The gospel: Christ died for our sins, was buried, and rose from death."],
+    ["6", "Hear and believe — receive him", ["John 5:24", "John 1:12", "Revelation 3:20", "Romans 10:9-10"]],
+    ["7", "Be sure of eternal life", ["John 5:24", "1 John 5:11-12"], "You have eternal life (now), will not come into judgment (future), and have passed from death to life (past)."],
+  ];
+  const bridgeSvg = `<svg viewBox="0 0 560 300" role="img" aria-label="Bridge illustration: man on the cliff of eternal death, God on the cliff of eternal life, the chasm of hell between, broken bridges of good deeds, morals, education and religion, and the cross of Jesus as the only bridge">
+    <rect width="560" height="300" rx="16" fill="var(--bridge-sky)"/>
+    <path d="M0 132 H176 L196 300 H0Z" fill="var(--bridge-cliff)"/><path d="M560 132 H384 L364 300 H560Z" fill="var(--bridge-cliff)"/>
+    <path d="M196 300 L176 132 H384 L364 300Z" fill="var(--bridge-chasm)"/>
+    ${T(352, 286, "HELL", 13, 800, "var(--bridge-chasm-text)")}${T(352, 268, "(Revelation 21:8)", 10, 600, "var(--bridge-chasm-text)")}
+    ${[["GOOD DEEDS", 168], ["GOOD MORALS", 194], ["EDUCATION", 220], ["RELIGION", 246]].map(([t, y], i) => `<g transform="rotate(${22 + i * 5} 180 ${y})"><rect x="180" y="${y - 9}" width="${92 - i * 4}" height="18" rx="3" fill="#7a6a58"/><path d="M${272 - i * 4} ${y - 9} l8 9 l-8 9z" fill="var(--bridge-chasm)"/><text x="188" y="${y + 4}" font-size="10" font-weight="800" fill="#fff" font-family="system-ui, sans-serif">${t}</text></g>`).join("")}
+    <rect x="168" y="124" width="224" height="16" rx="3" fill="var(--bridge-cross)"/>
+    <rect x="272" y="44" width="16" height="82" rx="3" fill="var(--bridge-cross)"/><rect x="250" y="66" width="60" height="13" rx="3" fill="var(--bridge-cross)"/>
+    ${T(280, 136, "JOHN 14:6", 10, 800, "#fff")}
+    ${T(214, 116, "HEAR", 12, 800)}${T(346, 116, "BELIEVE", 12, 800)}
+    ${T(280, 32, "JESUS CHRIST — THE ONLY BRIDGE", 13, 800)}
+    ${T(84, 162, "MAN", 20, 800)}${T(84, 180, "Eternal death", 12, 600)}
+    ${T(476, 162, "GOD", 20, 800)}${T(476, 180, "Eternal life", 12, 600)}
+    <path d="M70 108 C 160 64, 400 64, 480 104" fill="none" stroke="var(--accent)" stroke-width="3" stroke-dasharray="6 6"/><path d="M480 104 l-13 -3 l7 11z" fill="var(--accent)"/>
+    ${dot(476, 108, "1")}${dot(84, 108, "2")}${dot(330, 230, "3")}${dot(150, 214, "4")}${dot(312, 92, "5")}${dot(200, 92, "6")}${dot(520, 140, "7")}
+  </svg>`;
+
+  const handSteps = [
+    ["👍", "Thumb · God loves you", ["1 John 4:8", "John 3:16"], "Gugma sa Dios"],
+    ["1", "Pointer · Man’s problem: sin", ["Romans 3:23", "Romans 6:23", "Hebrews 9:27", "Revelation 21:8"], "Ang problema sa tao — sala; padulngan sa makasasala"],
+    ["2", "Middle · God’s solution: Jesus Christ", ["John 14:6", "1 Corinthians 15:3-4", "Acts 4:12"], "Ang kasulbaran — Jesu-Kristo"],
+    ["3", "Ring · Receive Jesus Christ", ["John 1:12", "Revelation 3:20"], "Pag-angkon ni Jesu-Kristo — desisyon"],
+    ["4", "Little finger · Be sure of salvation", ["1 John 5:11-12", "Romans 10:9-10"], "Kasigurohan sa kaluwasan"],
+  ];
+  const finger = (x, y, w, hgt, rot, label, n) => `<g transform="rotate(${rot} ${x + w / 2} ${y + hgt})"><rect x="${x}" y="${y}" width="${w}" height="${hgt + 30}" rx="${w / 2}" fill="var(--hand-fill)" stroke="var(--bridge-label)" stroke-width="3"/>
+    <text transform="translate(${x + w / 2 + 4} ${y + hgt - 30}) rotate(-90)" font-size="11" font-weight="800" fill="var(--bridge-label)" font-family="system-ui, sans-serif">${label}</text>${dot(x + w / 2, y + 18, n).replace(/r="13"/, 'r="12"')}</g>`;
+  const handSvg = `<svg viewBox="0 0 560 360" role="img" aria-label="Hand illustration: thumb God loves you, pointer man's problem sin, middle finger Jesus Christ the solution, ring finger receive Christ, little finger assurance of salvation">
+    <rect width="560" height="360" rx="16" fill="var(--bridge-sky)"/>${T(280, 24, "GAMITON ANG KAMOT SA PAGSANGYAW SA MAAYONG BALITA", 10, 700)}
+    ${finger(150, 76, 50, 110, -16, "SIN", "1")}${finger(216, 46, 52, 140, -5, "JESUS", "2")}${finger(284, 58, 50, 128, 6, "RECEIVE", "3")}${finger(346, 96, 44, 100, 16, "SURE", "4")}
+    <g transform="rotate(38 430 250)"><rect x="404" y="140" width="52" height="140" rx="26" fill="var(--hand-fill)" stroke="var(--bridge-label)" stroke-width="3"/>
+      <text transform="translate(434 250) rotate(-90)" font-size="11" font-weight="800" fill="var(--bridge-label)" font-family="system-ui, sans-serif">GOD’S LOVE</text>${T(430, 168, "👍", 18, 400)}</g>
+    <path d="M140 200 C 140 170, 420 170, 430 210 L 420 300 C 400 345, 170 345, 150 300 Z" fill="var(--hand-fill)" stroke="var(--bridge-label)" stroke-width="3"/>
+    ${T(285, 250, "Share the good news", 15, 800)}${T(285, 270, "on one hand", 13, 600)}
+
+  </svg>`;
+
+  return collapseSec("mem-bridge", false, "Gospel illustrations", "Bridge or Hand · tap a verse to jump to it", null, () => h("div", { class: "bridge stack", style: "gap:12px" },
+    h("div", { class: "seg seg-wide", role: "group", "aria-label": "Illustration" }, ...[["bridge", "Bridge"], ["hand", "Hand"]].map(([k, l]) =>
+      h("button", { type: "button", "aria-pressed": mode === k ? "true" : "false", onclick: () => { S.witIllus = k; rerenderKeepScroll(); } }, l))),
+    mode === "bridge"
+      ? h("div", { class: "stack", style: "gap:12px" }, h("div", { class: "bridge-art", html: bridgeSvg }), stepList(bridgeSteps),
+          h("p", { class: "muted small", style: "margin:0" }, "Salvation is by Christ alone. Draw the two cliffs on paper, cross out the broken bridges, then draw the cross as you read each verse together."))
+      : h("div", { class: "stack", style: "gap:12px" }, h("div", { class: "bridge-art", html: handSvg }), stepList(handSteps),
+          h("p", { class: "muted small", style: "margin:0" }, "Hold up your hand and count the five points on your fingers. Easy to remember, easy to share anywhere."))));
+}
+
 function openMemRef(coll, ref) {
   const v = memFlat(coll).find(x => x.ref === ref); if (!v) return;
   const c = getColl(coll);
@@ -1501,9 +1538,10 @@ function openMemRef(coll, ref) {
 }
 
 function viewMemory(root) {
+  migrateWitnessKeys();
   if (!MEMORY) { root.append(h("div", { class: "loading" }, "Loading your memory verses…")); return; }
   const c = getColl(S.memColl) || collections()[0];
-  if (c.id !== "lamp2" && !BIBLE) {
+  if (!ownText(c) && !BIBLE) {
     root.append(h("div", { class: "loading" }, "Loading verses…"));
     loadBible().then(() => { if (S.tab === "memory") render(); }).catch(() => {});
     return;
@@ -1513,12 +1551,12 @@ function viewMemory(root) {
   root.append(h("div", { class: "seg seg-wide", role: "group", "aria-label": "Collection" },
     ...collections().map(x => h("button", { type: "button", "aria-pressed": x.id === c.id ? "true" : "false", onclick: () => { S.memColl = x.id; S.lampSec = "all"; S.lampStatus = "all"; render(); } }, x.id === "tms" ? "TMS" : x.name.replace(" Verses", "")))));
   root.append(h("div", { class: "panel stack", style: "gap:10px" },
-    h("div", null, h("b", { style: "font-family:var(--read);font-size:19px" }, c.name), h("span", { class: "chip", style: "margin-left:8px" }, c.id === "lamp2" ? c.translation : curVer())),
-    c.id !== "lamp2" ? h("div", { class: "row" }, h("span", { class: "muted small" }, "Bible version:"), versionSeg()) : null,
+    h("div", null, h("b", { style: "font-family:var(--read);font-size:19px" }, c.name), h("span", { class: "chip", style: "margin-left:8px" }, ownText(c) ? c.translation : curVer())),
+    !ownText(c) ? h("div", { class: "row" }, h("span", { class: "muted small" }, "Bible version:"), versionSeg()) : null,
     h("div", { class: "spread" }, h("span", null, h("b", null, mc), ` of ${flat.length} memorized`),
       h("button", { class: "btn sm primary", type: "button", onclick: () => { const set = memFiltered(c); if (!set.length) return toast("No verses match these filters"); openPractice(set.map(memCard), c.id === "tms" ? "TMS practice" : c.name + " practice"); } }, icon("play"), "Practice these")),
     h("div", { class: "progress" }, h("i", { style: `width:${(mc / flat.length * 100).toFixed(1)}%` }))));
-  if (c.id === "witness") root.append(bridgeIllustration());
+  if (c.id === "witness") root.append(gospelIllustrations());
   S.lampSec = "all";
   if (S.lampStatus !== "memorized") S.lampStatus = "all";
   const statuses = [["all", "All"], ["memorized", "Memorized"]];
@@ -1555,7 +1593,7 @@ function viewMemory(root) {
     });
   } else list.forEach(v => listEl.append(verseRow(v)));
   root.append(listEl);
-  if (c.id === "lamp2") root.append(h("p", { class: "muted small" }, NIV_NOTICE));
+  if (ownText(c)) root.append(h("p", { class: "muted small" }, NIV_NOTICE));
 }
 function memFiltered(c) {
   const week = new Set();
@@ -3597,7 +3635,7 @@ function viewReview(root) {
     if (!MEMORY) return h("span", { class: "muted small" }, "Open the Memory tab once to load your verses.");
     const all = collections().flatMap(c => memFlat(c.id)); const byKey = new Map(all.map(v => [v.key, v]));
     const names = st.mem.map(k => byKey.get(k)).filter(Boolean);
-    return names.length ? h("p", { style: "margin:0" }, names.map(v => `${v.coll === "lamp2" ? v.sec + v.n : v.coll === "tms" ? "TMS " + v.sec + v.n : "Witnessing " + v.n} ${v.ref}`).join(" · ")) : h("span", { class: "muted small" }, "Mark verses as memorized in the Memory tab.");
+    return names.length ? h("p", { style: "margin:0" }, names.map(v => `${v.coll === "lamp2" ? v.sec + v.n : v.coll === "lamp1" ? "Lamp 1 " + v.sec + v.n : v.coll === "tms" ? "TMS " + v.sec + v.n : "Witnessing " + v.n} ${v.ref}`).join(" · ")) : h("span", { class: "muted small" }, "Mark verses as memorized in the Memory tab.");
   }));
   // reflection
   const id = "review-" + R.key, existing = S.notes.find(n => n.id === id);
