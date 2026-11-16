@@ -1,4 +1,4 @@
-const CACHE = "adwj-v10";
+const CACHE = "adwj-v11";
 const ASSETS = ["./", "index.html", "kjv.json", "bsb.json", "asv.json", "memory.json", "devotionals.json", "stories.json",
   "vendor/firebase-app-compat.js", "vendor/firebase-auth-compat.js", "vendor/firebase-firestore-compat.js", "vendor/qrcode.js", "manifest.webmanifest", "favicon.svg", "favicon.ico", "icons/favicon-32.png", "config.js",
   "icons/icon-192.png", "icons/icon-512.png", "icons/maskable-512.png", "icons/apple-touch-icon.png"];
@@ -11,8 +11,9 @@ self.addEventListener("activate", (e) => {
 self.addEventListener("fetch", (e) => {
   const req = e.request;
   if (req.method !== "GET" || new URL(req.url).origin !== self.location.origin) return;
-  if (req.mode === "navigate" || new URL(req.url).pathname.endsWith("/config.js")) {
-    const key = req.mode === "navigate" ? "index.html" : "config.js";
+  const path = new URL(req.url).pathname;
+  if (req.mode === "navigate" || path.endsWith("/config.js") || path.endsWith("/manifest.webmanifest")) {
+    const key = req.mode === "navigate" ? "index.html" : path.endsWith("/config.js") ? "config.js" : "manifest.webmanifest";
     e.respondWith(fetch(req).then((res) => { if (res.ok) { const copy = res.clone(); caches.open(CACHE).then((c) => c.put(key, copy)); } return res; })
       .catch(() => caches.match(key)));
     return;
