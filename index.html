@@ -4170,8 +4170,6 @@ function enterReading() {
       h("button", { class: "rd-b", type: "button", onclick: () => step(1) }, lbl[1], icon("right"))));
   document.body.append(ctrl);
   try { history.pushState({ rd: 1 }, ""); } catch {}
-  const el = document.documentElement;
-  try { const r = (el.requestFullscreen || el.webkitRequestFullscreen); if (r) { const pr = r.call(el); if (pr && pr.catch) pr.catch(() => {}); } } catch {}
   window.scrollTo(0, 0); rdWake();
 }
 function exitReading(fromNav) {
@@ -4179,11 +4177,9 @@ function exitReading(fromNav) {
   S.reading = false; clearTimeout(rdTimer);
   document.body.classList.remove("reading");
   const c = $("#rd-ctrl"); if (c) c.remove();
-  try { if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(() => {}); else if (document.webkitFullscreenElement && document.webkitExitFullscreen) document.webkitExitFullscreen(); } catch {}
   if (!fromNav && history.state && history.state.rd) { S.rdPopping = true; history.back(); }
 }
 window.addEventListener("popstate", () => { if (S.rdPopping) { S.rdPopping = false; return; } if (S.reading) exitReading(true); });
-document.addEventListener("fullscreenchange", () => { if (!document.fullscreenElement && S.reading && S.rdFs) exitReading(); S.rdFs = !!document.fullscreenElement; });
 document.addEventListener("keydown", (e) => { if (e.key === "Escape" && S.reading) exitReading(); });
 document.addEventListener("click", (e) => { if (!S.reading || e.target.closest(".fs-btn")) return; if (e.target.closest("#rd-ctrl") || e.target.closest(".selbar") || e.target.closest("#layer")) { rdWake(); return; }
   const c = $("#rd-ctrl"); if (!c) return; if (c.classList.contains("idle")) rdWake(); else { clearTimeout(rdTimer); c.classList.add("idle"); } });
